@@ -1,0 +1,24 @@
+[package]
+name = "lizhisim"
+description = "A Japanese (Riichi) mahjong game simulator."
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme = "README.md"
+repository.workspace = true
+categories.workspace = true
+keywords.workspace = true
+
+[[bin]]
+name = "lizhisim"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.86"
+arraydeque = "0.5.1"
+arrayvec = "0.7.4"
+hashbrown = "0.14.5"
+mt19937 = "2.0.1"
+rand = " 0.8.5"
+thiserror = "1.0.63"

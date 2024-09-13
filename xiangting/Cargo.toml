@@ -1,0 +1,27 @@
+[package]
+name = "xiangting"
+description = "A library for calculation of deficiency number (a.k.a. xiangting (向聴) number)."
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme = "README.md"
+repository.workspace = true
+categories.workspace = true
+keywords.workspace = true
+
+[lib]
+name = "xiangting"
+path = "src/lib.rs"
+
+[dependencies]
+bitvec = "1.0.1"
+thiserror = "1.0.63"
+
+[dev-dependencies]
+criterion = "0.5.1"
+random-hand = { path = "../common/random-hand" }
+
+[[bench]]
+name = "benchmark"
+harness = false
