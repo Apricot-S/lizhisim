@@ -10,4 +10,4 @@ A Japanese (Riichi) mahjong game simulator.
 
 Copyright (c) Apricot S. All rights reserved.
 
-This repository is licensed under the [MIT license](LICENSE).
+Licensed under the [MIT license](LICENSE).
