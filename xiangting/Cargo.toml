@@ -23,9 +23,5 @@ criterion = "0.5.1"
 random-hand = { path = "../common/random-hand" }
 
 [[bench]]
-name = "empty"
-harness = false
-
-[[bench]]
-name = "calculate"
+name = "bench"
 harness = false
