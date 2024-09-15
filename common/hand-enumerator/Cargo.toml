@@ -13,7 +13,3 @@ keywords.workspace = true
 [lib]
 name = "hand_enumerator"
 path = "src/lib.rs"
-
-[[bin]]
-name = "hand-enumerator"
-path = "src/main.rs"
