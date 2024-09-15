@@ -120,18 +120,8 @@ fn count_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziGulipaiP
 
     let mut max = count_mianzi_dazi_gulipai(bingpai, n + 1);
 
-    if (n <= 6) && (bingpai[n] > 0) && (bingpai[n + 1] > 0) && (bingpai[n + 2] > 0) {
-        bingpai[n] -= 1;
-        bingpai[n + 1] -= 1;
-        bingpai[n + 2] -= 1;
-        let mut r = count_mianzi_dazi_gulipai(bingpai, n);
-        bingpai[n] += 1;
-        bingpai[n + 1] += 1;
-        bingpai[n + 2] += 1;
-
-        r.a.num_mianzi += 1;
-        r.b.num_mianzi += 1;
-
+    #[inline]
+    fn update_max(max: &mut MianziDaziGulipaiPattern, r: MianziDaziGulipaiPattern) {
         if (r.a.num_gulipai < max.a.num_gulipai)
             || (r.a.num_gulipai == max.a.num_gulipai) && (r.a.num_dazi < max.a.num_dazi)
         {
@@ -144,6 +134,21 @@ fn count_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziGulipaiP
         }
     }
 
+    if (n <= 6) && (bingpai[n] > 0) && (bingpai[n + 1] > 0) && (bingpai[n + 2] > 0) {
+        bingpai[n] -= 1;
+        bingpai[n + 1] -= 1;
+        bingpai[n + 2] -= 1;
+        let mut r = count_mianzi_dazi_gulipai(bingpai, n);
+        bingpai[n] += 1;
+        bingpai[n + 1] += 1;
+        bingpai[n + 2] += 1;
+
+        r.a.num_mianzi += 1;
+        r.b.num_mianzi += 1;
+
+        update_max(&mut max, r);
+    }
+
     if bingpai[n] >= 3 {
         bingpai[n] -= 3;
         let mut r = count_mianzi_dazi_gulipai(bingpai, n);
@@ -152,16 +157,7 @@ fn count_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziGulipaiP
         r.a.num_mianzi += 1;
         r.b.num_mianzi += 1;
 
-        if (r.a.num_gulipai < max.a.num_gulipai)
-            || (r.a.num_gulipai == max.a.num_gulipai) && (r.a.num_dazi < max.a.num_dazi)
-        {
-            max.a = r.a;
-        }
-        if (r.b.num_mianzi > max.b.num_mianzi)
-            || (r.b.num_mianzi == max.b.num_mianzi) && (r.b.num_dazi > max.b.num_dazi)
-        {
-            max.b = r.b;
-        }
+        update_max(&mut max, r);
     }
 
     max
