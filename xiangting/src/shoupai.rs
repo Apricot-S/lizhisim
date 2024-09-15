@@ -61,9 +61,10 @@ pub(super) fn validate_shoupai(
 
     let mut shoupai = *bingpai;
     let fulupai = count_fulupai(fulu_mianzi);
-    for (s, &f) in shoupai.iter_mut().zip(fulupai.iter()) {
-        *s += f;
-    }
+    shoupai
+        .iter_mut()
+        .zip(fulupai.iter())
+        .for_each(|(s, &f)| *s += f);
 
     let num_shoupai = shoupai.iter().try_fold(0, |acc, &num_tile| {
         if num_tile > MAX_NUM_SAME_TILE {
