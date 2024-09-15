@@ -1,3 +1,3 @@
-mod generate_hand;
+mod hand_enumerator;
 
-pub use generate_hand::generate_all_pure_hand;
+pub use hand_enumerator::HandEnumerator;

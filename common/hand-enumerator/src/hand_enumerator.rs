@@ -1,10 +1,10 @@
-use std::collections::VecDeque;
+use std::{cell::Cell, rc::Rc};
 
 pub struct HandEnumerator {
-    length: usize,
-    tiles: [u8; 34],
+    tiles: Vec<usize>,
     current_hand: Vec<u8>,
-    stack: VecDeque<(usize, usize)>,
+    stack: Vec<(usize, Rc<Cell<usize>>)>,
+    length: usize,
 }
 
 impl HandEnumerator {
@@ -14,10 +14,10 @@ impl HandEnumerator {
         }
 
         Ok(Self {
+            tiles: vec![4; 34],
+            current_hand: Vec::new(),
+            stack: vec![(0, Rc::new(Cell::new(0)))],
             length,
-            tiles: [4; 34],
-            current_hand: Vec::with_capacity(length),
-            stack: VecDeque::from([(0usize, 0usize)]),
         })
     }
 }
@@ -26,30 +26,38 @@ impl Iterator for HandEnumerator {
     type Item = Vec<u8>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        print!("stack: {:?}, ", self.stack);
-        while let Some((i, start)) = self.stack.pop_front() {
+        while let Some((start, i)) = self.stack.last().cloned() {
             if self.current_hand.len() == self.length {
-                let hand = self.current_hand.clone();
-                self.current_hand.clear();
-                self.stack.push_back((i, start + 1));
-                return Some(hand);
+                let result = self.current_hand.clone();
+                // バックトラック処理
+                self.stack.pop();
+                if let Some(last_tile) = self.current_hand.pop() {
+                    self.tiles[last_tile as usize] += 1;
+                }
+                return Some(result);
             }
 
-            let mut found = false;
-            for j in start..34 {
-                if self.tiles[j] > 0 {
-                    self.tiles[j] -= 1;
-                    self.current_hand.push(j as u8);
-                    self.stack.push_back((i, j));
-                    found = true;
-                    break;
+            if i.get() >= 34 {
+                // このレベルでのループ終了、バックトラック
+                self.stack.pop();
+                if let Some(last_tile) = self.current_hand.pop() {
+                    self.tiles[last_tile as usize] += 1;
                 }
+                continue;
             }
 
-            if !found {
-                if let Some(last) = self.current_hand.pop() {
-                    self.tiles[last as usize] += 1;
-                }
+            if self.tiles[i.get()] > 0 {
+                // タイルを選択
+                self.tiles[i.get()] -= 1;
+                self.current_hand.push(i.get() as u8);
+
+                // 新しいフレームをスタックにプッシュ（再帰呼び出しのシミュレーション）
+                self.stack.push((i.get(), Rc::new(Cell::new(i.get()))));
+                // 現在のフレームのインデックスを更新
+                i.set(i.get() + 1);
+            } else {
+                // 次のタイルへ
+                i.set(i.get() + 1);
             }
         }
 
