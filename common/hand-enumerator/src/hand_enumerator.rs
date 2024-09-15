@@ -31,7 +31,7 @@ impl Iterator for HandEnumerator {
         while let Some(i) = self.stack.pop() {
             if self.current_hand.len() == self.length {
                 let result = self.current_hand.clone();
-                // バックトラック処理
+                // Backtrack
                 if let Some(last_tile) = self.current_hand.pop() {
                     self.tiles[last_tile as usize] += 1;
                 }
@@ -39,7 +39,7 @@ impl Iterator for HandEnumerator {
             }
 
             if i >= NUM_TILE_INDEX {
-                // このレベルでのループ終了、バックトラック
+                // End the loop at this level and backtrack
                 if let Some(last_tile) = self.current_hand.pop() {
                     self.tiles[last_tile as usize] += 1;
                 }
@@ -47,16 +47,16 @@ impl Iterator for HandEnumerator {
             }
 
             if self.tiles[i] > 0 {
-                // タイルを選択
+                // Select tile
                 self.tiles[i] -= 1;
                 self.current_hand.push(i as u8);
 
-                // 現在のフレームのインデックスを更新
+                // Update the index of the current frame
                 self.stack.push(i + 1);
-                // 新しいフレームをスタックにプッシュ（再帰呼び出しのシミュレーション）
+                // Push a new frame to the stack (simulate recursive call)
                 self.stack.push(i);
             } else {
-                // 次のタイルへ
+                // Move to the next tile
                 self.stack.push(i + 1);
             }
         }
