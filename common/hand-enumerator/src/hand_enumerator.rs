@@ -101,10 +101,10 @@ mod test {
             (hand, count + 1)
         });
 
-        let end = start.elapsed();
+        let elapsed_time = start.elapsed();
         println!(
             "Time elapsed in generating hands (length = {}) is: {:?}",
-            length, end,
+            length, elapsed_time,
         );
 
         assert_eq!(first_hand, expected_first);
