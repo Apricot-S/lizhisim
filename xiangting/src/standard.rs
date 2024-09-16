@@ -347,11 +347,11 @@ pub(crate) fn calculate_replacement_number(
 
     // Remove a possible pair and calculate the replacement number with a pair
     for n in 0..NUM_TILE_INDEX {
-        if bingpai[n] >= 2 {
-            bingpai[n] -= 2;
+        if bingpai.has_duizi(n) {
+            bingpai.remove_duizi(n);
             let replacement_number =
                 calculate_replacement_number_inner(&mut bingpai, num_bingpai, true);
-            bingpai[n] += 2;
+            bingpai.restore_duizi(n);
             if replacement_number < min {
                 min = replacement_number;
             }
