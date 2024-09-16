@@ -315,15 +315,15 @@ fn calculate_replacement_number_inner(
                 let num_dazi = m.num_dazi + p.num_dazi + s.num_dazi + z.num_dazi;
                 let num_gulipai = m.num_gulipai + p.num_gulipai + s.num_gulipai + z.num_gulipai;
 
-                let replacement_number = calculate_replacement_number_formula(
+                let temp = calculate_replacement_number_formula(
                     num_mianzi,
                     num_dazi,
                     num_gulipai,
                     has_jiangpai,
                 );
 
-                if replacement_number < min {
-                    min = replacement_number;
+                if temp < min {
+                    min = temp;
                 }
             }
         }
@@ -349,11 +349,11 @@ pub(crate) fn calculate_replacement_number(
     for n in 0..NUM_TILE_INDEX {
         if bingpai.has_duizi(n) {
             bingpai.remove_duizi(n);
-            let replacement_number =
-                calculate_replacement_number_inner(&mut bingpai, num_bingpai, true);
+            let temp = calculate_replacement_number_inner(&mut bingpai, num_bingpai, true);
             bingpai.restore_duizi(n);
-            if replacement_number < min {
-                min = replacement_number;
+
+            if temp < min {
+                min = temp;
             }
         }
     }
