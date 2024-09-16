@@ -163,16 +163,8 @@ fn count_shupai_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziG
     max
 }
 
-fn calculate_replacement_number_inner(
-    bingpai: &mut Bingpai,
-    num_bingpai: u8,
-    has_jiangpai: bool,
-) -> u8 {
-    let r_wanzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[0..9], 0);
-    let r_bingzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[9..18], 0);
-    let r_suozi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[18..27], 0);
-
-    let z = bingpai[27..34].iter().fold(
+fn count_zipai_mianzi_dazi_gulipai(bingpai: &[u8]) -> MianziDaziGulipai {
+    bingpai.iter().fold(
         MianziDaziGulipai {
             num_mianzi: 0,
             num_dazi: 0,
@@ -188,7 +180,18 @@ fn calculate_replacement_number_inner(
             }
             acc
         },
-    );
+    )
+}
+
+fn calculate_replacement_number_inner(
+    bingpai: &mut Bingpai,
+    num_bingpai: u8,
+    has_jiangpai: bool,
+) -> u8 {
+    let r_wanzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[0..9], 0);
+    let r_bingzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[9..18], 0);
+    let r_suozi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[18..27], 0);
+    let z = count_zipai_mianzi_dazi_gulipai(&bingpai[27..34]);
 
     let num_fulu = match num_bingpai {
         12..=14 => 0,
