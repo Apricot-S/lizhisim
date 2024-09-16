@@ -235,8 +235,10 @@ pub(crate) fn calculate_replacement_number(
         _ => unimplemented!("Shanten number calculation including melds is not yet supported."),
     }
 
+    // Calculate the replacement number without a pair
     let mut min = calculate_replacement_number_inner(&mut bingpai, num_bingpai, false);
 
+    // Remove a possible pair and calculate the replacement number with a pair
     for n in 0..NUM_TILE_INDEX {
         if bingpai[n] >= 2 {
             bingpai[n] -= 2;
