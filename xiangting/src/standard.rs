@@ -81,7 +81,7 @@ fn calculate_replacement_number_formula(
     14 - num_mianzi * 3 - num_dazi * 2 - num_gulipai
 }
 
-fn count_dazi_gulipai(bingpai: &[u8]) -> MianziDaziGulipaiPattern {
+fn count_shupai_dazi_gulipai(bingpai: &[u8]) -> MianziDaziGulipaiPattern {
     let mut num_tile: u8 = 0;
     let mut num_dazi: u8 = 0;
     let mut num_gulipai: u8 = 0;
@@ -113,12 +113,12 @@ fn count_dazi_gulipai(bingpai: &[u8]) -> MianziDaziGulipaiPattern {
     }
 }
 
-fn count_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziGulipaiPattern {
+fn count_shupai_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziGulipaiPattern {
     if n > 8 {
-        return count_dazi_gulipai(bingpai);
+        return count_shupai_dazi_gulipai(bingpai);
     }
 
-    let mut max = count_mianzi_dazi_gulipai(bingpai, n + 1);
+    let mut max = count_shupai_mianzi_dazi_gulipai(bingpai, n + 1);
 
     #[inline]
     fn update_max(max: &mut MianziDaziGulipaiPattern, r: MianziDaziGulipaiPattern) {
@@ -138,7 +138,7 @@ fn count_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziGulipaiP
         bingpai[n] -= 1;
         bingpai[n + 1] -= 1;
         bingpai[n + 2] -= 1;
-        let mut r = count_mianzi_dazi_gulipai(bingpai, n);
+        let mut r = count_shupai_mianzi_dazi_gulipai(bingpai, n);
         bingpai[n] += 1;
         bingpai[n + 1] += 1;
         bingpai[n + 2] += 1;
@@ -151,7 +151,7 @@ fn count_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziGulipaiP
 
     if bingpai[n] >= 3 {
         bingpai[n] -= 3;
-        let mut r = count_mianzi_dazi_gulipai(bingpai, n);
+        let mut r = count_shupai_mianzi_dazi_gulipai(bingpai, n);
         bingpai[n] += 3;
 
         r.a.num_mianzi += 1;
@@ -168,9 +168,9 @@ fn calculate_replacement_number_inner(
     num_bingpai: u8,
     has_jiangpai: bool,
 ) -> u8 {
-    let r_wanzi = count_mianzi_dazi_gulipai(&mut bingpai[0..9], 0);
-    let r_bingzi = count_mianzi_dazi_gulipai(&mut bingpai[9..18], 0);
-    let r_suozi = count_mianzi_dazi_gulipai(&mut bingpai[18..27], 0);
+    let r_wanzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[0..9], 0);
+    let r_bingzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[9..18], 0);
+    let r_suozi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[18..27], 0);
 
     let z = bingpai[27..34].iter().fold(
         MianziDaziGulipai {
@@ -268,7 +268,7 @@ mod test {
     #[test]
     fn count_dazi_gulipai_works() {
         let bingpai = [0, 2, 0, 2, 1, 0, 0, 1, 1];
-        let r = count_dazi_gulipai(&bingpai);
+        let r = count_shupai_dazi_gulipai(&bingpai);
         assert_eq!(r.a.num_mianzi, 0);
         assert_eq!(r.a.num_dazi, 3);
         assert_eq!(r.a.num_gulipai, 1);
@@ -280,7 +280,7 @@ mod test {
     #[test]
     fn count_mianzi_dazi_gulipai_works() {
         let mut bingpai = [1, 0, 3, 1, 2, 1, 0, 1, 0];
-        let r = count_mianzi_dazi_gulipai(&mut bingpai, 0);
+        let r = count_shupai_mianzi_dazi_gulipai(&mut bingpai, 0);
         assert_eq!(r.a.num_mianzi, 1);
         assert_eq!(r.a.num_dazi, 3);
         assert_eq!(r.a.num_gulipai, 0);
