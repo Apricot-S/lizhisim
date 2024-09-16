@@ -4,15 +4,111 @@ use super::mianzi::Mianzi;
 use super::shoupai::count_fulupai;
 use bitvec::prelude::*;
 
-struct MianziDaziGulipai {
-    num_mianzi: u8,
-    num_dazi: u8,
-    num_gulipai: u8,
+trait BingpaiExt {
+    fn has_liangmen_dazi(&self, n: usize) -> bool;
+    fn remove_liangmen_dazi(&mut self, n: usize);
+    fn restore_liangmen_dazi(&mut self, n: usize);
+
+    fn has_qianzhang_dazi(&self, n: usize) -> bool;
+    fn remove_qianzhang_dazi(&mut self, n: usize);
+    fn restore_qianzhang_dazi(&mut self, n: usize);
+
+    fn has_shunzi(&self, n: usize) -> bool;
+    fn remove_shunzi(&mut self, n: usize);
+    fn restore_shunzi(&mut self, n: usize);
+
+    fn has_duizi(&self, n: usize) -> bool;
+    fn remove_duizi(&mut self, n: usize);
+    fn restore_duizi(&mut self, n: usize);
+
+    fn has_kezi(&self, n: usize) -> bool;
+    fn remove_kezi(&mut self, n: usize);
+    fn restore_kezi(&mut self, n: usize);
 }
 
-struct MianziDaziGulipaiPattern {
-    a: MianziDaziGulipai,
-    b: MianziDaziGulipai,
+impl BingpaiExt for [u8] {
+    #[inline]
+    fn has_liangmen_dazi(&self, n: usize) -> bool {
+        (self[n] > 0) && (self[n + 1] > 0)
+    }
+
+    #[inline]
+    fn remove_liangmen_dazi(&mut self, n: usize) {
+        self[n] -= 1;
+        self[n + 1] -= 1;
+    }
+
+    #[inline]
+    fn restore_liangmen_dazi(&mut self, n: usize) {
+        self[n] += 1;
+        self[n + 1] += 1;
+    }
+
+    #[inline]
+    fn has_qianzhang_dazi(&self, n: usize) -> bool {
+        (self[n] > 0) && (self[n + 2] > 0)
+    }
+
+    #[inline]
+    fn remove_qianzhang_dazi(&mut self, n: usize) {
+        self[n] -= 1;
+        self[n + 2] -= 1;
+    }
+
+    #[inline]
+    fn restore_qianzhang_dazi(&mut self, n: usize) {
+        self[n] += 1;
+        self[n + 2] += 1;
+    }
+
+    #[inline]
+    fn has_shunzi(&self, n: usize) -> bool {
+        (self[n] > 0) && (self[n + 1] > 0) && (self[n + 2] > 0)
+    }
+
+    #[inline]
+    fn remove_shunzi(&mut self, n: usize) {
+        self[n] -= 1;
+        self[n + 1] -= 1;
+        self[n + 2] -= 1;
+    }
+
+    #[inline]
+    fn restore_shunzi(&mut self, n: usize) {
+        self[n] += 1;
+        self[n + 1] += 1;
+        self[n + 2] += 1;
+    }
+
+    #[inline]
+    fn has_duizi(&self, n: usize) -> bool {
+        self[n] >= 2
+    }
+
+    #[inline]
+    fn remove_duizi(&mut self, n: usize) {
+        self[n] -= 2;
+    }
+
+    #[inline]
+    fn restore_duizi(&mut self, n: usize) {
+        self[n] += 2;
+    }
+
+    #[inline]
+    fn has_kezi(&self, n: usize) -> bool {
+        self[n] >= 3
+    }
+
+    #[inline]
+    fn remove_kezi(&mut self, n: usize) {
+        self[n] -= 3;
+    }
+
+    #[inline]
+    fn restore_kezi(&mut self, n: usize) {
+        self[n] += 3;
+    }
 }
 
 type TileFlag = BitArr!(for NUM_TILE_INDEX);
@@ -81,6 +177,17 @@ fn calculate_replacement_number_formula(
     14 - num_mianzi * 3 - num_dazi * 2 - num_gulipai
 }
 
+struct MianziDaziGulipai {
+    num_mianzi: u8,
+    num_dazi: u8,
+    num_gulipai: u8,
+}
+
+struct MianziDaziGulipaiPattern {
+    a: MianziDaziGulipai,
+    b: MianziDaziGulipai,
+}
+
 fn count_shupai_dazi_gulipai(bingpai: &[u8]) -> MianziDaziGulipaiPattern {
     let mut num_tile: u8 = 0;
     let mut num_dazi: u8 = 0;
@@ -134,14 +241,10 @@ fn count_shupai_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziG
         }
     }
 
-    if (n <= 6) && (bingpai[n] > 0) && (bingpai[n + 1] > 0) && (bingpai[n + 2] > 0) {
-        bingpai[n] -= 1;
-        bingpai[n + 1] -= 1;
-        bingpai[n + 2] -= 1;
+    if (n <= 6) && bingpai.has_shunzi(n) {
+        bingpai.remove_shunzi(n);
         let mut r = count_shupai_mianzi_dazi_gulipai(bingpai, n);
-        bingpai[n] += 1;
-        bingpai[n + 1] += 1;
-        bingpai[n + 2] += 1;
+        bingpai.restore_shunzi(n);
 
         r.a.num_mianzi += 1;
         r.b.num_mianzi += 1;
@@ -149,10 +252,10 @@ fn count_shupai_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziG
         update_max(&mut max, r);
     }
 
-    if bingpai[n] >= 3 {
-        bingpai[n] -= 3;
+    if bingpai.has_kezi(n) {
+        bingpai.remove_kezi(n);
         let mut r = count_shupai_mianzi_dazi_gulipai(bingpai, n);
-        bingpai[n] += 3;
+        bingpai.restore_kezi(n);
 
         r.a.num_mianzi += 1;
         r.b.num_mianzi += 1;
