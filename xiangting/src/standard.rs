@@ -188,11 +188,6 @@ fn calculate_replacement_number_inner(
     num_bingpai: u8,
     has_jiangpai: bool,
 ) -> u8 {
-    let r_wanzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[0..9], 0);
-    let r_bingzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[9..18], 0);
-    let r_suozi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[18..27], 0);
-    let z = count_zipai_mianzi_dazi_gulipai(&bingpai[27..34]);
-
     let num_fulu = match num_bingpai {
         12..=14 => 0,
         9..=11 => 1,
@@ -201,6 +196,11 @@ fn calculate_replacement_number_inner(
         1..=2 => 4,
         _ => panic!("Invalid hand."),
     };
+
+    let z = count_zipai_mianzi_dazi_gulipai(&bingpai[27..34]);
+    let r_wanzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[0..9], 0);
+    let r_bingzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[9..18], 0);
+    let r_suozi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[18..27], 0);
 
     let mut min = 14;
 
@@ -218,6 +218,7 @@ fn calculate_replacement_number_inner(
                     num_gulipai,
                     has_jiangpai,
                 );
+
                 if replacement_number < min {
                     min = replacement_number;
                 }
