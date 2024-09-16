@@ -177,18 +177,18 @@ fn calculate_replacement_number_formula(
     14 - num_mianzi * 3 - num_dazi * 2 - num_gulipai
 }
 
-struct MianziDaziGulipai {
+struct TileGroupCount {
     num_mianzi: u8,
     num_dazi: u8,
     num_gulipai: u8,
 }
 
-struct MianziDaziGulipaiPattern {
-    a: MianziDaziGulipai,
-    b: MianziDaziGulipai,
+struct TileGroupCountPattern {
+    a: TileGroupCount,
+    b: TileGroupCount,
 }
 
-fn count_shupai_dazi_gulipai(bingpai: &[u8]) -> MianziDaziGulipaiPattern {
+fn count_shupai_dazi_gulipai(bingpai: &[u8]) -> TileGroupCountPattern {
     let mut num_tile: u8 = 0;
     let mut num_dazi: u8 = 0;
     let mut num_gulipai: u8 = 0;
@@ -206,13 +206,13 @@ fn count_shupai_dazi_gulipai(bingpai: &[u8]) -> MianziDaziGulipaiPattern {
     num_dazi += num_tile >> 1;
     num_gulipai += num_tile % 2;
 
-    MianziDaziGulipaiPattern {
-        a: MianziDaziGulipai {
+    TileGroupCountPattern {
+        a: TileGroupCount {
             num_mianzi: 0,
             num_dazi,
             num_gulipai,
         },
-        b: MianziDaziGulipai {
+        b: TileGroupCount {
             num_mianzi: 0,
             num_dazi,
             num_gulipai,
@@ -220,15 +220,15 @@ fn count_shupai_dazi_gulipai(bingpai: &[u8]) -> MianziDaziGulipaiPattern {
     }
 }
 
-fn count_shupai_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziGulipaiPattern {
+fn count_shupai_tile_group(bingpai: &mut [u8], n: usize) -> TileGroupCountPattern {
     if n > 8 {
         return count_shupai_dazi_gulipai(bingpai);
     }
 
-    let mut max = count_shupai_mianzi_dazi_gulipai(bingpai, n + 1);
+    let mut max = count_shupai_tile_group(bingpai, n + 1);
 
     #[inline]
-    fn update_max(max: &mut MianziDaziGulipaiPattern, r: MianziDaziGulipaiPattern) {
+    fn update_max(max: &mut TileGroupCountPattern, r: TileGroupCountPattern) {
         if (r.a.num_gulipai < max.a.num_gulipai)
             || (r.a.num_gulipai == max.a.num_gulipai) && (r.a.num_dazi < max.a.num_dazi)
         {
@@ -243,7 +243,7 @@ fn count_shupai_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziG
 
     if (n <= 6) && bingpai.has_shunzi(n) {
         bingpai.remove_shunzi(n);
-        let mut r = count_shupai_mianzi_dazi_gulipai(bingpai, n);
+        let mut r = count_shupai_tile_group(bingpai, n);
         bingpai.restore_shunzi(n);
 
         r.a.num_mianzi += 1;
@@ -254,7 +254,7 @@ fn count_shupai_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziG
 
     if bingpai.has_kezi(n) {
         bingpai.remove_kezi(n);
-        let mut r = count_shupai_mianzi_dazi_gulipai(bingpai, n);
+        let mut r = count_shupai_tile_group(bingpai, n);
         bingpai.restore_kezi(n);
 
         r.a.num_mianzi += 1;
@@ -266,9 +266,9 @@ fn count_shupai_mianzi_dazi_gulipai(bingpai: &mut [u8], n: usize) -> MianziDaziG
     max
 }
 
-fn count_zipai_mianzi_dazi_gulipai(bingpai: &[u8]) -> MianziDaziGulipai {
+fn count_zipai_tile_group(bingpai: &[u8]) -> TileGroupCount {
     bingpai.iter().fold(
-        MianziDaziGulipai {
+        TileGroupCount {
             num_mianzi: 0,
             num_dazi: 0,
             num_gulipai: 0,
@@ -300,16 +300,16 @@ fn calculate_replacement_number_inner(
         _ => panic!("Invalid hand."),
     };
 
-    let z = count_zipai_mianzi_dazi_gulipai(&bingpai[27..34]);
-    let r_wanzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[0..9], 0);
-    let r_bingzi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[9..18], 0);
-    let r_suozi = count_shupai_mianzi_dazi_gulipai(&mut bingpai[18..27], 0);
+    let z = count_zipai_tile_group(&bingpai[27..34]);
+    let count_pattern_wanzi = count_shupai_tile_group(&mut bingpai[0..9], 0);
+    let count_pattern_bingzi = count_shupai_tile_group(&mut bingpai[9..18], 0);
+    let count_pattern_suozi = count_shupai_tile_group(&mut bingpai[18..27], 0);
 
     let mut min = 14;
 
-    for m in [&r_wanzi.a, &r_wanzi.b] {
-        for p in [&r_bingzi.a, &r_bingzi.b] {
-            for s in [&r_suozi.a, &r_suozi.b] {
+    for m in [&count_pattern_wanzi.a, &count_pattern_wanzi.b] {
+        for p in [&count_pattern_bingzi.a, &count_pattern_bingzi.b] {
+            for s in [&count_pattern_suozi.a, &count_pattern_suozi.b] {
                 let num_mianzi =
                     num_fulu + m.num_mianzi + p.num_mianzi + s.num_mianzi + z.num_mianzi;
                 let num_dazi = m.num_dazi + p.num_dazi + s.num_dazi + z.num_dazi;
@@ -389,7 +389,7 @@ mod test {
     #[test]
     fn count_mianzi_dazi_gulipai_works() {
         let mut bingpai = [1, 0, 3, 1, 2, 1, 0, 1, 0];
-        let r = count_shupai_mianzi_dazi_gulipai(&mut bingpai, 0);
+        let r = count_shupai_tile_group(&mut bingpai, 0);
         assert_eq!(r.a.num_mianzi, 1);
         assert_eq!(r.a.num_dazi, 3);
         assert_eq!(r.a.num_gulipai, 0);
