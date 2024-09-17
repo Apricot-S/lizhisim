@@ -5,30 +5,28 @@ use thiserror::Error;
 
 pub(super) fn count_fulupai(fulu_mianzi: &[Option<Mianzi>; MAX_NUM_FULU_MIANZI]) -> Bingpai {
     let mut fulupai: Bingpai = [0; NUM_TILE_INDEX];
-    for m in fulu_mianzi {
-        match m {
-            Some(Mianzi::Shunzi(tile, position)) => {
-                fulupai[*tile as usize] += 1;
-                match position {
-                    ClaimedTilePosition::Low => {
-                        fulupai[(*tile + 1) as usize] += 1;
-                        fulupai[(*tile + 2) as usize] += 1;
-                    }
-                    ClaimedTilePosition::Middle => {
-                        fulupai[(*tile - 1) as usize] += 1;
-                        fulupai[(*tile + 1) as usize] += 1;
-                    }
-                    ClaimedTilePosition::High => {
-                        fulupai[(*tile - 2) as usize] += 1;
-                        fulupai[(*tile - 1) as usize] += 1;
-                    }
+    fulu_mianzi.iter().for_each(|m| match m {
+        Some(Mianzi::Shunzi(tile, position)) => {
+            fulupai[*tile as usize] += 1;
+            match position {
+                ClaimedTilePosition::Low => {
+                    fulupai[(*tile + 1) as usize] += 1;
+                    fulupai[(*tile + 2) as usize] += 1;
+                }
+                ClaimedTilePosition::Middle => {
+                    fulupai[(*tile - 1) as usize] += 1;
+                    fulupai[(*tile + 1) as usize] += 1;
+                }
+                ClaimedTilePosition::High => {
+                    fulupai[(*tile - 2) as usize] += 1;
+                    fulupai[(*tile - 1) as usize] += 1;
                 }
             }
-            Some(Mianzi::Kezi(tile)) => fulupai[*tile as usize] += 3,
-            Some(Mianzi::Gangzi(tile)) => fulupai[*tile as usize] += 4,
-            None => (),
         }
-    }
+        Some(Mianzi::Kezi(tile)) => fulupai[*tile as usize] += 3,
+        Some(Mianzi::Gangzi(tile)) => fulupai[*tile as usize] += 4,
+        None => (),
+    });
     fulupai
 }
 
