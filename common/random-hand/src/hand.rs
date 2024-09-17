@@ -62,7 +62,7 @@ pub fn generate_random_full_flush_pure_hand(rng: &mut impl Rng) -> [u8; 34] {
     fill_hand(&wall, hand_length)
 }
 
-pub fn generate_random_thirteen_orphans_pure_hand(rng: &mut impl Rng) -> [u8; 34] {
+pub fn generate_random_non_simple_pure_hand(rng: &mut impl Rng) -> [u8; 34] {
     const NON_SIMPLES: [u8; 13] = [0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33];
     let mut wall = [0u8; 52];
     NON_SIMPLES
@@ -75,7 +75,7 @@ pub fn generate_random_thirteen_orphans_pure_hand(rng: &mut impl Rng) -> [u8; 34
         });
     wall.shuffle(rng);
 
-    let hand_length = *[13usize, 14usize].choose(rng).unwrap();
+    let hand_length = choose_hand_length(rng);
 
     fill_hand(&wall, hand_length)
 }
