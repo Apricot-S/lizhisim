@@ -220,6 +220,7 @@ fn count_shupai_tile_group(
     bingpai: &mut [u8],
     n: usize,
     jiangpai: Option<usize>,
+    four_tiles: &BitSlice,
 ) -> TileGroupCountPattern {
     if n > 8 {
         return TileGroupCountPattern {
@@ -238,7 +239,7 @@ fn count_shupai_tile_group(
         };
     }
 
-    let mut max = count_shupai_tile_group(bingpai, n + 1, jiangpai);
+    let mut max = count_shupai_tile_group(bingpai, n + 1, jiangpai, four_tiles);
 
     #[inline]
     fn update_max(max: &mut TileGroupCountPattern, r: TileGroupCountPattern) {
@@ -256,7 +257,7 @@ fn count_shupai_tile_group(
 
     if (n <= 6) && bingpai.has_shunzi(n) {
         bingpai.remove_shunzi(n);
-        let mut r = count_shupai_tile_group(bingpai, n, jiangpai);
+        let mut r = count_shupai_tile_group(bingpai, n, jiangpai, four_tiles);
         bingpai.restore_shunzi(n);
 
         r.a.num_mianzi += 1;
@@ -267,7 +268,7 @@ fn count_shupai_tile_group(
 
     if bingpai.has_kezi(n) {
         bingpai.remove_kezi(n);
-        let mut r = count_shupai_tile_group(bingpai, n, jiangpai);
+        let mut r = count_shupai_tile_group(bingpai, n, jiangpai, four_tiles);
         bingpai.restore_kezi(n);
 
         r.a.num_mianzi += 1;
@@ -278,20 +279,33 @@ fn count_shupai_tile_group(
 
     if (n <= 6) && bingpai.has_qianzhang_dazi(n) {
         bingpai.remove_qianzhang_dazi(n);
-        let mut r = count_shupai_tile_group(bingpai, n, jiangpai);
+        let mut r = count_shupai_tile_group(bingpai, n, jiangpai, four_tiles);
         bingpai.restore_qianzhang_dazi(n);
 
-        r.a.num_dazi += 1;
-        r.b.num_dazi += 1;
+        if !four_tiles[n + 1] {
+            r.a.num_dazi += 1;
+            r.b.num_dazi += 1;
+        }
 
         update_max(&mut max, r);
     }
 
     if (n <= 7) && bingpai.has_liangmen_dazi(n) {
         bingpai.remove_liangmen_dazi(n);
-        let mut r = count_shupai_tile_group(bingpai, n, jiangpai);
+        let mut r = count_shupai_tile_group(bingpai, n, jiangpai, four_tiles);
         bingpai.restore_liangmen_dazi(n);
 
+        /*if n == 7 {
+            if !four_tiles[n - 2] {
+                r.a.num_dazi += 1;
+                r.b.num_dazi += 1;
+            }
+        } else {
+            if !four_tiles[n + 2] {
+                r.a.num_dazi += 1;
+                r.b.num_dazi += 1;
+            }
+        }*/
         r.a.num_dazi += 1;
         r.b.num_dazi += 1;
 
@@ -300,7 +314,7 @@ fn count_shupai_tile_group(
 
     if bingpai.has_duizi(n) {
         bingpai.remove_duizi(n);
-        let mut r = count_shupai_tile_group(bingpai, n, jiangpai);
+        let mut r = count_shupai_tile_group(bingpai, n, jiangpai, four_tiles);
         bingpai.restore_duizi(n);
 
         if Some(n) != jiangpai {
@@ -399,15 +413,16 @@ fn calculate_replacement_number_inner(
     let jiangpai_z = offset(jiangpai, 27, 34);
 
     let z = count_zipai_tile_group(&bingpai[27..34], jiangpai_z);
-    let count_pattern_m = count_shupai_tile_group(&mut bingpai[0..9], 0, jiangpai_m);
-    let count_pattern_p = count_shupai_tile_group(&mut bingpai[9..18], 0, jiangpai_p);
-    let count_pattern_s = count_shupai_tile_group(&mut bingpai[18..27], 0, jiangpai_s);
+    let pattern_m = count_shupai_tile_group(&mut bingpai[0..9], 0, jiangpai_m, &four_tiles[0..9]);
+    let pattern_p = count_shupai_tile_group(&mut bingpai[9..18], 0, jiangpai_p, &four_tiles[9..18]);
+    let pattern_s =
+        count_shupai_tile_group(&mut bingpai[18..27], 0, jiangpai_s, &four_tiles[18..27]);
 
     let mut min = 14;
 
-    for m in [&count_pattern_m.a, &count_pattern_m.b] {
-        for p in [&count_pattern_p.a, &count_pattern_p.b] {
-            for s in [&count_pattern_s.a, &count_pattern_s.b] {
+    for m in [&pattern_m.a, &pattern_m.b] {
+        for p in [&pattern_p.a, &pattern_p.b] {
+            for s in [&pattern_s.a, &pattern_s.b] {
                 let num_mianzi =
                     num_fulu + m.num_mianzi + p.num_mianzi + s.num_mianzi + z.num_mianzi;
                 let num_dazi = m.num_dazi + p.num_dazi + s.num_dazi + z.num_dazi;
@@ -493,7 +508,7 @@ mod test {
     #[test]
     fn count_shupai_tile_group_works() {
         let mut bingpai = [1, 0, 3, 1, 2, 1, 0, 1, 0];
-        let r = count_shupai_tile_group(&mut bingpai, 0, None);
+        let r = count_shupai_tile_group(&mut bingpai, 0, None, &AllTileFlag::ZERO[0..9]);
         assert_eq!(r.a.num_mianzi, 1);
         assert_eq!(r.a.num_dazi, 3);
         assert_eq!(r.a.num_gulipai, 0);
@@ -790,7 +805,7 @@ mod test {
 
         let fulu_mianzi = Some([Some(Mianzi::Gangzi(1)), None, None, None]);
         let replacement_number_2 = calculate_replacement_number(bingpai, &fulu_mianzi, num_bingpai);
-        assert_eq!(replacement_number_2, 2); // 現在はアルゴリズム上 1 と判定される 要修正
+        assert_eq!(replacement_number_2, 2);
     }
 
     #[test]
