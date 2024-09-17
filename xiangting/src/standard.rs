@@ -295,19 +295,17 @@ fn count_shupai_tile_group(
         let mut r = count_shupai_tile_group(bingpai, n, jiangpai, four_tiles);
         bingpai.restore_liangmen_dazi(n);
 
-        /*if n == 7 {
-            if !four_tiles[n - 2] {
-                r.a.num_dazi += 1;
-                r.b.num_dazi += 1;
-            }
-        } else {
-            if !four_tiles[n + 2] {
-                r.a.num_dazi += 1;
-                r.b.num_dazi += 1;
-            }
-        }*/
-        r.a.num_dazi += 1;
-        r.b.num_dazi += 1;
+        let is_wait_consumed_in_hand = match n {
+            0 => four_tiles[2],
+            1..=6 => four_tiles[n - 1] && four_tiles[n + 2],
+            7 => four_tiles[6],
+            _ => panic!("Invalid rank"),
+        };
+
+        if !is_wait_consumed_in_hand {
+            r.a.num_dazi += 1;
+            r.b.num_dazi += 1;
+        }
 
         update_max(&mut max, r);
     }
@@ -810,7 +808,7 @@ mod test {
 
     #[test]
     fn calculate_replacement_number_waiting_for_the_5th_tile_5() {
-        // Middle wait for a tile already called as a concealed kan
+        // Middle wait for a tile already called as a kan
         let bingpai: Bingpai = [
             1, 0, 1, 0, 0, 0, 0, 0, 0, // m
             0, 0, 0, 1, 1, 1, 0, 0, 0, // p
@@ -822,6 +820,60 @@ mod test {
         assert_eq!(replacement_number_1, 1);
 
         let fulu_mianzi = Some([Some(Mianzi::Gangzi(1)), None, None, None]);
+        let replacement_number_2 = calculate_replacement_number(bingpai, &fulu_mianzi, num_bingpai);
+        assert_eq!(replacement_number_2, 2);
+    }
+
+    #[test]
+    fn calculate_replacement_number_waiting_for_the_5th_tile_6() {
+        // Edge wait for a tile already called as a kan (12-3)
+        let bingpai: Bingpai = [
+            1, 1, 1, 0, 0, 0, 0, 0, 0, // m
+            1, 1, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 1, 1, 1, // s
+            2, 0, 0, 0, 0, 0, 0, // z
+        ];
+        let num_bingpai: u8 = bingpai.iter().sum();
+        let replacement_number_1 = calculate_replacement_number(bingpai, &None, num_bingpai);
+        assert_eq!(replacement_number_1, 1);
+
+        let fulu_mianzi = Some([Some(Mianzi::Gangzi(11)), None, None, None]);
+        let replacement_number_2 = calculate_replacement_number(bingpai, &fulu_mianzi, num_bingpai);
+        assert_eq!(replacement_number_2, 2);
+    }
+
+    #[test]
+    fn calculate_replacement_number_waiting_for_the_5th_tile_7() {
+        // Edge wait for a tile already called as a kan (7-89)
+        let bingpai: Bingpai = [
+            1, 1, 1, 0, 0, 0, 0, 0, 0, // m
+            1, 1, 1, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 1, 1, // s
+            2, 0, 0, 0, 0, 0, 0, // z
+        ];
+        let num_bingpai: u8 = bingpai.iter().sum();
+        let replacement_number_1 = calculate_replacement_number(bingpai, &None, num_bingpai);
+        assert_eq!(replacement_number_1, 1);
+
+        let fulu_mianzi = Some([Some(Mianzi::Gangzi(24)), None, None, None]);
+        let replacement_number_2 = calculate_replacement_number(bingpai, &fulu_mianzi, num_bingpai);
+        assert_eq!(replacement_number_2, 2);
+    }
+
+    #[test]
+    fn calculate_replacement_number_waiting_for_the_5th_tile_8() {
+        // Open wait for tiles already called as kans
+        let bingpai: Bingpai = [
+            0, 1, 1, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 1, 1, 1, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            2, 0, 0, 0, 0, 0, 0, // z
+        ];
+        let num_bingpai: u8 = bingpai.iter().sum();
+        let replacement_number_1 = calculate_replacement_number(bingpai, &None, num_bingpai);
+        assert_eq!(replacement_number_1, 1);
+
+        let fulu_mianzi = Some([Some(Mianzi::Gangzi(0)), Some(Mianzi::Gangzi(3)), None, None]);
         let replacement_number_2 = calculate_replacement_number(bingpai, &fulu_mianzi, num_bingpai);
         assert_eq!(replacement_number_2, 2);
     }
