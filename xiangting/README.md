@@ -5,7 +5,7 @@ A library for calculation of deficiency number (a.k.a. xiangting (向聴) number
 This is a port of [majiang-core/lib/xiangting.js](https://github.com/kobalab/majiang-core/blob/master/lib/xiangting.js) to Rust.  
 However, the following differences apply:
 
-- The original algorithm miscalculated the deficiency number in some cases. These errors have been corrected in this port.
+- The original algorithm miscalculated the deficiency number in some cases. These errors have been corrected in this port, but the calculation speed has deteriorated as a result.
 - It does not support short hand or long hand.
 
 ## Usage
