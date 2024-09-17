@@ -479,6 +479,7 @@ pub(crate) fn calculate_replacement_number(
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::ClaimedTilePosition;
 
     #[test]
     fn calculate_replacement_number_formula_works() {
@@ -595,8 +596,12 @@ mod test {
             0, 1, 0, 0, 0, 0, 0, // z
         ];
         let num_bingpai: u8 = bingpai.iter().sum();
-        let replacement_number = calculate_replacement_number(bingpai, &None, num_bingpai);
-        assert_eq!(replacement_number, 1);
+        let replacement_number_1 = calculate_replacement_number(bingpai, &None, num_bingpai);
+        assert_eq!(replacement_number_1, 1);
+
+        let fulu_mianzi = Some([Some(Mianzi::Kezi(27)), None, None, None]);
+        let replacement_number_2 = calculate_replacement_number(bingpai, &fulu_mianzi, num_bingpai);
+        assert_eq!(replacement_number_2, 1);
     }
 
     #[test]
@@ -650,8 +655,17 @@ mod test {
             0, 0, 0, 0, 0, 0, 0, // z
         ];
         let num_bingpai: u8 = bingpai.iter().sum();
-        let replacement_number = calculate_replacement_number(bingpai, &None, num_bingpai);
-        assert_eq!(replacement_number, 2);
+        let replacement_number_1 = calculate_replacement_number(bingpai, &None, num_bingpai);
+        assert_eq!(replacement_number_1, 2);
+
+        let fulu_mianzi = Some([
+            Some(Mianzi::Kezi(1)),
+            Some(Mianzi::Shunzi(13, ClaimedTilePosition::Low)),
+            None,
+            None,
+        ]);
+        let replacement_number_2 = calculate_replacement_number(bingpai, &fulu_mianzi, num_bingpai);
+        assert_eq!(replacement_number_2, 2);
     }
 
     #[test]
@@ -759,5 +773,41 @@ mod test {
         let num_bingpai: u8 = bingpai.iter().sum();
         let replacement_number = calculate_replacement_number(bingpai, &None, num_bingpai);
         assert_eq!(replacement_number, 2);
+    }
+
+    #[test]
+    fn calculate_replacement_number_waiting_for_the_5th_tile_4() {
+        // Middle wait for a tile already called as a concealed kan
+        let bingpai: Bingpai = [
+            1, 0, 1, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 1, 1, 1, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 1, 1, 1, // s
+            2, 0, 0, 0, 0, 0, 0, // z
+        ];
+        let num_bingpai: u8 = bingpai.iter().sum();
+        let replacement_number_1 = calculate_replacement_number(bingpai, &None, num_bingpai);
+        assert_eq!(replacement_number_1, 1);
+
+        let fulu_mianzi = Some([Some(Mianzi::Gangzi(1)), None, None, None]);
+        let replacement_number_2 = calculate_replacement_number(bingpai, &fulu_mianzi, num_bingpai);
+        assert_eq!(replacement_number_2, 2); // 現在はアルゴリズム上 1 と判定される 要修正
+    }
+
+    #[test]
+    fn calculate_replacement_number_waiting_for_the_5th_tile_5() {
+        // Pair wait for a tile already called as a pon
+        let bingpai: Bingpai = [
+            1, 1, 1, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 1, 1, 1, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 1, 1, 1, // s
+            1, 0, 0, 0, 0, 0, 0, // z
+        ];
+        let num_bingpai: u8 = bingpai.iter().sum();
+        let replacement_number_1 = calculate_replacement_number(bingpai, &None, num_bingpai);
+        assert_eq!(replacement_number_1, 1);
+
+        let fulu_mianzi = Some([Some(Mianzi::Kezi(27)), None, None, None]);
+        let replacement_number_2 = calculate_replacement_number(bingpai, &fulu_mianzi, num_bingpai);
+        assert_eq!(replacement_number_2, 2);
     }
 }
