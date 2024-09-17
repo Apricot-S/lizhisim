@@ -17,17 +17,17 @@ use xiangting::{
 
 fn main() {
     // 123m456p789s11222z
-    let hand_13: [u8; 34] = [
+    let hand_14: [u8; 34] = [
         1, 1, 1, 0, 0, 0, 0, 0, 0, // m
         0, 0, 0, 1, 1, 1, 0, 0, 0, // p
         0, 0, 0, 0, 0, 0, 1, 1, 1, // s
         2, 3, 0, 0, 0, 0, 0, // z
     ];
 
-    let replacement_number = calculate_replacement_number(&hand_13, &None);
+    let replacement_number = calculate_replacement_number(&hand_14, &None);
     assert_eq!(replacement_number.unwrap(), 0u8);
 
-    let xiangting_number = calculate_xiangting_number(&hand_13, &None);
+    let xiangting_number = calculate_xiangting_number(&hand_14, &None);
     assert_eq!(xiangting_number.unwrap(), -1i8);
 
     // 123m1z (3 melds)
