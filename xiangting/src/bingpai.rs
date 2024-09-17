@@ -11,6 +11,8 @@ pub enum InvalidBingpaiError {
     ExceedsMaxNumBingpai(u8),
     #[error("Invalid hand: Hand is empty.")]
     EmptyBingpai,
+    #[error("Invalid hand: Total tile count is not a multiple of 3 plus 1 or 2 ({0}).")]
+    InvalidNumBingpai(u8),
 }
 
 pub(super) fn count_bingpai(bingpai: &Bingpai) -> Result<u8, InvalidBingpaiError> {
@@ -26,6 +28,9 @@ pub(super) fn count_bingpai(bingpai: &Bingpai) -> Result<u8, InvalidBingpaiError
     }
     if num_bingpai == 0 {
         return Err(InvalidBingpaiError::EmptyBingpai);
+    }
+    if num_bingpai % 3 == 0 {
+        return Err(InvalidBingpaiError::InvalidNumBingpai(num_bingpai));
     }
 
     Ok(num_bingpai)
@@ -91,11 +96,18 @@ mod test {
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 0, 0, 0, // z
         ];
+        let bingpai_5: Bingpai = [
+            1, 1, 1, 1, 1, 1, 1, 1, 1, // m
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            0, 0, 0, 0, 1, 1, 1, // z
+        ];
 
         let num_bingpai_1 = count_bingpai(&bingpai_1).unwrap_err();
         let num_bingpai_2 = count_bingpai(&bingpai_2).unwrap_err();
         let num_bingpai_3 = count_bingpai(&bingpai_3).unwrap_err();
         let num_bingpai_4 = count_bingpai(&bingpai_4).unwrap_err();
+        let num_bingpai_5 = count_bingpai(&bingpai_5).unwrap_err();
 
         assert!(matches!(num_bingpai_1, InvalidBingpaiError::EmptyBingpai));
         assert!(matches!(
@@ -109,6 +121,10 @@ mod test {
         assert!(matches!(
             num_bingpai_4,
             InvalidBingpaiError::ExceedsMaxNumSameTile(5)
+        ));
+        assert!(matches!(
+            num_bingpai_5,
+            InvalidBingpaiError::InvalidNumBingpai(12)
         ));
     }
 }

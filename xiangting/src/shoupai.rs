@@ -36,6 +36,8 @@ pub enum InvalidShoupaiError {
     ExceedsMaxNumSameTile(u8),
     #[error("Invalid hand: Total tile count exceeds 14 ({0}).")]
     ExceedsMaxNumShoupai(u8),
+    #[error("Invalid hand: Total tile count is not a multiple of 3 plus 1 or 2 ({0}).")]
+    InvalidNumShoupai(u8),
     #[error("InvalidMianziError({0})")]
     InvalidMianzi(#[from] InvalidMianziError),
 }
@@ -71,6 +73,9 @@ pub(super) fn validate_shoupai(
 
     if num_shoupai > (MAX_NUM_SHOUPAI + num_gangzi) {
         return Err(InvalidShoupaiError::ExceedsMaxNumShoupai(num_shoupai));
+    }
+    if (num_shoupai - num_gangzi) % 3 == 0 {
+        return Err(InvalidShoupaiError::InvalidNumShoupai(num_shoupai));
     }
 
     Ok(())
@@ -235,6 +240,19 @@ mod test {
     }
 
     #[test]
+    fn invalid_shoupai_menqian_incomplete_hand() {
+        let bingpai: Bingpai = [
+            4, 4, 4, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            0, 0, 0, 0, 0, 0, 0, // z
+        ];
+        let menqian = [None, None, None, None];
+        let result = validate_shoupai(&bingpai, &menqian).unwrap_err();
+        assert!(matches!(result, InvalidShoupaiError::InvalidNumShoupai(12)));
+    }
+
+    #[test]
     fn valid_shoupai_4_fulu() {
         let bingpai: Bingpai = [
             0, 0, 0, 0, 0, 0, 0, 0, 0, // m
@@ -301,5 +319,17 @@ mod test {
         ];
         let result_3 = validate_shoupai(&bingpai, &shunzi_3).unwrap_err();
         assert!(matches!(result_3, InvalidShoupaiError::InvalidMianzi(_)));
+
+        let shunzi_4 = [
+            Some(Mianzi::Shunzi(0, ClaimedTilePosition::Low)),
+            Some(Mianzi::Shunzi(0, ClaimedTilePosition::Low)),
+            Some(Mianzi::Shunzi(0, ClaimedTilePosition::Low)),
+            None,
+        ];
+        let result_4 = validate_shoupai(&bingpai, &shunzi_4).unwrap_err();
+        assert!(matches!(
+            result_4,
+            InvalidShoupaiError::InvalidNumShoupai(12)
+        ));
     }
 }

@@ -3,9 +3,10 @@
 A library for calculation of deficiency number (a.k.a. xiangting (向聴) number).
 
 This is a port of [majiang-core/lib/xiangting.js](https://github.com/kobalab/majiang-core/blob/master/lib/xiangting.js) to Rust.  
-However, it does not support long hand.
+However, the following differences apply:
 
-**Note:** Calculations considering melds are not yet supported.
+- The original algorithm miscalculated the deficiency number in some cases. These errors have been corrected in this port.
+- It does not support short hand or long hand.
 
 ## Usage
 
