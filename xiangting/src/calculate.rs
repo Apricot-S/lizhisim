@@ -50,7 +50,6 @@ pub enum XiangtingError {
 /// let replacement_number_4 = calculate_replacement_number(&hand_4, &None);
 /// assert_eq!(replacement_number_4.unwrap(), 0u8);
 /// ```
-#[must_use]
 pub fn calculate_replacement_number(
     bingpai: &Bingpai,
     fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
@@ -102,7 +101,6 @@ pub fn calculate_replacement_number(
 /// let xiangting_number_4 = calculate_xiangting_number(&hand_4, &None);
 /// assert_eq!(xiangting_number_4.unwrap(), -1i8);
 /// ```
-#[must_use]
 pub fn calculate_xiangting_number(
     bingpai: &Bingpai,
     fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
