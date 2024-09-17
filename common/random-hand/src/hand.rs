@@ -1,6 +1,21 @@
 use rand::seq::SliceRandom;
 use rand::Rng;
 
+#[inline]
+fn choose_hand_length(rng: &mut impl Rng) -> usize {
+    const CHOICES: [usize; 10] = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14];
+    *CHOICES.choose(rng).unwrap()
+}
+
+#[inline]
+fn fill_hand(wall: &[u8], hand_length: usize) -> [u8; 34] {
+    let mut hand = [0u8; 34];
+    wall.iter()
+        .take(hand_length)
+        .for_each(|&t| hand[t as usize] += 1);
+    hand
+}
+
 pub fn generate_random_pure_hand(rng: &mut impl Rng) -> [u8; 34] {
     let mut wall = [0u8; 136];
     wall.iter_mut()
@@ -8,15 +23,9 @@ pub fn generate_random_pure_hand(rng: &mut impl Rng) -> [u8; 34] {
         .for_each(|(i, tile)| *tile = (i / 4) as u8);
     wall.shuffle(rng);
 
-    const CHOICES: [usize; 10] = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14];
-    let hand_length = *CHOICES.choose(rng).unwrap();
+    let hand_length = choose_hand_length(rng);
 
-    let mut hand = [0u8; 34];
-    wall.iter()
-        .take(hand_length)
-        .for_each(|&t| hand[t as usize] += 1);
-
-    hand
+    fill_hand(&wall, hand_length)
 }
 
 pub fn generate_random_half_flush_pure_hand(rng: &mut impl Rng) -> [u8; 34] {
@@ -34,15 +43,9 @@ pub fn generate_random_half_flush_pure_hand(rng: &mut impl Rng) -> [u8; 34] {
     });
     wall.shuffle(rng);
 
-    const CHOICES: [usize; 10] = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14];
-    let hand_length = *CHOICES.choose(rng).unwrap();
+    let hand_length = choose_hand_length(rng);
 
-    let mut hand = [0u8; 34];
-    wall.iter()
-        .take(hand_length)
-        .for_each(|&t| hand[t as usize] += 1);
-
-    hand
+    fill_hand(&wall, hand_length)
 }
 
 pub fn generate_random_full_flush_pure_hand(rng: &mut impl Rng) -> [u8; 34] {
@@ -54,15 +57,9 @@ pub fn generate_random_full_flush_pure_hand(rng: &mut impl Rng) -> [u8; 34] {
         .for_each(|(i, tile)| *tile = (i / 4 + color_start) as u8);
     wall.shuffle(rng);
 
-    const CHOICES: [usize; 10] = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14];
-    let hand_length = *CHOICES.choose(rng).unwrap();
+    let hand_length = choose_hand_length(rng);
 
-    let mut hand = [0u8; 34];
-    wall.iter()
-        .take(hand_length)
-        .for_each(|&t| hand[t as usize] += 1);
-
-    hand
+    fill_hand(&wall, hand_length)
 }
 
 pub fn generate_random_thirteen_orphans_pure_hand(rng: &mut impl Rng) -> [u8; 34] {
@@ -78,13 +75,7 @@ pub fn generate_random_thirteen_orphans_pure_hand(rng: &mut impl Rng) -> [u8; 34
         });
     wall.shuffle(rng);
 
-    const CHOICES: [usize; 10] = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14];
-    let hand_length = *CHOICES.choose(rng).unwrap();
+    let hand_length = *[13usize, 14usize].choose(rng).unwrap();
 
-    let mut hand = [0u8; 34];
-    wall.iter()
-        .take(hand_length)
-        .for_each(|&t| hand[t as usize] += 1);
-
-    hand
+    fill_hand(&wall, hand_length)
 }
