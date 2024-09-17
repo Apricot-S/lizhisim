@@ -38,8 +38,6 @@ pub enum InvalidShoupaiError {
     ExceedsMaxNumSameTile(u8),
     #[error("Invalid hand: Total tile count exceeds 14 ({0}).")]
     ExceedsMaxNumShoupai(u8),
-    #[error("Invalid hand: Total tile count is not a multiple of 3 plus 1 or 2 ({0}).")]
-    InvalidNumShoupai(u8),
     #[error("InvalidMianziError({0})")]
     InvalidMianzi(#[from] InvalidMianziError),
 }
@@ -75,9 +73,6 @@ pub(super) fn validate_shoupai(
 
     if num_shoupai > (MAX_NUM_SHOUPAI + num_gangzi) {
         return Err(InvalidShoupaiError::ExceedsMaxNumShoupai(num_shoupai));
-    }
-    if (num_shoupai - num_gangzi) % 3 == 0 {
-        return Err(InvalidShoupaiError::InvalidNumShoupai(num_shoupai));
     }
 
     Ok(())
