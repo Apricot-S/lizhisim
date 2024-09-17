@@ -279,7 +279,7 @@ mod test {
     }
 
     #[test]
-    fn invalid_shoupai_4_fulu() {
+    fn invalid_shoupai_4_fulu_too_many_tiles() {
         let bingpai: Bingpai = [
             0, 0, 0, 0, 0, 0, 0, 0, 0, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
@@ -293,11 +293,21 @@ mod test {
             Some(Mianzi::Kezi(2)),
             Some(Mianzi::Kezi(3)),
         ];
-        let result_1 = validate_shoupai(&bingpai, &kezi_4).unwrap_err();
+        let result = validate_shoupai(&bingpai, &kezi_4).unwrap_err();
         assert!(matches!(
-            result_1,
-            InvalidShoupaiError::ExceedsMaxNumShoupai(15)
+            result,
+            InvalidShoupaiError::ExceedsMaxNumShoupai(15),
         ));
+    }
+
+    #[test]
+    fn invalid_shoupai_4_fulu_5th_tile() {
+        let bingpai: Bingpai = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            1, 1, 1, 0, 0, 0, 0, // z
+        ];
 
         let gangzi_4 = [
             Some(Mianzi::Gangzi(0)),
@@ -305,20 +315,21 @@ mod test {
             Some(Mianzi::Gangzi(2)),
             Some(Mianzi::Gangzi(2)),
         ];
-        let result_2 = validate_shoupai(&bingpai, &gangzi_4).unwrap_err();
+        let result = validate_shoupai(&bingpai, &gangzi_4).unwrap_err();
         assert!(matches!(
-            result_2,
-            InvalidShoupaiError::ExceedsMaxNumSameTile(8)
+            result,
+            InvalidShoupaiError::ExceedsMaxNumSameTile(8),
         ));
+    }
 
-        let shunzi_3 = [
-            Some(Mianzi::Shunzi(0, ClaimedTilePosition::Low)),
-            Some(Mianzi::Shunzi(0, ClaimedTilePosition::Low)),
-            Some(Mianzi::Shunzi(27, ClaimedTilePosition::Low)),
-            None,
+    #[test]
+    fn invalid_shoupai_4_fulu_incomplete_hand() {
+        let bingpai: Bingpai = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            1, 1, 1, 0, 0, 0, 0, // z
         ];
-        let result_3 = validate_shoupai(&bingpai, &shunzi_3).unwrap_err();
-        assert!(matches!(result_3, InvalidShoupaiError::InvalidMianzi(_)));
 
         let shunzi_4 = [
             Some(Mianzi::Shunzi(0, ClaimedTilePosition::Low)),
@@ -326,10 +337,26 @@ mod test {
             Some(Mianzi::Shunzi(0, ClaimedTilePosition::Low)),
             None,
         ];
-        let result_4 = validate_shoupai(&bingpai, &shunzi_4).unwrap_err();
-        assert!(matches!(
-            result_4,
-            InvalidShoupaiError::InvalidNumShoupai(12)
-        ));
+        let result = validate_shoupai(&bingpai, &shunzi_4).unwrap_err();
+        assert!(matches!(result, InvalidShoupaiError::InvalidNumShoupai(12)));
+    }
+
+    #[test]
+    fn invalid_shoupai_4_fulu_invalid_mianzi() {
+        let bingpai: Bingpai = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            1, 1, 1, 0, 0, 0, 0, // z
+        ];
+
+        let shunzi_3 = [
+            Some(Mianzi::Shunzi(0, ClaimedTilePosition::Low)),
+            Some(Mianzi::Shunzi(0, ClaimedTilePosition::Low)),
+            Some(Mianzi::Shunzi(27, ClaimedTilePosition::Low)),
+            None,
+        ];
+        let result = validate_shoupai(&bingpai, &shunzi_3).unwrap_err();
+        assert!(matches!(result, InvalidShoupaiError::InvalidMianzi(_)));
     }
 }
