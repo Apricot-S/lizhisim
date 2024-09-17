@@ -38,12 +38,6 @@ fn main() {
         1, 0, 0, 0, 0, 0, 0, // z
     ];
 
-    let replacement_number_wo_melds = calculate_replacement_number(&hand_4, &None);
-    assert_eq!(replacement_number_wo_melds.unwrap(), 1u8);
-
-    let xiangting_number_wo_melds = calculate_xiangting_number(&hand_4, &None);
-    assert_eq!(xiangting_number_wo_melds.unwrap(), 0i8);
-
     // 456p 789s 111z
     let melds = Some([
         Some(Mianzi::Shunzi(12, ClaimedTilePosition::Low)),
@@ -52,8 +46,14 @@ fn main() {
         None,
     ]);
 
+    let replacement_number_wo_melds = calculate_replacement_number(&hand_4, &None);
+    assert_eq!(replacement_number_wo_melds.unwrap(), 1u8);
+
     let replacement_number_w_melds = calculate_replacement_number(&hand_4, &melds);
     assert_eq!(replacement_number_w_melds.unwrap(), 2u8);
+
+    let xiangting_number_wo_melds = calculate_xiangting_number(&hand_4, &None);
+    assert_eq!(xiangting_number_wo_melds.unwrap(), 0i8);
 
     let xiangting_number_w_melds = calculate_xiangting_number(&hand_4, &melds);
     assert_eq!(xiangting_number_w_melds.unwrap(), 1i8);
