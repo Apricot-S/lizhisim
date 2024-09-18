@@ -84,61 +84,69 @@ mod test {
     }
 
     #[test]
-    fn invalid_bingpai() {
-        let bingpai_1: Bingpai = [
+    fn invalid_bingpai_empty() {
+        let bingpai: Bingpai = [
             0, 0, 0, 0, 0, 0, 0, 0, 0, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 0, 0, 0, // z
         ];
-        let bingpai_2: Bingpai = [
+        let result = count_bingpai(&bingpai).unwrap_err();
+        assert!(matches!(result, InvalidBingpaiError::EmptyBingpai));
+    }
+
+    #[test]
+    fn invalid_bingpai_too_many_tiles() {
+        let bingpai: Bingpai = [
             1, 1, 1, 1, 1, 1, 1, 1, 1, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 1, 1, 1, 1, 1, 1, // z
         ];
-        let bingpai_3: Bingpai = [
+        let result = count_bingpai(&bingpai).unwrap_err();
+        assert!(matches!(
+            result,
+            InvalidBingpaiError::ExceedsMaxNumBingpai(15)
+        ));
+    }
+
+    #[test]
+    fn invalid_bingpai_5th_tile() {
+        let bingpai_1: Bingpai = [
             5, 4, 4, 2, 0, 0, 0, 0, 0, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 0, 0, 0, // z
         ];
-        let bingpai_4: Bingpai = [
+        let result_1 = count_bingpai(&bingpai_1).unwrap_err();
+        assert!(matches!(
+            result_1,
+            InvalidBingpaiError::ExceedsMaxNumSameTile(5)
+        ));
+
+        let bingpai_2: Bingpai = [
             5, 4, 4, 4, 2, 0, 0, 0, 0, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 0, 0, 0, // z
         ];
-        let bingpai_5: Bingpai = [
+        let result_2 = count_bingpai(&bingpai_2).unwrap_err();
+        assert!(matches!(
+            result_2,
+            InvalidBingpaiError::ExceedsMaxNumSameTile(5)
+        ));
+    }
+
+    #[test]
+    fn invalid_bingpai_incomplete_hand() {
+        let bingpai: Bingpai = [
             1, 1, 1, 1, 1, 1, 1, 1, 1, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 1, 1, 1, // z
         ];
-
-        let num_bingpai_1 = count_bingpai(&bingpai_1).unwrap_err();
-        let num_bingpai_2 = count_bingpai(&bingpai_2).unwrap_err();
-        let num_bingpai_3 = count_bingpai(&bingpai_3).unwrap_err();
-        let num_bingpai_4 = count_bingpai(&bingpai_4).unwrap_err();
-        let num_bingpai_5 = count_bingpai(&bingpai_5).unwrap_err();
-
-        assert!(matches!(num_bingpai_1, InvalidBingpaiError::EmptyBingpai));
-        assert!(matches!(
-            num_bingpai_2,
-            InvalidBingpaiError::ExceedsMaxNumBingpai(15)
-        ));
-        assert!(matches!(
-            num_bingpai_3,
-            InvalidBingpaiError::ExceedsMaxNumSameTile(5)
-        ));
-        assert!(matches!(
-            num_bingpai_4,
-            InvalidBingpaiError::ExceedsMaxNumSameTile(5)
-        ));
-        assert!(matches!(
-            num_bingpai_5,
-            InvalidBingpaiError::InvalidNumBingpai(12)
-        ));
+        let result = count_bingpai(&bingpai).unwrap_err();
+        assert!(matches!(result, InvalidBingpaiError::InvalidNumBingpai(12)));
     }
 
     #[test]
@@ -172,81 +180,95 @@ mod test {
     }
 
     #[test]
-    fn invalid_bingpai_3_player() {
-        let bingpai_1: Bingpai = [
+    fn invalid_bingpai_3_player_empty() {
+        let bingpai: Bingpai = [
             0, 0, 0, 0, 0, 0, 0, 0, 0, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 0, 0, 0, // z
         ];
-        let bingpai_2: Bingpai = [
+        let result = count_bingpai_3_player(&bingpai).unwrap_err();
+        assert!(matches!(result, InvalidBingpaiError::EmptyBingpai));
+    }
+
+    #[test]
+    fn invalid_bingpai_3_player_too_many_tiles() {
+        let bingpai: Bingpai = [
             0, 0, 0, 0, 0, 0, 0, 0, 0, // m
             1, 1, 1, 1, 1, 1, 1, 1, 1, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 1, 1, 1, 1, 1, 1, // z
         ];
-        let bingpai_3: Bingpai = [
+        let result = count_bingpai_3_player(&bingpai).unwrap_err();
+        assert!(matches!(
+            result,
+            InvalidBingpaiError::ExceedsMaxNumBingpai(15)
+        ));
+    }
+
+    #[test]
+    fn invalid_bingpai_3_player_5th_tile() {
+        let bingpai_1: Bingpai = [
             0, 0, 0, 0, 0, 0, 0, 0, 0, // m
             5, 4, 4, 2, 0, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 0, 0, 0, // z
         ];
-        let bingpai_4: Bingpai = [
+        let result_1 = count_bingpai_3_player(&bingpai_1).unwrap_err();
+        assert!(matches!(
+            result_1,
+            InvalidBingpaiError::ExceedsMaxNumSameTile(5)
+        ));
+
+        let bingpai_2: Bingpai = [
             0, 0, 0, 0, 0, 0, 0, 0, 0, // m
             5, 4, 4, 4, 2, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 0, 0, 0, // z
         ];
-        let bingpai_5: Bingpai = [
+        let result_2 = count_bingpai_3_player(&bingpai_2).unwrap_err();
+        assert!(matches!(
+            result_2,
+            InvalidBingpaiError::ExceedsMaxNumSameTile(5)
+        ));
+    }
+
+    #[test]
+    fn invalid_bingpai_3_player_incomplete_hand() {
+        let bingpai: Bingpai = [
             0, 0, 0, 0, 0, 0, 0, 0, 0, // m
             1, 1, 1, 1, 1, 1, 1, 1, 1, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 1, 1, 1, // z
         ];
-        let bingpai_6: Bingpai = [
+        let result = count_bingpai_3_player(&bingpai).unwrap_err();
+        assert!(matches!(result, InvalidBingpaiError::InvalidNumBingpai(12)));
+    }
+
+    #[test]
+    fn invalid_bingpai_3_player_2m_8m() {
+        let bingpai_2m: Bingpai = [
             0, 1, 0, 0, 0, 0, 0, 0, 0, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 0, 0, 0, // z
         ];
-        let bingpai_7: Bingpai = [
+        let bingpai_8m: Bingpai = [
             0, 0, 0, 0, 0, 0, 0, 1, 0, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
             0, 0, 0, 0, 0, 0, 0, // z
         ];
 
-        let num_bingpai_1 = count_bingpai_3_player(&bingpai_1).unwrap_err();
-        let num_bingpai_2 = count_bingpai_3_player(&bingpai_2).unwrap_err();
-        let num_bingpai_3 = count_bingpai_3_player(&bingpai_3).unwrap_err();
-        let num_bingpai_4 = count_bingpai_3_player(&bingpai_4).unwrap_err();
-        let num_bingpai_5 = count_bingpai_3_player(&bingpai_5).unwrap_err();
-        let num_bingpai_6 = count_bingpai_3_player(&bingpai_6).unwrap_err();
-        let num_bingpai_7 = count_bingpai_3_player(&bingpai_7).unwrap_err();
+        let result_2m = count_bingpai_3_player(&bingpai_2m).unwrap_err();
+        let result_8m = count_bingpai_3_player(&bingpai_8m).unwrap_err();
 
-        assert!(matches!(num_bingpai_1, InvalidBingpaiError::EmptyBingpai));
         assert!(matches!(
-            num_bingpai_2,
-            InvalidBingpaiError::ExceedsMaxNumBingpai(15)
-        ));
-        assert!(matches!(
-            num_bingpai_3,
-            InvalidBingpaiError::ExceedsMaxNumSameTile(5)
-        ));
-        assert!(matches!(
-            num_bingpai_4,
-            InvalidBingpaiError::ExceedsMaxNumSameTile(5)
-        ));
-        assert!(matches!(
-            num_bingpai_5,
-            InvalidBingpaiError::InvalidNumBingpai(12)
-        ));
-        assert!(matches!(
-            num_bingpai_6,
+            result_2m,
             InvalidBingpaiError::InvalidTileFor3Player(1)
         ));
         assert!(matches!(
-            num_bingpai_7,
+            result_8m,
             InvalidBingpaiError::InvalidTileFor3Player(7)
         ));
     }
