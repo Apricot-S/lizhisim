@@ -213,8 +213,8 @@ struct TileGroupCount {
 }
 
 struct TileGroupCountPattern {
-    a: TileGroupCount,
-    b: TileGroupCount,
+    a: TileGroupCount, // Pattern with the minimum number of isolated tiles
+    b: TileGroupCount, // Pattern with the maximum number of melds
 }
 
 fn count_shupai_tile_group(
