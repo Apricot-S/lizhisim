@@ -16,6 +16,7 @@ pub enum XiangtingError {
 }
 
 /// Calculates the replacement number (= xiangting number + 1) for a given hand.
+/// This function is for 4-player mahjong.
 ///
 /// # Arguments
 ///
@@ -79,6 +80,54 @@ pub fn calculate_replacement_number(
     Ok([r0, r1, r2].into_iter().min().unwrap())
 }
 
+/// Calculates the replacement number (= xiangting number + 1) for a given hand.
+/// This function is for 3-player mahjong. Tiles from 2m to 8m cannot be used.
+///
+/// # Arguments
+///
+/// * `bingpai` - A reference to the count of each tile to pure (discardable) hand.
+/// * `fulu_mianzi` - An optional reference to an array of optional `Mianzi` representing melds.
+///
+/// # Returns
+///
+/// A `Result` containing the replacement number as `u8` or a `XiangtingError`.
+///
+/// # Examples
+///
+/// ```
+/// # use xiangting::{calculate_replacement_number_3_player, ClaimedTilePosition, Mianzi};
+/// // 111m456p789s11222z
+/// let hand_14: [u8; 34] = [
+///     3, 0, 0, 0, 0, 0, 0, 0, 0, // m
+///     0, 0, 0, 1, 1, 1, 0, 0, 0, // p
+///     0, 0, 0, 0, 0, 0, 1, 1, 1, // s
+///     2, 3, 0, 0, 0, 0, 0, // z
+/// ];
+/// let replacement_number = calculate_replacement_number_3_player(&hand_14, &None);
+/// assert_eq!(replacement_number.unwrap(), 0u8);
+///
+/// // 111m1z (3 melds)
+/// let hand_4: [u8; 34] = [
+///     3, 0, 0, 0, 0, 0, 0, 0, 0, // m
+///     0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+///     0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+///     1, 0, 0, 0, 0, 0, 0, // z
+/// ];
+///
+/// // 444p 7777s 111z
+/// let melds = [
+///     Some(Mianzi::Kezi(12)),
+///     Some(Mianzi::Gangzi(24)),
+///     Some(Mianzi::Kezi(27)),
+///     None,
+/// ];
+///
+/// let replacement_number_wo_melds = calculate_replacement_number_3_player(&hand_4, &None);
+/// assert_eq!(replacement_number_wo_melds.unwrap(), 1u8);
+///
+/// let replacement_number_w_melds = calculate_replacement_number_3_player(&hand_4, &Some(melds));
+/// assert_eq!(replacement_number_w_melds.unwrap(), 2u8);
+/// ```
 pub fn calculate_replacement_number_3_player(
     bingpai: &Bingpai,
     fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
