@@ -443,9 +443,9 @@ fn calculate_replacement_number_inner(
                     has_jiangpai,
                 );
 
-                if !has_jiangpai && (num_duizi == 0) {
+                if !has_jiangpai && (num_duizi == 0) && four_tiles.any() {
                     let gulipai = merge_flags(m.gulipai, p.gulipai, s.gulipai, z.gulipai);
-                    if four_tiles.any() && gulipai.any() && (four_tiles | gulipai) == four_tiles {
+                    if gulipai.any() && (four_tiles | gulipai) == four_tiles {
                         // A tile that is held in a quantity of four
                         // cannot become a pair even if it is isolated.
                         temp += 1;
@@ -501,9 +501,9 @@ fn calculate_replacement_number_inner_3_player(
                 has_jiangpai,
             );
 
-            if !has_jiangpai && (num_duizi == 0) {
+            if !has_jiangpai && (num_duizi == 0) && four_tiles.any() {
                 let gulipai = merge_flags(m.gulipai, p.gulipai, s.gulipai, z.gulipai);
-                if four_tiles.any() && gulipai.any() && (four_tiles | gulipai) == four_tiles {
+                if gulipai.any() && (four_tiles | gulipai) == four_tiles {
                     // A tile that is held in a quantity of four
                     // cannot become a pair even if it is isolated.
                     temp += 1;
