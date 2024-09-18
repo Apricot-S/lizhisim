@@ -172,7 +172,7 @@ fn count_4_tiles_in_shoupai(
 
 fn calculate_replacement_number_formula(
     mut num_mianzi: u8,
-    mut num_dazi: u8,
+    mut num_mianzi_candidate: u8,
     mut num_gulipai: u8,
     has_jiangpai: bool,
 ) -> u8 {
@@ -181,32 +181,33 @@ fn calculate_replacement_number_formula(
 
     // Adjust for excess melds
     if num_mianzi > 4 {
-        num_dazi += num_mianzi - 4;
+        num_mianzi_candidate += num_mianzi - 4;
         num_mianzi = 4;
     }
 
     // Adjust for excess meld candidates
-    if (num_mianzi + num_dazi) > 4 {
-        num_gulipai += num_mianzi + num_dazi - 4;
-        num_dazi = 4 - num_mianzi;
+    if (num_mianzi + num_mianzi_candidate) > 4 {
+        num_gulipai += num_mianzi + num_mianzi_candidate - 4;
+        num_mianzi_candidate = 4 - num_mianzi;
     }
 
     // Adjust for excess isolated tiles
-    if (num_mianzi + num_dazi + num_gulipai) > num_required_block {
-        num_gulipai = num_required_block - num_mianzi - num_dazi;
+    if (num_mianzi + num_mianzi_candidate + num_gulipai) > num_required_block {
+        num_gulipai = num_required_block - num_mianzi - num_mianzi_candidate;
     }
 
     // Count the pair as a meld candidate if it exists
     if has_jiangpai {
-        num_dazi += 1;
+        num_mianzi_candidate += 1;
     }
 
-    14 - num_mianzi * 3 - num_dazi * 2 - num_gulipai
+    14 - num_mianzi * 3 - num_mianzi_candidate * 2 - num_gulipai
 }
 
 struct TileGroupCount {
     num_mianzi: u8,
     num_dazi: u8,
+    num_duizi: u8,
     num_gulipai: u8,
     gulipai: SingleColorTileFlag,
 }
@@ -227,12 +228,14 @@ fn count_shupai_tile_group(
             a: TileGroupCount {
                 num_mianzi: 0,
                 num_dazi: 0,
+                num_duizi: 0,
                 num_gulipai: single_color_bingpai.iter().sum(),
                 gulipai: to_flag(single_color_bingpai),
             },
             b: TileGroupCount {
                 num_mianzi: 0,
                 num_dazi: 0,
+                num_duizi: 0,
                 num_gulipai: single_color_bingpai.iter().sum(),
                 gulipai: to_flag(single_color_bingpai),
             },
@@ -244,12 +247,14 @@ fn count_shupai_tile_group(
     #[inline]
     fn update_max(max: &mut TileGroupCountPattern, r: TileGroupCountPattern) {
         if (r.a.num_gulipai < max.a.num_gulipai)
-            || (r.a.num_gulipai == max.a.num_gulipai) && (r.a.num_dazi < max.a.num_dazi)
+            || (r.a.num_gulipai == max.a.num_gulipai)
+                && ((r.a.num_dazi + r.a.num_duizi) < (max.a.num_dazi + max.a.num_duizi))
         {
             max.a = r.a;
         }
         if (r.b.num_mianzi > max.b.num_mianzi)
-            || (r.b.num_mianzi == max.b.num_mianzi) && (r.b.num_dazi > max.b.num_dazi)
+            || (r.b.num_mianzi == max.b.num_mianzi)
+                && ((r.b.num_dazi + r.b.num_duizi) > (max.b.num_dazi + max.b.num_duizi))
         {
             max.b = r.b;
         }
@@ -316,8 +321,8 @@ fn count_shupai_tile_group(
         single_color_bingpai.restore_duizi(n);
 
         if Some(n) != jiangpai {
-            r.a.num_dazi += 1;
-            r.b.num_dazi += 1;
+            r.a.num_duizi += 1;
+            r.b.num_duizi += 1;
         }
 
         update_max(&mut max, r);
@@ -331,6 +336,7 @@ fn count_zipai_tile_group(zipai_bingpai: &[u8], jiangpai: Option<usize>) -> Tile
         TileGroupCount {
             num_mianzi: 0,
             num_dazi: 0,
+            num_duizi: 0,
             num_gulipai: 0,
             gulipai: BitArray::ZERO,
         },
@@ -343,7 +349,7 @@ fn count_zipai_tile_group(zipai_bingpai: &[u8], jiangpai: Option<usize>) -> Tile
                 3 => acc.num_mianzi += 1,
                 2 => {
                     if Some(i) != jiangpai {
-                        acc.num_dazi += 1;
+                        acc.num_duizi += 1;
                     }
                 }
                 1 => {
@@ -363,6 +369,7 @@ fn count_19m_tile_group(wanzi_bingpai: &[u8], jiangpai: Option<usize>) -> TileGr
         TileGroupCount {
             num_mianzi: 0,
             num_dazi: 0,
+            num_duizi: 0,
             num_gulipai: 0,
             gulipai: BitArray::ZERO,
         },
@@ -376,7 +383,7 @@ fn count_19m_tile_group(wanzi_bingpai: &[u8], jiangpai: Option<usize>) -> TileGr
                     3 => acc.num_mianzi += 1,
                     2 => {
                         if Some(i) != jiangpai {
-                            acc.num_dazi += 1;
+                            acc.num_duizi += 1;
                         }
                     }
                     1 => {
@@ -425,20 +432,24 @@ fn calculate_replacement_number_inner(
                 let num_mianzi =
                     num_fulu + m.num_mianzi + p.num_mianzi + s.num_mianzi + z.num_mianzi;
                 let num_dazi = m.num_dazi + p.num_dazi + s.num_dazi + z.num_dazi;
+                let num_duizi = m.num_duizi + p.num_duizi + s.num_duizi + z.num_duizi;
+                let num_mianzi_candidate = num_dazi + num_duizi;
                 let num_gulipai = m.num_gulipai + p.num_gulipai + s.num_gulipai + z.num_gulipai;
 
                 let mut temp = calculate_replacement_number_formula(
                     num_mianzi,
-                    num_dazi,
+                    num_mianzi_candidate,
                     num_gulipai,
                     has_jiangpai,
                 );
 
-                let gulipai = merge_flags(m.gulipai, p.gulipai, s.gulipai, z.gulipai);
-                if four_tiles.any() && gulipai.any() && (four_tiles | gulipai) == four_tiles {
-                    // A tile that is held in a quantity of four
-                    // cannot become a pair even if it is isolated.
-                    temp += 1;
+                if !has_jiangpai && (num_duizi == 0) {
+                    let gulipai = merge_flags(m.gulipai, p.gulipai, s.gulipai, z.gulipai);
+                    if four_tiles.any() && gulipai.any() && (four_tiles | gulipai) == four_tiles {
+                        // A tile that is held in a quantity of four
+                        // cannot become a pair even if it is isolated.
+                        temp += 1;
+                    }
                 }
 
                 if temp < min {
@@ -479,20 +490,24 @@ fn calculate_replacement_number_inner_3_player(
         for s in [&pattern_s.a, &pattern_s.b] {
             let num_mianzi = num_fulu + m.num_mianzi + p.num_mianzi + s.num_mianzi + z.num_mianzi;
             let num_dazi = m.num_dazi + p.num_dazi + s.num_dazi + z.num_dazi;
+            let num_duizi = m.num_duizi + p.num_duizi + s.num_duizi + z.num_duizi;
+            let num_mianzi_candidate = num_dazi + num_duizi;
             let num_gulipai = m.num_gulipai + p.num_gulipai + s.num_gulipai + z.num_gulipai;
 
             let mut temp = calculate_replacement_number_formula(
                 num_mianzi,
-                num_dazi,
+                num_mianzi_candidate,
                 num_gulipai,
                 has_jiangpai,
             );
 
-            let gulipai = merge_flags(m.gulipai, p.gulipai, s.gulipai, z.gulipai);
-            if four_tiles.any() && gulipai.any() && (four_tiles | gulipai) == four_tiles {
-                // A tile that is held in a quantity of four
-                // cannot become a pair even if it is isolated.
-                temp += 1;
+            if !has_jiangpai && (num_duizi == 0) {
+                let gulipai = merge_flags(m.gulipai, p.gulipai, s.gulipai, z.gulipai);
+                if four_tiles.any() && gulipai.any() && (four_tiles | gulipai) == four_tiles {
+                    // A tile that is held in a quantity of four
+                    // cannot become a pair even if it is isolated.
+                    temp += 1;
+                }
             }
 
             if temp < min {
@@ -615,9 +630,11 @@ mod test {
         let r = count_shupai_tile_group(&mut bingpai, 0, None, &AllTileFlag::ZERO[0..9]);
         assert_eq!(r.a.num_mianzi, 1);
         assert_eq!(r.a.num_dazi, 3);
+        assert_eq!(r.a.num_duizi, 0);
         assert_eq!(r.a.num_gulipai, 0);
         assert_eq!(r.b.num_mianzi, 2);
         assert_eq!(r.b.num_dazi, 0);
+        assert_eq!(r.b.num_duizi, 0);
         assert_eq!(r.b.num_gulipai, 3);
     }
 
@@ -985,7 +1002,7 @@ mod test {
     }
 
     #[test]
-    fn calculate_replacement_number_3_player_and_4_player() {
+    fn calculate_replacement_number_different_3_player_and_4_player() {
         let bingpai: Bingpai = [
             4, 0, 0, 0, 0, 0, 0, 0, 0, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
@@ -994,7 +1011,7 @@ mod test {
         ];
         let num_bingpai: u8 = bingpai.iter().sum();
         let replacement_number_4p = calculate_replacement_number(bingpai, &None, num_bingpai);
-        assert_eq!(replacement_number_4p, 2); // 現在は 3 と判定される 要修正
+        assert_eq!(replacement_number_4p, 2);
 
         let replacement_number_3p =
             calculate_replacement_number_3_player(bingpai, &None, num_bingpai);
