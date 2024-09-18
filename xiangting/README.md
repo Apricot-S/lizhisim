@@ -51,7 +51,7 @@ In the calculation for a hand with melds (副露), the meld tiles can be include
 
 If they are not included (e.g., 天鳳 (Tenhou), 雀魂 (Mahjong Soul)), `&None` should be specified for `fulu_mianzi`.
 
-If they are included (e.g., World Riichi Championship, M.LEAGUE), the meld tiles should be specified for `fulu_mianzi`.
+If they are included (e.g., World Riichi Championship, M.LEAGUE), the melds should be specified for `fulu_mianzi`.
 
 ```rust
 use xiangting::{calculate_replacement_number, ClaimedTilePosition, Mianzi};
