@@ -626,8 +626,9 @@ mod test {
 
     #[test]
     fn count_shupai_tile_group_works() {
-        let mut bingpai = [1, 0, 3, 1, 2, 1, 0, 1, 0];
-        let r = count_shupai_tile_group(&mut bingpai, 0, None, &AllTileFlag::ZERO[0..9]);
+        let mut single_color_bingpai = [1, 0, 3, 1, 2, 1, 0, 1, 0];
+        let r =
+            count_shupai_tile_group(&mut single_color_bingpai, 0, None, &AllTileFlag::ZERO[0..9]);
         assert_eq!(r.a.num_mianzi, 1);
         assert_eq!(r.a.num_dazi, 3);
         assert_eq!(r.a.num_duizi, 0);
