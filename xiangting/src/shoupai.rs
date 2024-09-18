@@ -224,7 +224,7 @@ mod test {
             1, 1, 0, 0, 0, 0, 0, // z
         ];
         let menqian = [None, None, None, None];
-        validate_shoupai(&bingpai, &menqian).unwrap();
+        assert_eq!(validate_shoupai(&bingpai, &menqian).unwrap(), ());
     }
 
     #[test]
@@ -287,7 +287,7 @@ mod test {
             Some(Mianzi::Kezi(2)),
             Some(Mianzi::Kezi(3)),
         ];
-        validate_shoupai(&bingpai, &kezi_4).unwrap();
+        assert_eq!(validate_shoupai(&bingpai, &kezi_4).unwrap(), ());
 
         let gangzi_4 = [
             Some(Mianzi::Gangzi(0)),
@@ -295,7 +295,7 @@ mod test {
             Some(Mianzi::Gangzi(2)),
             Some(Mianzi::Gangzi(3)),
         ];
-        validate_shoupai(&bingpai, &gangzi_4).unwrap();
+        assert_eq!(validate_shoupai(&bingpai, &gangzi_4).unwrap(), ());
     }
 
     #[test]
@@ -395,7 +395,7 @@ mod test {
             Some(Mianzi::Kezi(9)),
             Some(Mianzi::Kezi(33)),
         ];
-        assert!(validate_shoupai_3_player(&bingpai, &kezi_4).is_ok());
+        assert_eq!(validate_shoupai_3_player(&bingpai, &kezi_4).unwrap(), ());
 
         let gangzi_4 = [
             Some(Mianzi::Gangzi(0)),
@@ -403,7 +403,7 @@ mod test {
             Some(Mianzi::Gangzi(9)),
             Some(Mianzi::Gangzi(33)),
         ];
-        assert!(validate_shoupai_3_player(&bingpai, &gangzi_4).is_ok());
+        assert_eq!(validate_shoupai_3_player(&bingpai, &gangzi_4).unwrap(), ());
     }
 
     #[test]
