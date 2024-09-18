@@ -183,4 +183,40 @@ mod test {
         let replacement_number = calculate_replacement_number(&bingpai, &None);
         assert_eq!(replacement_number.unwrap(), 1);
     }
+
+    #[test]
+    fn calculate_replacement_number_3_player_standard_tenpai() {
+        let bingpai: Bingpai = [
+            3, 0, 0, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 1, 1, 1, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 1, 1, 1, // s
+            2, 2, 0, 0, 0, 0, 0, // z
+        ];
+        let replacement_number = calculate_replacement_number_3_player(&bingpai, &None);
+        assert_eq!(replacement_number.unwrap(), 1);
+    }
+
+    #[test]
+    fn calculate_replacement_number_3_player_shisanyao_tenpai() {
+        let bingpai: Bingpai = [
+            1, 0, 0, 0, 0, 0, 0, 0, 1, // m
+            1, 0, 0, 0, 0, 0, 0, 0, 1, // p
+            1, 0, 0, 0, 0, 0, 0, 0, 1, // s
+            1, 1, 1, 1, 1, 1, 1, // z
+        ];
+        let replacement_number = calculate_replacement_number_3_player(&bingpai, &None);
+        assert_eq!(replacement_number.unwrap(), 1);
+    }
+
+    #[test]
+    fn calculate_replacement_number_3_player_qiduizi_tenpai() {
+        let bingpai: Bingpai = [
+            2, 0, 0, 0, 0, 0, 0, 0, 2, // m
+            0, 1, 0, 0, 0, 0, 0, 2, 0, // p
+            0, 0, 0, 0, 2, 0, 0, 0, 0, // s
+            2, 0, 0, 0, 0, 0, 2, // z
+        ];
+        let replacement_number = calculate_replacement_number_3_player(&bingpai, &None);
+        assert_eq!(replacement_number.unwrap(), 1);
+    }
 }
