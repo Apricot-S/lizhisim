@@ -113,9 +113,9 @@ impl BingpaiExt for [u8] {
 
 type SingleColorTileFlag = BitArr!(for 9);
 
-fn to_flag(bingpai: &[u8]) -> SingleColorTileFlag {
+fn to_flag(single_color_bingpai: &[u8]) -> SingleColorTileFlag {
     let mut flag = SingleColorTileFlag::ZERO;
-    bingpai
+    single_color_bingpai
         .iter()
         .enumerate()
         .for_each(|(i, &count)| flag.set(i, count > 0));
