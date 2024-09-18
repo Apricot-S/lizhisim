@@ -1,8 +1,6 @@
 use super::bingpai::Bingpai;
 use super::constants::MAX_NUM_SHOUPAI;
 
-const YAOJIUPAI_INDICES: [usize; 13] = [0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33];
-
 pub(crate) fn calculate_replacement_number(bingpai: &Bingpai, num_bingpai: u8) -> u8 {
     if (num_bingpai != (MAX_NUM_SHOUPAI - 1)) && (num_bingpai != MAX_NUM_SHOUPAI) {
         return u8::MAX;
@@ -11,13 +9,14 @@ pub(crate) fn calculate_replacement_number(bingpai: &Bingpai, num_bingpai: u8) -
     let mut num_kinds: u8 = 0;
     let mut has_jiangpai: bool = false;
 
-    for index in YAOJIUPAI_INDICES {
+    const YAOJIUPAI_INDICES: [usize; 13] = [0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33];
+    YAOJIUPAI_INDICES.iter().for_each(|&index| {
         let count = bingpai[index];
         if count >= 1 {
             num_kinds += 1;
             has_jiangpai |= count >= 2;
         }
-    }
+    });
 
     14 - num_kinds - (if has_jiangpai { 1 } else { 0 })
 }
