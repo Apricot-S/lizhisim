@@ -111,10 +111,10 @@ impl BingpaiExt for [u8] {
     }
 }
 
-type OneColorTileFlag = BitArr!(for 9);
+type SingleColorTileFlag = BitArr!(for 9);
 
-fn to_flag(bingpai: &[u8]) -> OneColorTileFlag {
-    let mut flag = OneColorTileFlag::ZERO;
+fn to_flag(bingpai: &[u8]) -> SingleColorTileFlag {
+    let mut flag = SingleColorTileFlag::ZERO;
     bingpai
         .iter()
         .enumerate()
@@ -125,10 +125,10 @@ fn to_flag(bingpai: &[u8]) -> OneColorTileFlag {
 type AllTileFlag = BitArr!(for NUM_TILE_INDEX);
 
 fn merge_flags(
-    m: OneColorTileFlag,
-    p: OneColorTileFlag,
-    s: OneColorTileFlag,
-    z: OneColorTileFlag,
+    m: SingleColorTileFlag,
+    p: SingleColorTileFlag,
+    s: SingleColorTileFlag,
+    z: SingleColorTileFlag,
 ) -> AllTileFlag {
     let mut all_tiles = AllTileFlag::ZERO;
 
@@ -208,7 +208,7 @@ struct TileGroupCount {
     num_mianzi: u8,
     num_dazi: u8,
     num_gulipai: u8,
-    gulipai: OneColorTileFlag,
+    gulipai: SingleColorTileFlag,
 }
 
 struct TileGroupCountPattern {
