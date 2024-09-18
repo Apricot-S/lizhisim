@@ -444,6 +444,10 @@ fn calculate_replacement_number_inner(
                 if temp < min {
                     min = temp;
                 }
+
+                if min == 0 {
+                    return 0;
+                }
             }
         }
     }
@@ -501,6 +505,10 @@ fn calculate_replacement_number_inner_3_player(
             if temp < min {
                 min = temp;
             }
+
+            if min == 0 {
+                return 0;
+            }
         }
     }
 
@@ -531,6 +539,10 @@ pub(crate) fn calculate_replacement_number(
 
     // Remove a possible pair and calculate the replacement number with a pair
     for n in 0..NUM_TILE_INDEX {
+        if min == 0 {
+            return 0;
+        }
+
         if bingpai.has_duizi(n) {
             bingpai.remove_duizi(n);
             let temp =
@@ -571,6 +583,10 @@ pub(crate) fn calculate_replacement_number_3_player(
 
     // Remove a possible pair and calculate the replacement number with a pair
     for n in 0..NUM_TILE_INDEX {
+        if min == 0 {
+            return 0;
+        }
+
         if bingpai.has_duizi(n) {
             bingpai.remove_duizi(n);
             let temp = calculate_replacement_number_inner_3_player(
