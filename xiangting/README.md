@@ -35,18 +35,18 @@ fn main() {
         1, 0, 0, 0, 0, 0, 0, // z
     ];
 
-    // 456p 789s 111z
-    let melds = Some([
+    // 456p 7777s 111z
+    let melds = [
         Some(Mianzi::Shunzi(12, ClaimedTilePosition::Low)),
-        Some(Mianzi::Shunzi(24, ClaimedTilePosition::Low)),
+        Some(Mianzi::Gangzi(24)),
         Some(Mianzi::Kezi(27)),
         None,
-    ]);
+    ];
 
     let replacement_number_wo_melds = calculate_replacement_number(&hand_4, &None);
     assert_eq!(replacement_number_wo_melds.unwrap(), 1u8);
 
-    let replacement_number_w_melds = calculate_replacement_number(&hand_4, &melds);
+    let replacement_number_w_melds = calculate_replacement_number(&hand_4, &Some(melds));
     assert_eq!(replacement_number_w_melds.unwrap(), 2u8);
 }
 ```
