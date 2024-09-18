@@ -392,24 +392,24 @@ fn count_19m_tile_group(bingpai: &[u8], jiangpai: Option<usize>) -> TileGroupCou
     )
 }
 
+#[inline]
+fn offset_jiangpai(jiangpai: Option<usize>, start: usize, upper: usize) -> Option<usize> {
+    jiangpai
+        .filter(|&value| value >= start && value < upper)
+        .map(|value| value - start)
+}
+
 fn calculate_replacement_number_inner(
     bingpai: &mut Bingpai,
     num_fulu: u8,
     four_tiles: AllTileFlag,
     jiangpai: Option<usize>,
 ) -> u8 {
-    #[inline]
-    fn offset(jiangpai: Option<usize>, start: usize, upper: usize) -> Option<usize> {
-        jiangpai
-            .filter(|&value| value >= start && value < upper)
-            .map(|value| value - start)
-    }
-
     let has_jiangpai = jiangpai.is_some();
-    let jiangpai_m = offset(jiangpai, 0, 9);
-    let jiangpai_p = offset(jiangpai, 9, 18);
-    let jiangpai_s = offset(jiangpai, 18, 27);
-    let jiangpai_z = offset(jiangpai, 27, 34);
+    let jiangpai_m = offset_jiangpai(jiangpai, 0, 9);
+    let jiangpai_p = offset_jiangpai(jiangpai, 9, 18);
+    let jiangpai_s = offset_jiangpai(jiangpai, 18, 27);
+    let jiangpai_z = offset_jiangpai(jiangpai, 27, 34);
 
     let z = count_zipai_tile_group(&bingpai[27..34], jiangpai_z);
     let pattern_m = count_shupai_tile_group(&mut bingpai[0..9], 0, jiangpai_m, &four_tiles[0..9]);
@@ -461,18 +461,11 @@ fn calculate_replacement_number_inner_3_player(
     four_tiles: AllTileFlag,
     jiangpai: Option<usize>,
 ) -> u8 {
-    #[inline]
-    fn offset(jiangpai: Option<usize>, start: usize, upper: usize) -> Option<usize> {
-        jiangpai
-            .filter(|&value| value >= start && value < upper)
-            .map(|value| value - start)
-    }
-
     let has_jiangpai = jiangpai.is_some();
-    let jiangpai_m = offset(jiangpai, 0, 9);
-    let jiangpai_p = offset(jiangpai, 9, 18);
-    let jiangpai_s = offset(jiangpai, 18, 27);
-    let jiangpai_z = offset(jiangpai, 27, 34);
+    let jiangpai_m = offset_jiangpai(jiangpai, 0, 9);
+    let jiangpai_p = offset_jiangpai(jiangpai, 9, 18);
+    let jiangpai_s = offset_jiangpai(jiangpai, 18, 27);
+    let jiangpai_z = offset_jiangpai(jiangpai, 27, 34);
 
     let z = count_zipai_tile_group(&bingpai[27..34], jiangpai_z);
     let m = count_19m_tile_group(&bingpai[0..9], jiangpai_m);
@@ -515,12 +508,12 @@ fn calculate_replacement_number_inner_3_player(
     min
 }
 
-pub(crate) fn calculate_replacement_number(
-    mut bingpai: Bingpai,
-    fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
+#[inline]
+fn calculate_num_fulu(
     num_bingpai: u8,
+    fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
 ) -> u8 {
-    let num_fulu = match fulu_mianzi {
+    match fulu_mianzi {
         None => match num_bingpai {
             12..=14 => 0,
             9..=11 => 1,
@@ -530,8 +523,15 @@ pub(crate) fn calculate_replacement_number(
             _ => panic!("Invalid hand: Total tile count exceeds 14."),
         },
         Some(f) => f.iter().flatten().count() as u8,
-    };
+    }
+}
 
+pub(crate) fn calculate_replacement_number(
+    mut bingpai: Bingpai,
+    fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
+    num_bingpai: u8,
+) -> u8 {
+    let num_fulu = calculate_num_fulu(num_bingpai, fulu_mianzi);
     let four_tiles = count_4_tiles_in_shoupai(&bingpai, fulu_mianzi);
 
     // Calculate the replacement number without a pair
@@ -563,18 +563,7 @@ pub(crate) fn calculate_replacement_number_3_player(
     fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
     num_bingpai: u8,
 ) -> u8 {
-    let num_fulu = match fulu_mianzi {
-        None => match num_bingpai {
-            12..=14 => 0,
-            9..=11 => 1,
-            6..=8 => 2,
-            3..=5 => 3,
-            1..=2 => 4,
-            _ => panic!("Invalid hand: Total tile count exceeds 14."),
-        },
-        Some(f) => f.iter().flatten().count() as u8,
-    };
-
+    let num_fulu = calculate_num_fulu(num_bingpai, fulu_mianzi);
     let four_tiles = count_4_tiles_in_shoupai(&bingpai, fulu_mianzi);
 
     // Calculate the replacement number without a pair
