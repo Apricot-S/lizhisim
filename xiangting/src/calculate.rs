@@ -15,7 +15,7 @@ pub enum XiangtingError {
     InvalidShoupai(#[from] InvalidShoupaiError),
 }
 
-/// Calculates the replacement number for a given hand.
+/// Calculates the replacement number (= xiangting number + 1) for a given hand.
 ///
 /// # Arguments
 ///
@@ -79,61 +79,6 @@ pub fn calculate_replacement_number(
     Ok([r0, r1, r2].into_iter().min().unwrap())
 }
 
-/// Calculates the xiangting number for a given hand.
-///
-/// # Arguments
-///
-/// * `bingpai` - A reference to the count of each tile to pure (discardable) hand.
-/// * `fulu_mianzi` - An optional reference to an array of optional `Mianzi` representing melds.
-///
-/// # Returns
-///
-/// A `Result` containing the xiangting number as `i8` or a `XiangtingError`.
-///
-/// # Examples
-///
-/// ```
-/// # use xiangting::{calculate_xiangting_number, ClaimedTilePosition, Mianzi};
-/// // 123m456p789s11222z
-/// let hand_14: [u8; 34] = [
-///     1, 1, 1, 0, 0, 0, 0, 0, 0, // m
-///     0, 0, 0, 1, 1, 1, 0, 0, 0, // p
-///     0, 0, 0, 0, 0, 0, 1, 1, 1, // s
-///     2, 3, 0, 0, 0, 0, 0, // z
-/// ];
-///
-/// let xiangting_number = calculate_xiangting_number(&hand_14, &None);
-/// assert_eq!(xiangting_number.unwrap(), -1i8);
-///
-/// // 123m1z (3 melds)
-/// let hand_4: [u8; 34] = [
-///     1, 1, 1, 0, 0, 0, 0, 0, 0, // m
-///     0, 0, 0, 0, 0, 0, 0, 0, 0, // p
-///     0, 0, 0, 0, 0, 0, 0, 0, 0, // s
-///     1, 0, 0, 0, 0, 0, 0, // z
-/// ];
-///
-/// // 456p 789s 111z
-/// let melds = Some([
-///     Some(Mianzi::Shunzi(12, ClaimedTilePosition::Low)),
-///     Some(Mianzi::Shunzi(24, ClaimedTilePosition::Low)),
-///     Some(Mianzi::Kezi(27)),
-///     None,
-/// ]);
-///
-/// let xiangting_number_wo_melds = calculate_xiangting_number(&hand_4, &None);
-/// assert_eq!(xiangting_number_wo_melds.unwrap(), 0i8);
-///
-/// let xiangting_number_w_melds = calculate_xiangting_number(&hand_4, &melds);
-/// assert_eq!(xiangting_number_w_melds.unwrap(), 1i8);
-/// ```
-pub fn calculate_xiangting_number(
-    bingpai: &Bingpai,
-    fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
-) -> Result<i8, XiangtingError> {
-    Ok((calculate_replacement_number(bingpai, fulu_mianzi)? as i8) - 1)
-}
-
 pub fn calculate_replacement_number_3_player(
     bingpai: &Bingpai,
     fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
@@ -148,13 +93,6 @@ pub fn calculate_replacement_number_3_player(
     let r1 = qiduizi::calculate_replacement_number(bingpai, num_bingpai);
     let r2 = shisanyao::calculate_replacement_number(bingpai, num_bingpai);
     Ok([r0, r1, r2].into_iter().min().unwrap())
-}
-
-pub fn calculate_xiangting_number_3_player(
-    bingpai: &Bingpai,
-    fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
-) -> Result<i8, XiangtingError> {
-    Ok((calculate_replacement_number_3_player(bingpai, fulu_mianzi)? as i8) - 1)
 }
 
 #[cfg(test)]
@@ -195,41 +133,5 @@ mod test {
         ];
         let replacement_number = calculate_replacement_number(&bingpai, &None);
         assert_eq!(replacement_number.unwrap(), 1);
-    }
-
-    #[test]
-    fn calculate_xiangting_number_standard_tenpai() {
-        let bingpai: Bingpai = [
-            1, 1, 1, 0, 0, 0, 0, 0, 0, // m
-            0, 0, 0, 1, 1, 1, 0, 0, 0, // p
-            0, 0, 0, 0, 0, 0, 1, 1, 1, // s
-            2, 2, 0, 0, 0, 0, 0, // z
-        ];
-        let replacement_number = calculate_xiangting_number(&bingpai, &None);
-        assert_eq!(replacement_number.unwrap(), 0);
-    }
-
-    #[test]
-    fn calculate_xiangting_number_shisanyao_tenpai() {
-        let bingpai: Bingpai = [
-            1, 0, 0, 0, 0, 0, 0, 0, 1, // m
-            1, 0, 0, 0, 0, 0, 0, 0, 1, // p
-            1, 0, 0, 0, 0, 0, 0, 0, 1, // s
-            1, 1, 1, 1, 1, 1, 1, // z
-        ];
-        let replacement_number = calculate_xiangting_number(&bingpai, &None);
-        assert_eq!(replacement_number.unwrap(), 0);
-    }
-
-    #[test]
-    fn calculate_xiangting_number_qiduizi_tenpai() {
-        let bingpai: Bingpai = [
-            2, 0, 0, 0, 0, 0, 0, 2, 0, // m
-            0, 1, 0, 0, 0, 0, 0, 2, 0, // p
-            0, 0, 0, 0, 2, 0, 0, 0, 0, // s
-            2, 0, 0, 0, 0, 0, 2, // z
-        ];
-        let replacement_number = calculate_xiangting_number(&bingpai, &None);
-        assert_eq!(replacement_number.unwrap(), 0);
     }
 }
