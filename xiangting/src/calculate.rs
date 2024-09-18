@@ -103,6 +103,7 @@ pub fn calculate_replacement_number(
 ///     0, 0, 0, 0, 0, 0, 1, 1, 1, // s
 ///     2, 3, 0, 0, 0, 0, 0, // z
 /// ];
+///
 /// let replacement_number = calculate_replacement_number_3_player(&hand_14, &None);
 /// assert_eq!(replacement_number.unwrap(), 0u8);
 ///
