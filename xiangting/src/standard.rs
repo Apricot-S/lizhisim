@@ -398,6 +398,7 @@ fn calculate_replacement_number_inner(
     four_tiles: AllTileFlag,
     jiangpai: Option<usize>,
 ) -> u8 {
+    #[inline]
     fn offset(jiangpai: Option<usize>, start: usize, upper: usize) -> Option<usize> {
         jiangpai
             .filter(|&value| value >= start && value < upper)
@@ -450,6 +451,62 @@ fn calculate_replacement_number_inner(
     min
 }
 
+fn calculate_replacement_number_inner_3_player(
+    bingpai: &mut Bingpai,
+    num_fulu: u8,
+    four_tiles: AllTileFlag,
+    jiangpai: Option<usize>,
+) -> u8 {
+    #[inline]
+    fn offset(jiangpai: Option<usize>, start: usize, upper: usize) -> Option<usize> {
+        jiangpai
+            .filter(|&value| value >= start && value < upper)
+            .map(|value| value - start)
+    }
+
+    let has_jiangpai = jiangpai.is_some();
+    let jiangpai_m = offset(jiangpai, 0, 9);
+    let jiangpai_p = offset(jiangpai, 9, 18);
+    let jiangpai_s = offset(jiangpai, 18, 27);
+    let jiangpai_z = offset(jiangpai, 27, 34);
+
+    let z = count_zipai_tile_group(&bingpai[27..34], jiangpai_z);
+    let m = count_19m_tile_group(&bingpai[0..9], jiangpai_m);
+    let pattern_p = count_shupai_tile_group(&mut bingpai[9..18], 0, jiangpai_p, &four_tiles[9..18]);
+    let pattern_s =
+        count_shupai_tile_group(&mut bingpai[18..27], 0, jiangpai_s, &four_tiles[18..27]);
+
+    let mut min = 14;
+
+    for p in [&pattern_p.a, &pattern_p.b] {
+        for s in [&pattern_s.a, &pattern_s.b] {
+            let num_mianzi = num_fulu + m.num_mianzi + p.num_mianzi + s.num_mianzi + z.num_mianzi;
+            let num_dazi = m.num_dazi + p.num_dazi + s.num_dazi + z.num_dazi;
+            let num_gulipai = m.num_gulipai + p.num_gulipai + s.num_gulipai + z.num_gulipai;
+
+            let mut temp = calculate_replacement_number_formula(
+                num_mianzi,
+                num_dazi,
+                num_gulipai,
+                has_jiangpai,
+            );
+
+            let gulipai = merge_flags(m.gulipai, p.gulipai, s.gulipai, z.gulipai);
+            if four_tiles.any() && gulipai.any() && (four_tiles | gulipai) == four_tiles {
+                // A tile that is held in a quantity of four
+                // cannot become a pair even if it is isolated.
+                temp += 1;
+            }
+
+            if temp < min {
+                min = temp;
+            }
+        }
+    }
+
+    min
+}
+
 pub(crate) fn calculate_replacement_number(
     mut bingpai: Bingpai,
     fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
@@ -478,6 +535,50 @@ pub(crate) fn calculate_replacement_number(
             bingpai.remove_duizi(n);
             let temp =
                 calculate_replacement_number_inner(&mut bingpai, num_fulu, four_tiles, Some(n));
+            bingpai.restore_duizi(n);
+
+            if temp < min {
+                min = temp;
+            }
+        }
+    }
+
+    min
+}
+
+pub(crate) fn calculate_replacement_number_3_player(
+    mut bingpai: Bingpai,
+    fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
+    num_bingpai: u8,
+) -> u8 {
+    let num_fulu = match fulu_mianzi {
+        None => match num_bingpai {
+            12..=14 => 0,
+            9..=11 => 1,
+            6..=8 => 2,
+            3..=5 => 3,
+            1..=2 => 4,
+            _ => panic!("Invalid hand: Total tile count exceeds 14."),
+        },
+        Some(f) => f.iter().flatten().count() as u8,
+    };
+
+    let four_tiles = count_4_tiles_in_shoupai(&bingpai, fulu_mianzi);
+
+    // Calculate the replacement number without a pair
+    let mut min =
+        calculate_replacement_number_inner_3_player(&mut bingpai, num_fulu, four_tiles, None);
+
+    // Remove a possible pair and calculate the replacement number with a pair
+    for n in 0..NUM_TILE_INDEX {
+        if bingpai.has_duizi(n) {
+            bingpai.remove_duizi(n);
+            let temp = calculate_replacement_number_inner_3_player(
+                &mut bingpai,
+                num_fulu,
+                four_tiles,
+                Some(n),
+            );
             bingpai.restore_duizi(n);
 
             if temp < min {
@@ -876,5 +977,22 @@ mod test {
         let fulu_mianzi = Some([Some(Mianzi::Gangzi(0)), Some(Mianzi::Gangzi(3)), None, None]);
         let replacement_number_2 = calculate_replacement_number(bingpai, &fulu_mianzi, num_bingpai);
         assert_eq!(replacement_number_2, 2);
+    }
+
+    #[test]
+    fn calculate_replacement_number_3_player_and_4_player() {
+        let bingpai: Bingpai = [
+            4, 0, 0, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            4, 3, 2, 0, 0, 0, 0, // z
+        ];
+        let num_bingpai: u8 = bingpai.iter().sum();
+        let replacement_number_4p = calculate_replacement_number(bingpai, &None, num_bingpai);
+        assert_eq!(replacement_number_4p, 2); // 現在は 3 と判定される 要修正
+
+        let replacement_number_3p =
+            calculate_replacement_number_3_player(bingpai, &None, num_bingpai);
+        assert_eq!(replacement_number_3p, 3);
     }
 }

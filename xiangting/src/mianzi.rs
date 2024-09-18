@@ -99,6 +99,12 @@ impl fmt::Display for Mianzi {
     }
 }
 
+impl fmt::Debug for Mianzi {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self, f)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

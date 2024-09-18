@@ -1,9 +1,9 @@
-use super::bingpai::{count_bingpai, Bingpai, InvalidBingpaiError};
+use super::bingpai::{count_bingpai, count_bingpai_3_player, Bingpai, InvalidBingpaiError};
 use super::constants::MAX_NUM_FULU_MIANZI;
 use super::mianzi::Mianzi;
 use super::qiduizi;
 use super::shisanyao;
-use super::shoupai::{validate_shoupai, InvalidShoupaiError};
+use super::shoupai::{validate_shoupai, validate_shoupai_3_player, InvalidShoupaiError};
 use super::standard;
 use thiserror::Error;
 
@@ -132,6 +132,29 @@ pub fn calculate_xiangting_number(
     fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
 ) -> Result<i8, XiangtingError> {
     Ok((calculate_replacement_number(bingpai, fulu_mianzi)? as i8) - 1)
+}
+
+pub fn calculate_replacement_number_3_player(
+    bingpai: &Bingpai,
+    fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
+) -> Result<u8, XiangtingError> {
+    let num_bingpai = count_bingpai_3_player(bingpai)?;
+
+    if let Some(f) = fulu_mianzi {
+        validate_shoupai_3_player(bingpai, f)?;
+    }
+
+    let r0 = standard::calculate_replacement_number_3_player(*bingpai, fulu_mianzi, num_bingpai);
+    let r1 = qiduizi::calculate_replacement_number(bingpai, num_bingpai);
+    let r2 = shisanyao::calculate_replacement_number(bingpai, num_bingpai);
+    Ok([r0, r1, r2].into_iter().min().unwrap())
+}
+
+pub fn calculate_xiangting_number_3_player(
+    bingpai: &Bingpai,
+    fulu_mianzi: &Option<[Option<Mianzi>; MAX_NUM_FULU_MIANZI]>,
+) -> Result<i8, XiangtingError> {
+    Ok((calculate_replacement_number_3_player(bingpai, fulu_mianzi)? as i8) - 1)
 }
 
 #[cfg(test)]

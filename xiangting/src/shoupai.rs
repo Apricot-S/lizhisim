@@ -40,6 +40,8 @@ pub enum InvalidShoupaiError {
     InvalidNumShoupai(u8),
     #[error("InvalidMianziError({0})")]
     InvalidMianzi(#[from] InvalidMianziError),
+    #[error("Invalid hand: {0} cannot be used in 3-player mahjong.")]
+    InvalidMianziFor3Player(Mianzi),
 }
 
 pub(super) fn validate_shoupai(
@@ -79,6 +81,24 @@ pub(super) fn validate_shoupai(
     }
 
     Ok(())
+}
+
+pub(super) fn validate_shoupai_3_player(
+    bingpai: &Bingpai,
+    fulu_mianzi: &[Option<Mianzi>; MAX_NUM_FULU_MIANZI],
+) -> Result<(), InvalidShoupaiError> {
+    fulu_mianzi.iter().flatten().try_for_each(|m| match m {
+        Mianzi::Shunzi(_, _) => Err(InvalidShoupaiError::InvalidMianziFor3Player(m.clone())),
+        Mianzi::Kezi(t) | Mianzi::Gangzi(t) => {
+            if (1..8).contains(t) {
+                Err(InvalidShoupaiError::InvalidMianziFor3Player(m.clone()))
+            } else {
+                Ok(())
+            }
+        }
+    })?;
+
+    validate_shoupai(bingpai, fulu_mianzi)
 }
 
 #[cfg(test)]
@@ -347,7 +367,7 @@ mod test {
             0, 0, 0, 0, 0, 0, 0, 0, 0, // m
             0, 0, 0, 0, 0, 0, 0, 0, 0, // p
             0, 0, 0, 0, 0, 0, 0, 0, 0, // s
-            1, 1, 1, 0, 0, 0, 0, // z
+            1, 1, 1, 1, 0, 0, 0, // z
         ];
 
         let shunzi_3 = [
@@ -358,5 +378,104 @@ mod test {
         ];
         let result = validate_shoupai(&bingpai, &shunzi_3).unwrap_err();
         assert!(matches!(result, InvalidShoupaiError::InvalidMianzi(_)));
+    }
+
+    #[test]
+    fn valid_shoupai_3_player_fulu() {
+        let bingpai: Bingpai = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            1, 1, 0, 0, 0, 0, 0, // z
+        ];
+
+        let kezi_4 = [
+            Some(Mianzi::Kezi(0)),
+            Some(Mianzi::Kezi(8)),
+            Some(Mianzi::Kezi(9)),
+            Some(Mianzi::Kezi(33)),
+        ];
+        assert!(validate_shoupai_3_player(&bingpai, &kezi_4).is_ok());
+
+        let gangzi_4 = [
+            Some(Mianzi::Gangzi(0)),
+            Some(Mianzi::Gangzi(8)),
+            Some(Mianzi::Gangzi(9)),
+            Some(Mianzi::Gangzi(33)),
+        ];
+        assert!(validate_shoupai_3_player(&bingpai, &gangzi_4).is_ok());
+    }
+
+    #[test]
+    fn invalid_shoupai_3_player_fulu_shunzi() {
+        let bingpai: Bingpai = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            3, 3, 3, 2, 0, 0, 0, // z
+        ];
+
+        let shunzi_1 = [
+            Some(Mianzi::Shunzi(0, ClaimedTilePosition::Low)),
+            None,
+            None,
+            None,
+        ];
+        let result = validate_shoupai_3_player(&bingpai, &shunzi_1).unwrap_err();
+        assert!(matches!(
+            result,
+            InvalidShoupaiError::InvalidMianziFor3Player(Mianzi::Shunzi(
+                0,
+                ClaimedTilePosition::Low
+            ))
+        ));
+    }
+
+    #[test]
+    fn invalid_shoupai_3_player_fulu_invalid_kezi() {
+        let bingpai: Bingpai = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            3, 3, 3, 2, 0, 0, 0, // z
+        ];
+
+        let kezi_2m = [Some(Mianzi::Kezi(1)), None, None, None];
+        let result = validate_shoupai_3_player(&bingpai, &kezi_2m).unwrap_err();
+        assert!(matches!(
+            result,
+            InvalidShoupaiError::InvalidMianziFor3Player(Mianzi::Kezi(1))
+        ));
+
+        let kezi_8m = [Some(Mianzi::Kezi(7)), None, None, None];
+        let result = validate_shoupai_3_player(&bingpai, &kezi_8m).unwrap_err();
+        assert!(matches!(
+            result,
+            InvalidShoupaiError::InvalidMianziFor3Player(Mianzi::Kezi(7))
+        ));
+    }
+
+    #[test]
+    fn invalid_shoupai_3_player_fulu_invalid_gangzi() {
+        let bingpai: Bingpai = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // m
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // p
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // s
+            3, 3, 3, 2, 0, 0, 0, // z
+        ];
+
+        let gangzi_2m = [Some(Mianzi::Gangzi(1)), None, None, None];
+        let result = validate_shoupai_3_player(&bingpai, &gangzi_2m).unwrap_err();
+        assert!(matches!(
+            result,
+            InvalidShoupaiError::InvalidMianziFor3Player(Mianzi::Gangzi(1))
+        ));
+
+        let gangzi_8m = [Some(Mianzi::Gangzi(7)), None, None, None];
+        let result = validate_shoupai_3_player(&bingpai, &gangzi_8m).unwrap_err();
+        assert!(matches!(
+            result,
+            InvalidShoupaiError::InvalidMianziFor3Player(Mianzi::Gangzi(7))
+        ));
     }
 }
