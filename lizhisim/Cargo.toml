@@ -22,3 +22,7 @@ hashbrown = "0.14.5"
 mt19937 = "2.0.1"
 rand = " 0.8.5"
 thiserror = "1.0.63"
+xiangting = { git = "https://github.com/Apricot-S/xiangting.git", version = "0.1.0", optional = true }
+
+[features]
+default = ["dep:xiangting"]

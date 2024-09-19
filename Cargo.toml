@@ -1,9 +1,6 @@
 [workspace]
 members = [
     "lizhisim",
-    "xiangting",
-    "common/hand-enumerator",
-    "common/random-hand",
 ]
 resolver = "2"
 
