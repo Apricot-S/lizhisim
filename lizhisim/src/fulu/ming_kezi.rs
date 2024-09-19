@@ -59,7 +59,7 @@ impl MingMianzi<3> for MingKezi {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use crate::{tile, tile_array};
 

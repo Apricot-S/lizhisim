@@ -58,7 +58,7 @@ impl MingMianzi<4> for DamingGangzi {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use crate::{tile, tile_array};
 

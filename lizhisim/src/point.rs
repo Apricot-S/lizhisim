@@ -96,7 +96,7 @@ pub(crate) fn validate_ma(ma: &Ma) -> Result<()> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]
