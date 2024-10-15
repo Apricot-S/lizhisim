@@ -140,8 +140,6 @@ pub struct Rule {
     is_zhuangjia_qipai_14: bool,
     /// Blessing of Heaven and Double Yakuman Combination
     is_tianhu_indifferent_to_zimopai: bool,
-    /// Blessing of Earth and Double Yakuman Combination
-    is_dihu_indifferent_to_zimopai: bool,
 }
 // 未実装のルール
 // 役満の包で該当役満以外の責任も持つか(持つ:天鳳、持たない:雀魂/一番街/Mリーグ)
@@ -610,11 +608,6 @@ impl Rule {
     pub fn is_tianhu_indifferent_to_zimopai(&self) -> &bool {
         &self.is_tianhu_indifferent_to_zimopai
     }
-    #[inline]
-    #[must_use]
-    pub fn is_dihu_indifferent_to_zimopai(&self) -> &bool {
-        &self.is_dihu_indifferent_to_zimopai
-    }
 
     #[must_use]
     pub fn new(
@@ -692,7 +685,6 @@ impl Rule {
         is_bei_menfengpai: bool,
         is_zhuangjia_qipai_14: bool,
         is_tianhu_indifferent_to_zimopai: bool,
-        is_dihu_indifferent_to_zimopai: bool,
     ) -> Result<Self> {
         validate_point(&init_point)?;
         validate_point(&fandian)?;
@@ -827,7 +819,6 @@ impl Rule {
             is_bei_menfengpai,
             is_zhuangjia_qipai_14,
             is_tianhu_indifferent_to_zimopai,
-            is_dihu_indifferent_to_zimopai,
         })
     }
 }
