@@ -10,8 +10,10 @@ const NUM_FENGPAI: u8 = 4;
 const NUM_SANYUANPAI: u8 = 3;
 const NUM_HONGBAOPAI: u8 = 3;
 
+pub(crate) const NUM_TILE_INDEX_WITHOUT_HONGBAOPAI: usize =
+    (NUM_SHUPAI + NUM_FENGPAI + NUM_SANYUANPAI) as usize;
 pub(crate) const NUM_TILE_INDEX: usize =
-    (NUM_SHUPAI + NUM_FENGPAI + NUM_SANYUANPAI + NUM_HONGBAOPAI) as usize;
+    NUM_TILE_INDEX_WITHOUT_HONGBAOPAI + NUM_HONGBAOPAI as usize;
 pub(crate) const NUM_SAME_TILE: u8 = 4;
 
 #[derive(Error, Debug)]
