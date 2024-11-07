@@ -89,7 +89,6 @@ fn main() {
         false,
         true,
         true,
-        false,
     );
 
     let seed = mt19937::Seed::default();
