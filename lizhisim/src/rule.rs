@@ -49,7 +49,7 @@ pub struct Rule {
     /// Busting
     can_jifei: bool,
     /// Han Limit
-    fanfu_limit: FanfuLimit,
+    fan_limit: FanLimit,
     /// Kiriage Mangan
     has_qieshangmanguan: bool,
     /// Head-Bump
@@ -190,7 +190,7 @@ pub struct HongbaopaiCount {
 }
 
 #[derive(Clone, PartialEq, Eq)]
-pub enum FanfuLimit {
+pub enum FanLimit {
     Fan1 = 1,
     Fan2 = 2,
     Fan4 = 4,
@@ -395,8 +395,8 @@ impl Rule {
     }
     #[inline]
     #[must_use]
-    pub fn fanfu_limit(&self) -> &FanfuLimit {
-        &self.fanfu_limit
+    pub fn fan_limit(&self) -> &FanLimit {
+        &self.fan_limit
     }
     #[inline]
     #[must_use]
@@ -634,7 +634,7 @@ impl Rule {
         has_shiduan: bool,
         hongbaopai_count: HongbaopaiCount,
         can_jifei: bool,
-        fanfu_limit: FanfuLimit,
+        fan_limit: FanLimit,
         has_qieshangmanguan: bool,
         has_toutiao: bool,
         zimo_scoring: ZimoScoring,
@@ -768,7 +768,7 @@ impl Rule {
             has_shiduan,
             hongbaopai_count,
             can_jifei,
-            fanfu_limit,
+            fan_limit,
             has_qieshangmanguan,
             has_toutiao,
             zimo_scoring,
