@@ -1,9 +1,11 @@
 use crate::fulu::{
-    AnGangzi, ClaimedTilePosition, DamingGangzi, FuluMianzi, JiaGangzi, Mianzi, MingKezi,
+    AnGangJiaGangMianzi, AnGangzi, DamingGangzi, FuluMianzi, JiaGangzi, Mianzi, MingKezi,
     MingMianzi, MingShunzi, Tajia,
 };
 use crate::tile;
-use crate::tile::{Tile, NUM_SAME_TILE, NUM_SHUPAI_RANK, NUM_TILE_INDEX};
+use crate::tile::{
+    Tile, NUM_SAME_TILE, NUM_SHUPAI_RANK, NUM_TILE_INDEX, NUM_TILE_INDEX_WITHOUT_HONGBAOPAI,
+};
 use crate::{matches_tile_index, tile_index};
 use anyhow::{bail, Result};
 use arrayvec::ArrayVec;
@@ -565,6 +567,50 @@ impl<'a> Shoupai<'a> {
                 candidates.push(
                     DamingGangzi::new(*tile, [*tile, *tile, *tile], discarder.clone()).unwrap(),
                 );
+            }
+        }
+
+        Some(candidates)
+    }
+
+    #[must_use]
+    pub fn get_angang_jiagang_candidates(
+        &self,
+    ) -> Option<ArrayVec<AnGangJiaGangMianzi, MAX_NUM_ANGANG_JIAGANG_CANDIDATES>> {
+        let zimopai = match &self.zimopai {
+            Zimopai::Some(t) => Some(t.normalize_hongbaopai()),
+            Zimopai::Unknown => None,
+            Zimopai::AfterChi(_) | Zimopai::AfterPeng(_) | Zimopai::None => return None,
+        };
+
+        let mut candidates =
+            ArrayVec::<AnGangJiaGangMianzi, MAX_NUM_ANGANG_JIAGANG_CANDIDATES>::new();
+
+        for (i, &c) in self
+            .bingpai
+            .iter()
+            .take(NUM_TILE_INDEX_WITHOUT_HONGBAOPAI)
+            .enumerate()
+        {
+            // If rank is 5
+            if (i % 9) == 4 && (i / 9) < 3 {}
+            // A tile that is not in the hand (including tsumo tile) cannot be kan.
+            if c == 0 {
+                continue;
+            }
+            // When concealed kan is possible
+            if c == 4 {
+                // Cannot concealed kan that does not include tsumo tile after riichi
+                if self.is_lizhi()
+                    && i != zimopai.map_or(NUM_TILE_INDEX_WITHOUT_HONGBAOPAI, |t| t.to_usize())
+                {
+                    continue;
+                }
+                let t = Tile::new_unchecked(i as u8);
+                candidates.push(AnGangJiaGangMianzi::AnGangzi(
+                    AnGangzi::new([t, t, t, t]).unwrap(),
+                ));
+            } else { // When added kan is possible
             }
         }
 
