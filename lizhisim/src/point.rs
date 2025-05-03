@@ -1,4 +1,4 @@
-use anyhow::{ensure, Result};
+use anyhow::{bail, ensure, Result};
 
 pub(crate) type Point = i32;
 
@@ -14,85 +14,58 @@ pub(crate) const MAX_MA: Ma = 10_000;
 pub(crate) const MIN_MA: Ma = -10_000;
 
 pub(crate) fn validate_point(point: &Point) -> Result<()> {
-    ensure!(
-        *point >= MIN_POINT,
-        "Points cannot be less than {}: {}",
-        MIN_POINT,
-        *point,
-    );
-    ensure!(
-        *point <= MAX_POINT,
-        "Points cannot be greater than {}: {}",
-        MAX_POINT,
-        *point,
-    );
-    ensure!(
-        *point % UNIT_POINT == 0,
-        "Points must be a multiple of {}: {}",
-        UNIT_POINT,
-        *point,
-    );
-    Ok(())
+    match *point {
+        p if p < MIN_POINT => bail!("Points cannot be less than {}: {}", MIN_POINT, p),
+        p if p > MAX_POINT => bail!("Points cannot be greater than {}: {}", MAX_POINT, p),
+        p if p % UNIT_POINT != 0 => bail!("Points must be a multiple of {}: {}", UNIT_POINT, p),
+        _ => Ok(()),
+    }
 }
 
 pub(crate) fn validate_lizhibang_point(point: &Point) -> Result<()> {
-    ensure!(
-        *point >= MIN_POINT,
-        "Riichi Bet Points cannot be less than {}: {}",
-        MIN_POINT,
-        *point,
-    );
-    ensure!(
-        *point <= MAX_LIZHIBANG_POINT,
-        "Riichi Bet Points cannot be greater than {}: {}",
-        MAX_LIZHIBANG_POINT,
-        *point,
-    );
-    ensure!(
-        *point % UNIT_POINT == 0,
-        "Riichi Bet Points must be a multiple of {}: {}",
-        UNIT_POINT,
-        *point,
-    );
-    Ok(())
+    match *point {
+        p if p < MIN_POINT => bail!("Riichi Bet Points cannot be less than {}: {}", MIN_POINT, p),
+        p if p > MAX_LIZHIBANG_POINT => bail!(
+            "Riichi Bet Points cannot be greater than {}: {}",
+            MAX_LIZHIBANG_POINT,
+            p
+        ),
+        p if p % UNIT_POINT != 0 => bail!(
+            "Riichi Bet Points must be a multiple of {}: {}",
+            UNIT_POINT,
+            p
+        ),
+        _ => Ok(()),
+    }
 }
 
 pub(crate) fn validate_changbang_point(point: &Point) -> Result<()> {
-    ensure!(
-        *point >= MIN_POINT,
-        "Repeat Counter Points cannot be less than {}: {}",
-        MIN_POINT,
-        *point,
-    );
-    ensure!(
-        *point <= MAX_CHANGBANG_POINT,
-        "Repeat Counter Points cannot be greater than {}: {}",
-        MAX_CHANGBANG_POINT,
-        *point,
-    );
-    ensure!(
-        *point % UNIT_POINT == 0,
-        "Repeat Counter Points must be a multiple of {}: {}",
-        UNIT_POINT,
-        *point,
-    );
-    Ok(())
+    match *point {
+        p if p < MIN_POINT => bail!(
+            "Repeat Counter Points cannot be less than {}: {}",
+            MIN_POINT,
+            p
+        ),
+        p if p > MAX_CHANGBANG_POINT => bail!(
+            "Repeat Counter Points cannot be greater than {}: {}",
+            MAX_CHANGBANG_POINT,
+            p
+        ),
+        p if p % UNIT_POINT != 0 => bail!(
+            "Repeat Counter Points must be a multiple of {}: {}",
+            UNIT_POINT,
+            p
+        ),
+        _ => Ok(()),
+    }
 }
 
 pub(crate) fn validate_ma(ma: &Ma) -> Result<()> {
-    ensure!(
-        *ma >= MIN_MA,
-        "Order Bonus cannot be less than {}: {}",
-        MIN_POINT,
-        *ma,
-    );
-    ensure!(
-        *ma <= MAX_MA,
-        "Order Bonus cannot be greater than {}: {}",
-        MAX_POINT,
-        *ma,
-    );
-    Ok(())
+    match *ma {
+        m if m < MIN_MA => bail!("Order Bonus cannot be less than {}: {}", MIN_MA, m),
+        m if m > MAX_MA => bail!("Order Bonus cannot be greater than {}: {}", MAX_MA, m),
+        _ => Ok(()),
+    }
 }
 
 #[cfg(test)]
