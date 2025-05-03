@@ -80,21 +80,17 @@ impl RandomBipai {
             }
         };
 
-        let baopai_indicators = if *rule.has_biao_baopai() {
+        let baopai_indicators = rule.has_biao_baopai().then(|| {
             let mut b = ArrayVec::<Tile, MAX_NUM_BAOPAI>::new();
             b.push(tiles[num_lingshangpai]);
-            Some(b)
-        } else {
-            None
-        };
+            b
+        });
 
-        let li_baopai_indicators = if *rule.has_li_baopai() {
+        let li_baopai_indicators = rule.has_li_baopai().then(|| {
             let mut l = ArrayVec::<Tile, MAX_NUM_BAOPAI>::new();
             l.push(tiles[num_lingshangpai + MAX_NUM_BAOPAI]);
-            Some(l)
-        } else {
-            None
-        };
+            l
+        });
 
         Self {
             closed: false,
