@@ -8,125 +8,125 @@ use anyhow::{bail, ensure, Result};
 pub struct Rule {
     /// Number of Players
     num_player: NumPlayer,
-    /// Rounds
+    /// 局数: Rounds
     changshu: Changshu,
 
     // Points
-    /// Default Starting Points
-    init_point: Point,
-    /// Minimum Points to Win
+    /// 開始時持ち点: Default Starting Points
+    starting_point: Point,
+    /// 1位必要点数: Minimum Points to Win
+    min_win_point: Point,
+    /// 返し点 (精算原点): Goal
     fandian: Point,
-    /// Goal
-    jingsuanyuandian: Point,
-    /// Upper Limit
+    /// 天辺: Upper Limit
     tianbian: Option<Point>,
-    /// Riichi Bet Points
+    /// 立直供託点数: Riichi Bet Points
     lizhibang_point: Point,
-    /// Repeat Counter Points
+    /// 積み棒点数: Repeat Counter Points
     changbang_point: Point,
-    /// Noten Penalty: 1 Tenpai Player
+    /// ノーテン罰符-1人聴牌: Noten Penalty: 1 Tenpai Player
     noting_fafu_1: Point,
-    /// Noten Penalty: 2 Tenpai Player
+    /// ノーテン罰符-2人聴牌: Noten Penalty: 2 Tenpai Player
     noting_fafu_2: Point,
-    /// Noten Penalty: 3 Tenpai Player
+    /// ノーテン罰符-3人聴牌: Noten Penalty: 3 Tenpai Player
     noting_fafu_3: Point,
-    /// Uma (Order Bonus)
+    /// 順位・沈みウマ: Uma (Order Bonus)
     shunwei_shen_ma: ShunweiShenMa,
-    /// Oka (Top Prize)
+    /// オカ: Oka (Top Prize)
     has_qiu: bool,
-    /// Tied Rank
+    /// 同点同順位: Tied Rank
     allows_tied_rank: bool,
-    /// Riichi for Negative Points
+    /// 箱下立直: Riichi for Negative Points
     can_lizhi_for_negative_point: bool,
     /// Deposits when Game Ends with Draw
     lizhibang_at_liuju: LizhibangAtLiuju,
 
     // Commonly Used Rules
-    /// Open Tanyao
+    /// 喰い断: Open Tanyao
     has_shiduan: bool,
-    /// Red Five
+    /// 赤ドラ: Red Five
     hongbaopai_count: HongbaopaiCount,
-    /// Busting
+    /// 飛び: Busting
     can_jifei: bool,
-    /// Han Limit
+    /// 飜縛り: Han Limit
     fan_limit: FanLimit,
-    /// Kiriage Mangan
+    /// 切上げ満貫: Kiriage Mangan
     has_qieshangmanguan: bool,
-    /// Head-Bump
+    /// 頭ハネ: Head-Bump
     has_toutiao: bool,
     /// Tsumo Scoring in 3-Player
-    zimo_scoring: ZimoScoring,
+    zimo_scoring_3p: ZimoScoring3P,
 
     // Dora
-    /// Open Dora
+    /// 表ドラ: Open Dora
     has_biao_baopai: bool,
-    /// Ura Dora
+    /// 裏ドラ: Ura Dora
     has_li_baopai: bool,
-    /// Kan Dora
+    /// 槓ドラ: Kan Dora
     has_gang_biao_baopai: bool,
-    /// Reveal Dora immediately after calling Open Kan
+    /// 槓ドラ即乗り: Reveal Dora immediately after calling Open Kan
     ming_baopai_immediately_open: bool,
-    /// Kan-Ura Dora
+    /// 槓裏ドラ: Kan-Ura Dora
     has_gang_li_baopai: bool,
-    /// Nuki Dora
+    /// 抜きドラ: Nuki Dora
     has_ba_baopai: bool,
 
     // Dealer Repeats
-    /// Dealer Repeats on Win
+    /// 和了連荘: Dealer Repeats on Win
     has_helelianzhuang: bool,
-    /// Dealer Repeats if Tenpai/Noten
+    /// 聴牌/ノーテン連荘: Dealer Repeats if Tenpai/Noten
     tingpai_noting_lianzhuang: TingpaiNotingLianzhuang,
-    /// First Place All Last Dealer Win Ends Game
+    /// 和了止め: First Place All Last Dealer Win Ends Game
     has_helezhongju: bool,
-    /// First Place All Last Dealer Tenpai Ends Game
+    /// 聴牌止め: First Place All Last Dealer Tenpai Ends Game
     has_tingpaizhongju: bool,
     /// Multiple Rons involving Dealer
     multiple_rong_with_zhuangjia: MultipleRongWithZhuangjia,
 
     // In-Match Draws
-    /// Four-Kan Abortive Draw
+    /// 四槓散了流局: Four-Kan Abortive Draw
     sigangsanle: Tuzhongliuju,
-    /// Four-Wind Discarded Draw
+    /// 四風連打流局: Four-Wind Discarded Draw
     sifenglianda: Tuzhongliuju,
-    /// Four-Player Riichi Draw
+    /// 四家立直流局: Four-Player Riichi Draw
     sijializhi: Tuzhongliuju,
-    /// Nine Different Terminals and Honors
+    /// 九種九牌流局: Nine Different Terminals and Honors
     jiuzhongjiupai: Tuzhongliuju,
-    /// Triple-Ron Draw
+    /// 三家和了流局: Triple-Ron Draw
     sanjiahele: Tuzhongliuju,
 
     // Yakuman
-    /// Counted Yakuman
+    /// 数え役満: Counted Yakuman
     leijiyiman: Leijiyiman,
-    /// Double Yakuman
+    /// ダブル役満: Double Yakuman
     has_shuangbeiyiman: bool,
-    /// Multiple Yakuman
+    /// 複合役満: Multiple Yakuman
     has_fuheyiman: bool,
-    /// Robbing a Kan for Thirteen Orphans
+    /// 国士無双の暗槓搶槓: Robbing a Kan for Thirteen Orphans
     has_angang_shisanyao: bool,
 
     // Others
-    /// Blessing of Man
+    /// 人和: Hand of Man
     renhe: Renhe,
-    /// Pay Responsibility for Yakuman
+    /// 責任払い (役満): Pay Responsibility for Yakuman
     bao_yiman: BaoYiman,
     /// Multiple Pay Responsibility for Yakuman
     can_coexist_multiple_yiman_bao: MultipulYimanBao,
-    /// Pay Responsibility for After a Kan by Open Kan
+    /// 責任払い (大明槓): Pay Responsibility for After a Kan by Open Kan
     has_bao_daminggang_lingshangkaihua: bool,
-    /// Mangan at Draw
+    /// 流し満貫: Mangan at Draw
     has_liujumanguan: bool,
-    /// Ippatsu
+    /// 一発: Ippatsu
     has_yifa: bool,
-    /// Extension to South/West/East
+    /// 南入/西入/東入: Extension to South/West/East
     extension_mode: ExtensionMode,
-    /// Swap Calling
+    /// 喰い替え: Swap Calling
     shiti: Shiti,
-    /// Last Turn Riichi
+    /// ツモ番なし立直: Last Turn Riichi
     nonzimo_lizhi: NonzimoLizhi,
-    /// Double Wind 4 Fu
+    /// 連風牌対子が4符: Double Wind 4 Fu
     is_lianfengpai_4_fu: bool,
-    /// Tsumo 0 Fu on After a Kan
+    /// 嶺上開花のツモが0符: Tsumo 0 Fu on After a Kan
     is_lingshangkaihua_zimofu_0: bool,
     /// Melded Tiles in Tenpai Check
     includes_fulupai_in_tingpai_check: bool,
@@ -141,7 +141,7 @@ pub struct Rule {
     /// Blessing of Heaven and Double Yakuman Combination
     is_tianhu_indifferent_to_zimopai: bool,
 }
-// 未実装のルール
+// 実装予定で未実装のルール
 // 役満の包で該当役満以外の責任も持つか(持つ:天鳳、持たない:雀魂/一番街/Mリーグ)
 // 役満包が発生したとき積み棒は誰が払うか(包責者:雀魂/一番街/Mリーグ、放銃者:龍龍)
 // 積み棒は包責任者が払うとき、大三元と四槓子の包責者が異なる場合、どちらの包責任者が積み棒を払うか(雀魂: ?(API に配列があるがどっち優先か不明) 一番街: 四槓子(包責者))
@@ -199,7 +199,7 @@ pub enum FanLimit {
 }
 
 #[derive(Clone, PartialEq, Eq)]
-pub enum ZimoScoring {
+pub enum ZimoScoring3P {
     ZimoLoss,
     SplitBeijiaPayment,
     FullPayment,
@@ -308,18 +308,18 @@ impl Rule {
     // Points
     #[inline]
     #[must_use]
-    pub fn init_point(&self) -> &Point {
-        &self.init_point
+    pub fn starting_point(&self) -> &Point {
+        &self.starting_point
+    }
+    #[inline]
+    #[must_use]
+    pub fn min_win_point(&self) -> &Point {
+        &self.min_win_point
     }
     #[inline]
     #[must_use]
     pub fn fandian(&self) -> &Point {
         &self.fandian
-    }
-    #[inline]
-    #[must_use]
-    pub fn jingsuanyuandian(&self) -> &Point {
-        &self.jingsuanyuandian
     }
     #[inline]
     #[must_use]
@@ -410,8 +410,8 @@ impl Rule {
     }
     #[inline]
     #[must_use]
-    pub fn zimo_scoring(&self) -> &ZimoScoring {
-        &self.zimo_scoring
+    pub fn zimo_scoring_3p(&self) -> &ZimoScoring3P {
+        &self.zimo_scoring_3p
     }
 
     // Dora
@@ -615,9 +615,9 @@ impl Rule {
         changshu: Changshu,
 
         // Points
-        init_point: Point,
+        starting_point: Point,
+        min_win_point: Point,
         fandian: Point,
-        jingsuanyuandian: Point,
         tianbian: Option<Point>,
         lizhibang_point: Point,
         changbang_point: Point,
@@ -637,7 +637,7 @@ impl Rule {
         fan_limit: FanLimit,
         has_qieshangmanguan: bool,
         has_toutiao: bool,
-        zimo_scoring: ZimoScoring,
+        zimo_scoring_3p: ZimoScoring3P,
 
         // Dora
         has_biao_baopai: bool,
@@ -686,20 +686,19 @@ impl Rule {
         is_zhuangjia_qipai_14: bool,
         is_tianhu_indifferent_to_zimopai: bool,
     ) -> Result<Self> {
-        validate_point(&init_point)?;
+        validate_point(&starting_point)?;
+        validate_point(&min_win_point)?;
         validate_point(&fandian)?;
-        validate_point(&jingsuanyuandian)?;
-        match tianbian {
-            Some(p) => validate_point(&p),
-            None => Ok(()),
-        }?;
+        if let Some(p) = tianbian {
+            validate_point(&p)?
+        };
         validate_lizhibang_point(&lizhibang_point)?;
         validate_changbang_point(&changbang_point)?;
         validate_point(&noting_fafu_1)?;
         validate_point(&noting_fafu_2)?;
         validate_point(&noting_fafu_3)?;
 
-        if jingsuanyuandian < init_point {
+        if fandian < starting_point {
             bail!("Initial Points must be greater or equal to the Starting Points")
         }
 
@@ -749,9 +748,9 @@ impl Rule {
             changshu,
 
             // Points
-            init_point,
+            starting_point,
+            min_win_point,
             fandian,
-            jingsuanyuandian,
             tianbian,
             lizhibang_point,
             changbang_point,
@@ -771,7 +770,7 @@ impl Rule {
             fan_limit,
             has_qieshangmanguan,
             has_toutiao,
-            zimo_scoring,
+            zimo_scoring_3p,
 
             // Dora
             has_biao_baopai,
