@@ -69,7 +69,7 @@ pub struct Rule {
     /// 槓裏ドラ: Kan-Ura Dora
     has_gang_li_baopai: bool,
     /// 抜きドラ: Nuki Dora
-    has_ba_baopai: bool,
+    has_babei_baopai: bool,
 
     // Dealer Repeats
     /// 和了連荘: Dealer Repeats on Win
@@ -442,8 +442,8 @@ impl Rule {
     }
     #[inline]
     #[must_use]
-    pub fn has_ba_baopai(&self) -> &bool {
-        &self.has_ba_baopai
+    pub fn has_babei_baopai(&self) -> &bool {
+        &self.has_babei_baopai
     }
 
     // Dealer Repeats
@@ -645,7 +645,7 @@ impl Rule {
         has_gang_biao_baopai: bool,
         ming_baopai_immediately_open: bool,
         has_gang_li_baopai: bool,
-        has_ba_baopai: bool,
+        has_babei_baopai: bool,
 
         // Dealer Repeats
         has_helelianzhuang: bool,
@@ -778,7 +778,7 @@ impl Rule {
             has_gang_biao_baopai,
             ming_baopai_immediately_open,
             has_gang_li_baopai,
-            has_ba_baopai,
+            has_babei_baopai,
 
             // Dealer Repeats
             has_helelianzhuang,

@@ -72,7 +72,7 @@ impl RandomBipai {
         let num_lingshangpai = match *rule.num_player() {
             NumPlayer::Four => NUM_LINGSHANGPAI,
             NumPlayer::Three => {
-                if *rule.has_ba_baopai() {
+                if *rule.has_babei_baopai() {
                     NUM_LINGSHANGPAI_WITH_BABEI
                 } else {
                     NUM_LINGSHANGPAI
