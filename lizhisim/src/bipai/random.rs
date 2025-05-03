@@ -122,20 +122,14 @@ impl Bipai for RandomBipai {
     #[inline]
     #[must_use]
     fn baopai_indicators(&self) -> Option<&[Tile]> {
-        match &self.baopai_indicators {
-            None => None,
-            Some(b) => Some(b.as_slice()),
-        }
+        self.baopai_indicators.as_ref().map(|b| b.as_slice())
     }
 
     #[inline]
     #[must_use]
     fn li_baopai_indicators(&self) -> Result<Option<&[Tile]>> {
         ensure!(self.closed, "Round is not finished yet.");
-        match &self.li_baopai_indicators {
-            None => Ok(None),
-            Some(l) => Ok(Some(l.as_slice())),
-        }
+        Ok(self.li_baopai_indicators.as_ref().map(|l| l.as_slice()))
     }
 
     #[inline]
