@@ -1,4 +1,4 @@
-use anyhow::{bail, ensure, Result};
+use anyhow::{bail, Result};
 
 pub(crate) type Point = i32;
 
