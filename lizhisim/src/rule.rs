@@ -728,6 +728,13 @@ impl Rule {
             )
         }
 
+        if !has_fuheyiman && can_coexist_multiple_yiman_bao == MultipulYimanBao::Both {
+            bail!(
+                "When Multiple Yakuman is not allowed, \
+                either Big Three Dragons or Four Quads must be specified for Yakuman Pao, not both."
+            )
+        }
+
         if angang_after_lizhi == AngangAfterLizhi::AllowedIfNotChangingWaits
             && includes_fulupai_in_tingpai_check
         {
