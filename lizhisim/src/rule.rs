@@ -138,8 +138,9 @@ pub struct Rule {
     is_bei_menfengpai: bool,
     /// Dealer's Start Hand is 14 Tiles
     is_zhuangjia_qipai_14: bool,
-    /// Blessing of Heaven and Double Yakuman Combination
-    is_tianhu_indifferent_to_zimopai: bool,
+    /// If Blessing of Heaven occurs, the tile that gives the highest points
+    /// is considered the drawn tile, regardless of which tile was actually drawn.
+    ignores_actual_zimopai_on_tianhu: bool,
 }
 // 実装予定で未実装のルール
 // 役満の包で該当役満以外の責任も持つか(持つ:天鳳、持たない:雀魂/一番街/Mリーグ)
@@ -605,8 +606,8 @@ impl Rule {
     }
     #[inline]
     #[must_use]
-    pub fn is_tianhu_indifferent_to_zimopai(&self) -> &bool {
-        &self.is_tianhu_indifferent_to_zimopai
+    pub fn ignores_actual_zimopai_on_tianhu(&self) -> &bool {
+        &self.ignores_actual_zimopai_on_tianhu
     }
 
     #[must_use]
@@ -684,7 +685,7 @@ impl Rule {
         can_noting_declaration: bool,
         is_bei_menfengpai: bool,
         is_zhuangjia_qipai_14: bool,
-        is_tianhu_indifferent_to_zimopai: bool,
+        ignores_actual_zimopai_on_tianhu: bool,
     ) -> Result<Self> {
         validate_point(&starting_point)?;
         validate_point(&min_win_point)?;
@@ -736,7 +737,7 @@ impl Rule {
             )
         }
 
-        if is_zhuangjia_qipai_14 && !is_tianhu_indifferent_to_zimopai {
+        if is_zhuangjia_qipai_14 && !ignores_actual_zimopai_on_tianhu {
             bail!(
                 "If the number of dealer's start hand is 14, \
                 the first draw tile cannot be distinguished."
@@ -817,7 +818,7 @@ impl Rule {
             can_noting_declaration,
             is_bei_menfengpai,
             is_zhuangjia_qipai_14,
-            is_tianhu_indifferent_to_zimopai,
+            ignores_actual_zimopai_on_tianhu,
         })
     }
 }
