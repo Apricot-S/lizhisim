@@ -127,7 +127,7 @@ pub struct Rule {
     /// 連風牌対子が4符: Double Wind 4 Fu
     is_lianfengpai_4_fu: bool,
     /// 嶺上開花のツモが0符: Tsumo 0 Fu on After a Kan
-    is_lingshangkaihua_zimofu_0: bool,
+    is_lingshangkaihua_zimo_0_fu: bool,
     /// Melded Tiles in Tenpai Check
     includes_fulupai_in_tingpai_check: bool,
     /// Concealed Kan after Riichi
@@ -575,8 +575,8 @@ impl Rule {
     }
     #[inline]
     #[must_use]
-    pub fn is_lingshangkaihua_zimofu_0(&self) -> &bool {
-        &self.is_lingshangkaihua_zimofu_0
+    pub fn is_lingshangkaihua_zimo_0_fu(&self) -> &bool {
+        &self.is_lingshangkaihua_zimo_0_fu
     }
     #[inline]
     #[must_use]
@@ -678,7 +678,7 @@ impl Rule {
         shiti: Shiti,
         nonzimo_lizhi: NonzimoLizhi,
         is_lianfengpai_4_fu: bool,
-        is_lingshangkaihua_zimofu_0: bool,
+        is_lingshangkaihua_zimo_0_fu: bool,
         includes_fulupai_in_tingpai_check: bool,
         angang_after_lizhi: AngangAfterLizhi,
         can_noting_declaration: bool,
@@ -811,7 +811,7 @@ impl Rule {
             shiti,
             nonzimo_lizhi,
             is_lianfengpai_4_fu,
-            is_lingshangkaihua_zimofu_0,
+            is_lingshangkaihua_zimo_0_fu,
             includes_fulupai_in_tingpai_check,
             angang_after_lizhi,
             can_noting_declaration,
