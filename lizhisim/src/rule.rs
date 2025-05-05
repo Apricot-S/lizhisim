@@ -97,7 +97,7 @@ pub struct Rule {
 
     // Yakuman
     /// 数え役満: Counted Yakuman
-    leijiyiman: Leijiyiman,
+    has_leijiyiman: bool,
     /// ダブル役満: Double Yakuman
     has_shuangbeiyiman: bool,
     /// 複合役満: Multiple Yakuman
@@ -504,8 +504,8 @@ impl Rule {
     // Yakuman
     #[inline]
     #[must_use]
-    pub fn leijiyiman(&self) -> &Leijiyiman {
-        &self.leijiyiman
+    pub fn has_leijiyiman(&self) -> &bool {
+        &self.has_leijiyiman
     }
     #[inline]
     #[must_use]
@@ -663,7 +663,7 @@ impl Rule {
         sanjiahele: Tuzhongliuju,
 
         // Yakuman
-        leijiyiman: Leijiyiman,
+        has_leijiyiman: bool,
         has_shuangbeiyiman: bool,
         has_fuheyiman: bool,
         has_angang_shisanyao: bool,
@@ -803,7 +803,7 @@ impl Rule {
             sanjiahele,
 
             // Yakuman
-            leijiyiman,
+            has_leijiyiman,
             has_shuangbeiyiman,
             has_fuheyiman,
             has_angang_shisanyao,
