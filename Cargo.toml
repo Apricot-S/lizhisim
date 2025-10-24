@@ -1,0 +1,22 @@
+[workspace]
+members = [
+    "lizhisim",
+]
+
+[workspace.package]
+description = "A Japanese (Riichi) mahjong game simulator."
+version = "0.1.0"
+authors = ["Apricot S."]
+edition = "2024"
+rust-version = "1.90"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/Apricot-S/lizhisim"
+categories = ["simulation"]
+keywords = ["mahjong", "riichi"]
+
+[workspace.metadata.release]
+tag-prefix = ""
+
+[workspace.dependencies]
+thiserror = "2.0.17"

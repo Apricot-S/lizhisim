@@ -1,0 +1,21 @@
+[package]
+name = "lizhisim"
+description.workspace = true
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+readme = "README.md"
+repository.workspace = true
+categories.workspace = true
+keywords.workspace = true
+
+[lib]
+name = "lizhisim"
+path = "src/lib.rs"
+
+[dependencies]
+anyhow = "1.0.100"
+rand = "0.9.2"
+thiserror.workspace = true
