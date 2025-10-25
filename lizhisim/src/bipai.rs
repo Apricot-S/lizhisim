@@ -3,7 +3,7 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 use crate::tile::{Tile, TileError};
-use crate::{t, tuz};
+use crate::{t, tu8, tuz};
 use rand::Rng;
 use rand::seq::SliceRandom;
 use thiserror::Error;
@@ -79,9 +79,9 @@ impl HongbaopaiConfig {
     #[inline]
     pub(crate) const fn new(m: u8, p: u8, s: u8) -> Result<Self, HongbaopaiConfigError> {
         if m <= MAX_TILE_COPIES && p <= MAX_TILE_COPIES && s <= MAX_TILE_COPIES {
-            Ok(Self { m: m, p: p, s: s })
+            Ok(Self { m, p, s })
         } else {
-            Err(HongbaopaiConfigError { m: m, p: p, s: s })
+            Err(HongbaopaiConfigError { m, p, s })
         }
     }
 
@@ -118,13 +118,34 @@ pub(crate) enum BipaiError {
     Tile(#[from] TileError),
     #[error("tile {0:?} appears {1} times instead of 4")]
     WrongMultiplicity(Tile, u8),
+    #[error(transparent)]
+    HongbaopaiConfig(#[from] HongbaopaiConfigError),
 }
 
 impl Bipai {
-    pub(crate) fn new(rng: &mut impl Rng) -> Self {
+    pub(crate) fn new(rng: &mut impl Rng, config: &HongbaopaiConfig) -> Self {
         let mut tiles = INITIAL_BIPAI;
+        Self::apply_hongbaopai_config(&mut tiles, config);
         tiles.shuffle(rng);
-        Self { tiles: tiles }
+        Self { tiles }
+    }
+
+    fn apply_hongbaopai_config(tiles: &mut [Tile; NUM_BIPAI_TILES], config: &HongbaopaiConfig) {
+        Self::replace_with_hongbaopai(tiles, RED_5M_INDEX, t!(0m), config.m());
+        Self::replace_with_hongbaopai(tiles, RED_5P_INDEX, t!(0p), config.p());
+        Self::replace_with_hongbaopai(tiles, RED_5S_INDEX, t!(0s), config.s());
+    }
+
+    fn replace_with_hongbaopai(
+        tiles: &mut [Tile; NUM_BIPAI_TILES],
+        base_index: usize,
+        red: Tile,
+        count: u8,
+    ) {
+        for i in 0..count {
+            let idx = base_index + i as usize;
+            tiles[idx] = red;
+        }
     }
 
     pub(crate) fn from_slice(bipai: &[u8]) -> Result<Self, BipaiError> {
@@ -140,8 +161,18 @@ impl Bipai {
             .map_err(|v: Vec<Tile>| BipaiError::WrongLength(v.len()))?;
 
         let mut counts = [0u8; 34];
+        let mut num_0m = 0;
+        let mut num_0p = 0;
+        let mut num_0s = 0;
         for tile in tiles {
             counts[tile.normalize_hongbaopai().to_usize()] += 1;
+
+            match tile.as_u8() {
+                tu8!(0m) => num_0m += 1,
+                tu8!(0p) => num_0p += 1,
+                tu8!(0s) => num_0s += 1,
+                _ => (),
+            }
         }
 
         if let Some((i, &count)) = counts
@@ -154,6 +185,8 @@ impl Bipai {
                 count,
             ));
         }
+
+        HongbaopaiConfig::new(num_0m, num_0p, num_0s)?;
 
         Ok(Bipai { tiles })
     }
@@ -191,13 +224,27 @@ mod tests {
     #[test]
     fn new_bipai() {
         let mut rng = StdRng::seed_from_u64(42);
-        let bipai = Bipai::new(&mut rng);
+        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let bipai = Bipai::new(&mut rng, &config);
 
         let mut counts = [0u8; 34];
+        let mut num_0m = 0;
+        let mut num_0p = 0;
+        let mut num_0s = 0;
         for tile in bipai.tiles {
             counts[tile.normalize_hongbaopai().to_usize()] += 1;
+
+            match tile.as_u8() {
+                tu8!(0m) => num_0m += 1,
+                tu8!(0p) => num_0p += 1,
+                tu8!(0s) => num_0s += 1,
+                _ => (),
+            }
         }
 
         assert_eq!(counts, [4; 34]);
+        assert_eq!(num_0m, 0);
+        assert_eq!(num_0p, 1);
+        assert_eq!(num_0s, 2);
     }
 }
