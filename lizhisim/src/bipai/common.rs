@@ -9,12 +9,13 @@ pub(super) const NUM_WANGPAI: usize = 14;
 pub(super) const NUM_LINGSHANGPAI: usize = 4;
 pub(super) const MAX_GANG_COUNT: usize = 4;
 pub(super) const MAX_NUM_BAOPAI: usize = MAX_GANG_COUNT + 1;
+pub(super) const NUM_HAND_TILES: usize = 13;
 
 /// 壁牌: Wall.
 pub(crate) trait Bipai {
     fn left_tile_count(&self) -> u8;
-    fn baopai_indicators(&self) -> Option<&[Tile]>;
-    fn libaopai_indicators(&self) -> Option<&[Tile]>;
+    fn baopai_indicators(&self) -> &[Tile];
+    fn libaopai_indicators(&self) -> &[Tile];
 
     fn zimo(&mut self) -> Option<Tile>;
     fn lingshangzimo(&mut self) -> Option<Tile>;

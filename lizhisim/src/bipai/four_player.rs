@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use super::common::MAX_TILE_COPIES;
+use super::common::{Bipai, MAX_TILE_COPIES, NUM_HAND_TILES, NUM_WANGPAI};
 use crate::tile::{Tile, TileError};
 use crate::{t, tu8, tuz};
 use rand::Rng;
@@ -13,6 +13,9 @@ const NUM_BIPAI_TILES: usize = (9 * 3 + 7) * MAX_TILE_COPIES as usize;
 const RED_5M_INDEX: usize = tuz!(5m) * MAX_TILE_COPIES as usize;
 const RED_5P_INDEX: usize = tuz!(5p) * MAX_TILE_COPIES as usize;
 const RED_5S_INDEX: usize = tuz!(5s) * MAX_TILE_COPIES as usize;
+
+const NUM_ZIMOPAI: usize = NUM_BIPAI_TILES - NUM_HAND_TILES * 4 - NUM_WANGPAI;
+const FIRST_ZIMO_INDEX: usize = NUM_HAND_TILES * 4;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct HongbaopaiConfig {
@@ -61,6 +64,8 @@ impl HongbaopaiConfig {
 #[derive(Debug)]
 pub(crate) struct Bipai4p {
     tiles: [Tile; NUM_BIPAI_TILES],
+    left_tile_count: u8,
+    zimo_index: usize,
 }
 
 #[derive(Debug, Error)]
@@ -123,7 +128,12 @@ impl Bipai4p {
 
         Self::apply_hongbaopai_config(&mut tiles, config);
         tiles.shuffle(rng);
-        Self { tiles }
+
+        Self {
+            tiles,
+            left_tile_count: NUM_ZIMOPAI as u8,
+            zimo_index: FIRST_ZIMO_INDEX,
+        }
     }
 
     fn apply_hongbaopai_config(tiles: &mut [Tile; NUM_BIPAI_TILES], config: &HongbaopaiConfig) {
@@ -195,7 +205,44 @@ impl Bipai4p {
             });
         }
 
-        Ok(Bipai4p { tiles })
+        Ok(Bipai4p {
+            tiles,
+            left_tile_count: NUM_ZIMOPAI as u8,
+            zimo_index: FIRST_ZIMO_INDEX,
+        })
+    }
+}
+
+impl Bipai for Bipai4p {
+    fn left_tile_count(&self) -> u8 {
+        self.left_tile_count
+    }
+
+    fn baopai_indicators(&self) -> &[Tile] {
+        &[] // TODO
+    }
+
+    fn libaopai_indicators(&self) -> &[Tile] {
+        &[] // TODO
+    }
+
+    fn zimo(&mut self) -> Option<Tile> {
+        if self.left_tile_count() == 0 {
+            return None;
+        }
+
+        let t = self.tiles[self.zimo_index];
+        self.left_tile_count -= 1;
+        self.zimo_index += 1;
+        Some(t)
+    }
+
+    fn lingshangzimo(&mut self) -> Option<Tile> {
+        None // TODO
+    }
+
+    fn kaigang(&mut self) {
+        // TODO
     }
 }
 
@@ -339,5 +386,43 @@ mod tests {
         } else {
             panic!("unexpected error: {:?}", err);
         }
+    }
+
+    #[test]
+    fn zimo_first() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[13 * 4] = 35;
+        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
+        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        let zimopai = bipai.zimo();
+        assert_eq!(zimopai, Some(t!(0p)));
+    }
+
+    #[test]
+    fn zimo_second() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[13 * 4] = 35;
+        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
+        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        let _ = bipai.zimo();
+        let zimopai = bipai.zimo();
+        assert_eq!(zimopai, Some(t!(5p)));
+    }
+
+    #[test]
+    fn zimo_no_tiles() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[13 * 4] = 35;
+        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
+        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        for _ in 0..70 {
+            let _ = bipai.zimo();
+        }
+
+        let zimopai = bipai.zimo();
+        assert_eq!(zimopai, None);
     }
 }
