@@ -41,10 +41,11 @@ impl Tile {
 
     #[inline]
     #[must_use]
-    pub(crate) const fn to_usize(&self) -> usize {
+    pub(crate) const fn to_usize(self) -> usize {
         self.id as usize
     }
 
+    #[allow(clippy::manual_range_patterns)]
     #[inline]
     #[must_use]
     pub(crate) const fn is_zipai(&self) -> bool {
@@ -60,6 +61,7 @@ impl Tile {
         )
     }
 
+    #[allow(clippy::manual_range_patterns)]
     #[inline]
     #[must_use]
     pub(crate) const fn is_hongbaopai(&self) -> bool {
