@@ -7,6 +7,7 @@ use thiserror::Error;
 
 const MAX_TILE_ID: u8 = 36;
 
+/// 牌: Tile.
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) struct Tile {

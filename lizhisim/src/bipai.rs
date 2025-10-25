@@ -104,6 +104,7 @@ impl HongbaopaiConfig {
     }
 }
 
+/// 壁牌: Wall.
 #[derive(Debug)]
 pub(crate) struct Bipai {
     tiles: [Tile; NUM_BIPAI_TILES],
