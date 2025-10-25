@@ -202,7 +202,6 @@ macro_rules! matches_tu8 {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::tile::Tile;
 
     #[test]
