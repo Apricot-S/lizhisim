@@ -60,7 +60,7 @@ const INITIAL_BIPAI: [Tile; NUM_BIPAI_TILES] = [
     t!(7z), t!(7z), t!(7z), t!(7z),
 ];
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub(crate) struct HongbaopaiConfig {
     m: u8,
     p: u8,
@@ -148,7 +148,7 @@ impl Bipai {
         }
     }
 
-    pub(crate) fn from_slice(bipai: &[u8]) -> Result<Self, BipaiError> {
+    pub(crate) fn from_slice(bipai: &[u8], config: &HongbaopaiConfig) -> Result<Self, BipaiError> {
         if bipai.len() != NUM_BIPAI_TILES {
             return Err(BipaiError::WrongLength(bipai.len()));
         }
@@ -186,7 +186,7 @@ impl Bipai {
             ));
         }
 
-        HongbaopaiConfig::new(num_0m, num_0p, num_0s)?;
+        if *config != HongbaopaiConfig::new(num_0m, num_0p, num_0s)? {}
 
         Ok(Bipai { tiles })
     }
@@ -226,6 +226,36 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(42);
         let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
         let bipai = Bipai::new(&mut rng, &config);
+
+        let mut counts = [0u8; 34];
+        let mut num_0m = 0;
+        let mut num_0p = 0;
+        let mut num_0s = 0;
+        for tile in bipai.tiles {
+            counts[tile.normalize_hongbaopai().to_usize()] += 1;
+
+            match tile.as_u8() {
+                tu8!(0m) => num_0m += 1,
+                tu8!(0p) => num_0p += 1,
+                tu8!(0s) => num_0s += 1,
+                _ => (),
+            }
+        }
+
+        assert_eq!(counts, [4; 34]);
+        assert_eq!(num_0m, 0);
+        assert_eq!(num_0p, 1);
+        assert_eq!(num_0s, 2);
+    }
+
+    #[test]
+    fn from_slice_valid() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[13 * 4] = 35;
+        tiles[22 * 4] = 36;
+        tiles[22 * 4 + 1] = 36;
+        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let bipai = Bipai::from_slice(&tiles, &config).unwrap();
 
         let mut counts = [0u8; 34];
         let mut num_0m = 0;
