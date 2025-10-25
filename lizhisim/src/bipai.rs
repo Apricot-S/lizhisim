@@ -60,7 +60,7 @@ const INITIAL_BIPAI: [Tile; NUM_BIPAI_TILES] = [
     t!(7z), t!(7z), t!(7z), t!(7z),
 ];
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct HongbaopaiConfig {
     m: u8,
     p: u8,
@@ -120,6 +120,11 @@ pub(crate) enum BipaiError {
     WrongMultiplicity(Tile, u8),
     #[error(transparent)]
     HongbaopaiConfig(#[from] HongbaopaiConfigError),
+    #[error("red five config mismatch: expected {expected:?}, found {found:?}")]
+    HongbaopaiConfigMismatch {
+        expected: HongbaopaiConfig,
+        found: HongbaopaiConfig,
+    },
 }
 
 impl Bipai {
@@ -186,7 +191,13 @@ impl Bipai {
             ));
         }
 
-        if *config != HongbaopaiConfig::new(num_0m, num_0p, num_0s)? {}
+        let config_ = HongbaopaiConfig::new(num_0m, num_0p, num_0s)?;
+        if config_ != *config {
+            return Err(BipaiError::HongbaopaiConfigMismatch {
+                expected: config.clone(),
+                found: config_,
+            });
+        }
 
         Ok(Bipai { tiles })
     }
