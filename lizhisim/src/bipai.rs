@@ -305,4 +305,14 @@ mod tests {
 
         assert!(matches!(err, BipaiError::InvalidLength(137)));
     }
+
+    #[test]
+    fn from_slice_invalid_tiles_id() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[135] = 37;
+        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let err = Bipai::from_slice(&tiles, &config).unwrap_err();
+
+        assert!(matches!(err, BipaiError::Tile(TileError::OutOfRange(37))));
+    }
 }
