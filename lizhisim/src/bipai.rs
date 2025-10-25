@@ -72,7 +72,7 @@ pub(crate) struct Bipai {
 #[derive(Debug, Error)]
 pub(crate) enum BipaiError {
     #[error("invalid number of tiles: {0}")]
-    WrongLength(usize),
+    InvalidLength(usize),
     #[error(transparent)]
     Tile(#[from] TileError),
     #[error("tile {0:?} appears {1} times instead of 4")]
@@ -154,7 +154,7 @@ impl Bipai {
 
     pub(crate) fn from_slice(bipai: &[u8], config: &HongbaopaiConfig) -> Result<Self, BipaiError> {
         if bipai.len() != NUM_BIPAI_TILES {
-            return Err(BipaiError::WrongLength(bipai.len()));
+            return Err(BipaiError::InvalidLength(bipai.len()));
         }
 
         let tiles: [Tile; NUM_BIPAI_TILES] = bipai
@@ -162,7 +162,7 @@ impl Bipai {
             .map(|&t| Tile::try_from(t))
             .collect::<Result<Vec<_>, _>>()?
             .try_into()
-            .map_err(|v: Vec<Tile>| BipaiError::WrongLength(v.len()))?;
+            .map_err(|v: Vec<Tile>| BipaiError::InvalidLength(v.len()))?;
 
         let mut counts = [0u8; 34];
         let mut num_0m = 0;
@@ -286,5 +286,23 @@ mod tests {
         assert_eq!(num_0m, 0);
         assert_eq!(num_0p, 1);
         assert_eq!(num_0s, 2);
+    }
+
+    #[test]
+    fn from_slice_invalid_135_tiles() {
+        let tiles = (0..135).map(|t| t / 4).collect::<Vec<u8>>();
+        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let err = Bipai::from_slice(&tiles, &config).unwrap_err();
+
+        assert!(matches!(err, BipaiError::InvalidLength(135)));
+    }
+
+    #[test]
+    fn from_slice_invalid_137_tiles() {
+        let tiles = (0..137).map(|t| t / 4).collect::<Vec<u8>>();
+        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let err = Bipai::from_slice(&tiles, &config).unwrap_err();
+
+        assert!(matches!(err, BipaiError::InvalidLength(137)));
     }
 }
