@@ -19,47 +19,6 @@ const RED_5M_INDEX: usize = tuz!(5m) * MAX_TILE_COPIES as usize;
 const RED_5P_INDEX: usize = tuz!(5p) * MAX_TILE_COPIES as usize;
 const RED_5S_INDEX: usize = tuz!(5s) * MAX_TILE_COPIES as usize;
 
-#[rustfmt::skip]
-const INITIAL_BIPAI: [Tile; NUM_BIPAI_TILES] = [
-    t!(1m), t!(1m), t!(1m), t!(1m),
-    t!(2m), t!(2m), t!(2m), t!(2m),
-    t!(3m), t!(3m), t!(3m), t!(3m),
-    t!(4m), t!(4m), t!(4m), t!(4m),
-    t!(5m), t!(5m), t!(5m), t!(5m),
-    t!(6m), t!(6m), t!(6m), t!(6m),
-    t!(7m), t!(7m), t!(7m), t!(7m),
-    t!(8m), t!(8m), t!(8m), t!(8m),
-    t!(9m), t!(9m), t!(9m), t!(9m),
-
-    t!(1p), t!(1p), t!(1p), t!(1p),
-    t!(2p), t!(2p), t!(2p), t!(2p),
-    t!(3p), t!(3p), t!(3p), t!(3p),
-    t!(4p), t!(4p), t!(4p), t!(4p),
-    t!(5p), t!(5p), t!(5p), t!(5p),
-    t!(6p), t!(6p), t!(6p), t!(6p),
-    t!(7p), t!(7p), t!(7p), t!(7p),
-    t!(8p), t!(8p), t!(8p), t!(8p),
-    t!(9p), t!(9p), t!(9p), t!(9p),
-
-    t!(1s), t!(1s), t!(1s), t!(1s),
-    t!(2s), t!(2s), t!(2s), t!(2s),
-    t!(3s), t!(3s), t!(3s), t!(3s),
-    t!(4s), t!(4s), t!(4s), t!(4s),
-    t!(5s), t!(5s), t!(5s), t!(5s),
-    t!(6s), t!(6s), t!(6s), t!(6s),
-    t!(7s), t!(7s), t!(7s), t!(7s),
-    t!(8s), t!(8s), t!(8s), t!(8s),
-    t!(9s), t!(9s), t!(9s), t!(9s),
-
-    t!(1z), t!(1z), t!(1z), t!(1z),
-    t!(2z), t!(2z), t!(2z), t!(2z),
-    t!(3z), t!(3z), t!(3z), t!(3z),
-    t!(4z), t!(4z), t!(4z), t!(4z),
-    t!(5z), t!(5z), t!(5z), t!(5z),
-    t!(6z), t!(6z), t!(6z), t!(6z),
-    t!(7z), t!(7z), t!(7z), t!(7z),
-];
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct HongbaopaiConfig {
     m: u8,
@@ -129,7 +88,47 @@ pub(crate) enum BipaiError {
 
 impl Bipai {
     pub(crate) fn new(rng: &mut impl Rng, config: &HongbaopaiConfig) -> Self {
-        let mut tiles = INITIAL_BIPAI;
+        #[rustfmt::skip]
+        let mut tiles = [
+            t!(1m), t!(1m), t!(1m), t!(1m),
+            t!(2m), t!(2m), t!(2m), t!(2m),
+            t!(3m), t!(3m), t!(3m), t!(3m),
+            t!(4m), t!(4m), t!(4m), t!(4m),
+            t!(5m), t!(5m), t!(5m), t!(5m),
+            t!(6m), t!(6m), t!(6m), t!(6m),
+            t!(7m), t!(7m), t!(7m), t!(7m),
+            t!(8m), t!(8m), t!(8m), t!(8m),
+            t!(9m), t!(9m), t!(9m), t!(9m),
+
+            t!(1p), t!(1p), t!(1p), t!(1p),
+            t!(2p), t!(2p), t!(2p), t!(2p),
+            t!(3p), t!(3p), t!(3p), t!(3p),
+            t!(4p), t!(4p), t!(4p), t!(4p),
+            t!(5p), t!(5p), t!(5p), t!(5p),
+            t!(6p), t!(6p), t!(6p), t!(6p),
+            t!(7p), t!(7p), t!(7p), t!(7p),
+            t!(8p), t!(8p), t!(8p), t!(8p),
+            t!(9p), t!(9p), t!(9p), t!(9p),
+
+            t!(1s), t!(1s), t!(1s), t!(1s),
+            t!(2s), t!(2s), t!(2s), t!(2s),
+            t!(3s), t!(3s), t!(3s), t!(3s),
+            t!(4s), t!(4s), t!(4s), t!(4s),
+            t!(5s), t!(5s), t!(5s), t!(5s),
+            t!(6s), t!(6s), t!(6s), t!(6s),
+            t!(7s), t!(7s), t!(7s), t!(7s),
+            t!(8s), t!(8s), t!(8s), t!(8s),
+            t!(9s), t!(9s), t!(9s), t!(9s),
+
+            t!(1z), t!(1z), t!(1z), t!(1z),
+            t!(2z), t!(2z), t!(2z), t!(2z),
+            t!(3z), t!(3z), t!(3z), t!(3z),
+            t!(4z), t!(4z), t!(4z), t!(4z),
+            t!(5z), t!(5z), t!(5z), t!(5z),
+            t!(6z), t!(6z), t!(6z), t!(6z),
+            t!(7z), t!(7z), t!(7z), t!(7z),
+        ];
+
         Self::apply_hongbaopai_config(&mut tiles, config);
         tiles.shuffle(rng);
         Self { tiles }
