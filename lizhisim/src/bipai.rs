@@ -76,9 +76,7 @@ pub(crate) enum BipaiError {
     #[error(transparent)]
     Tile(#[from] TileError),
     #[error("tile {0:?} appears {1} times instead of 4")]
-    WrongMultiplicity(Tile, u8),
-    #[error(transparent)]
-    HongbaopaiConfig(#[from] HongbaopaiConfigError),
+    InvalidTileCount(Tile, u8),
     #[error("red five config mismatch: expected {expected:?}, found {found:?}")]
     HongbaopaiConfigMismatch {
         expected: HongbaopaiConfig,
@@ -184,13 +182,15 @@ impl Bipai {
             .enumerate()
             .find(|&(_, &c)| c != MAX_TILE_COPIES)
         {
-            return Err(BipaiError::WrongMultiplicity(
+            return Err(BipaiError::InvalidTileCount(
                 Tile::try_from(i as u8)?,
                 count,
             ));
         }
 
-        let config_ = HongbaopaiConfig::new(num_0m, num_0p, num_0s)?;
+        // The number of tiles has already been checked, so there is no error.
+        let config_ = HongbaopaiConfig::new(num_0m, num_0p, num_0s).unwrap();
+
         if config_ != *config {
             return Err(BipaiError::HongbaopaiConfigMismatch {
                 expected: config.clone(),
@@ -291,7 +291,7 @@ mod tests {
     #[test]
     fn from_slice_invalid_135_tiles() {
         let tiles = (0..135).map(|t| t / 4).collect::<Vec<u8>>();
-        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
         let err = Bipai::from_slice(&tiles, &config).unwrap_err();
 
         assert!(matches!(err, BipaiError::InvalidLength(135)));
@@ -300,7 +300,7 @@ mod tests {
     #[test]
     fn from_slice_invalid_137_tiles() {
         let tiles = (0..137).map(|t| t / 4).collect::<Vec<u8>>();
-        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
         let err = Bipai::from_slice(&tiles, &config).unwrap_err();
 
         assert!(matches!(err, BipaiError::InvalidLength(137)));
@@ -310,9 +310,37 @@ mod tests {
     fn from_slice_invalid_tiles_id() {
         let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
         tiles[135] = 37;
-        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
         let err = Bipai::from_slice(&tiles, &config).unwrap_err();
 
         assert!(matches!(err, BipaiError::Tile(TileError::OutOfRange(37))));
+    }
+
+    #[test]
+    fn from_slice_invalid_1m_5_copies() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[135] = 0;
+        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
+        let err = Bipai::from_slice(&tiles, &config).unwrap_err();
+
+        if let BipaiError::InvalidTileCount(tile, 5) = err {
+            assert_eq!(tile, t!(1m));
+        } else {
+            panic!("unexpected error: {:?}", err);
+        }
+    }
+
+    #[test]
+    fn from_slice_invalid_config_mismatch() {
+        let tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let err = Bipai::from_slice(&tiles, &config).unwrap_err();
+
+        if let BipaiError::HongbaopaiConfigMismatch { expected, found } = err {
+            assert_eq!(expected, config);
+            assert_eq!(found, HongbaopaiConfig::new(0, 0, 0).unwrap());
+        } else {
+            panic!("unexpected error: {:?}", err);
+        }
     }
 }
