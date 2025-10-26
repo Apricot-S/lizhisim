@@ -257,6 +257,7 @@ impl Bipai for Bipai4p {
         debug_assert!(self.left_tile_count() > 0);
         debug_assert!(self.lingshangzimo_count < NUM_LINGSHANGPAI);
 
+        // The top and bottom of each stack (幢) are reversed in the dead wall (王牌).
         let t = self.tiles[NUM_BIPAI_TILES - self.lingshangzimo_count - 1];
         self.left_tile_count -= 1;
         self.lingshangzimo_count += 1;
