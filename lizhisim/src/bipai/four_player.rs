@@ -248,11 +248,9 @@ impl Bipai for Bipai4p {
     fn qipai(&self, player_index: usize) -> [Tile; NUM_HAND_TILES] {
         debug_assert!(player_index < 4);
 
-        let indices = (0..3)
+        (0..3)
             .flat_map(|i| (0..4).map(move |j| i * 16 + player_index * 4 + j))
-            .chain(std::iter::once(48 + player_index));
-
-        indices
+            .chain(std::iter::once(48 + player_index))
             .map(|pos| self.tiles[pos])
             .collect::<Vec<_>>()
             .try_into()
