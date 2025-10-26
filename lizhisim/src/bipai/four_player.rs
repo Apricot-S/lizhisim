@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use super::common::{Bipai, MAX_TILE_COPIES, NUM_HAND_TILES, NUM_WANGPAI};
+use super::common::{Bipai, MAX_NUM_BAOPAI, MAX_TILE_COPIES, NUM_HAND_TILES, NUM_WANGPAI};
 use crate::tile::{Tile, TileError};
 use crate::{t, tu8, tuz};
 use rand::Rng;
@@ -280,6 +280,9 @@ impl Bipai for Bipai4p {
     }
 
     fn kaigang(&mut self) {
+        debug_assert!((self.baopai_count as usize) < MAX_NUM_BAOPAI);
+        debug_assert!(self.lingshangzimo_count <= NUM_LINGSHANGPAI);
+
         self.baopai_count += 1
     }
 }
