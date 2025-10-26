@@ -488,11 +488,12 @@ mod tests {
     }
 
     #[test]
-    fn baopai_indicators_4_kaigang() {
+    fn baopai_indicators_max_kaigang() {
         let mut bipai = get_bipai_for_test();
         for _ in 0..5 {
             bipai.kaigang();
         }
+
         assert_eq!(
             bipai.baopai_indicators(),
             ArrayVec::<_, _>::from([t!(7m), t!(9p), t!(1m), t!(7m), t!(6s)]),
@@ -506,11 +507,12 @@ mod tests {
     }
 
     #[test]
-    fn libaopai_indicators_4_kaigang() {
+    fn libaopai_indicators_max_kaigang() {
         let mut bipai = get_bipai_for_test();
         for _ in 0..5 {
             bipai.kaigang();
         }
+
         assert_eq!(
             bipai.libaopai_indicators(),
             ArrayVec::<_, _>::from([t!(9m), t!(3z), t!(6m), t!(6m), t!(8m)]),
