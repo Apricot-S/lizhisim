@@ -227,6 +227,7 @@ impl Bipai for Bipai4p {
     }
 
     fn qipai(&self, player_index: usize) -> [Tile; NUM_HAND_TILES] {
+        debug_assert!(player_index < 4);
         unimplemented!()
     }
 
@@ -390,6 +391,55 @@ mod tests {
         } else {
             panic!("unexpected error: {:?}", err);
         }
+    }
+
+    #[test]
+    fn left_tile_count_before_zimo() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[13 * 4] = 35;
+        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
+        let bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        assert_eq!(bipai.left_tile_count(), 70);
+    }
+
+    #[test]
+    fn left_tile_count_after_first_zimo() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[13 * 4] = 35;
+        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
+        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        let _ = bipai.zimo();
+        assert_eq!(bipai.left_tile_count(), 69);
+    }
+
+    #[test]
+    fn left_tile_count_no_tiles() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[13 * 4] = 35;
+        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
+        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        for _ in 0..70 {
+            let _ = bipai.zimo();
+        }
+
+        assert_eq!(bipai.left_tile_count(), 0);
+    }
+
+    #[test]
+    fn left_tile_count_no_error_with_overdraw() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[13 * 4] = 35;
+        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
+        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        for _ in 0..(70 + 1) {
+            let _ = bipai.zimo();
+        }
+
+        assert_eq!(bipai.left_tile_count(), 0);
     }
 
     #[test]
