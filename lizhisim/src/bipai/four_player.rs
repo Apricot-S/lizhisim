@@ -219,11 +219,15 @@ impl Bipai for Bipai4p {
     }
 
     fn baopai_indicators(&self) -> &[Tile] {
-        &[] // TODO
+        unimplemented!()
     }
 
     fn libaopai_indicators(&self) -> &[Tile] {
-        &[] // TODO
+        unimplemented!()
+    }
+
+    fn qipai(&self, player_index: usize) -> [Tile; NUM_HAND_TILES] {
+        unimplemented!()
     }
 
     fn zimo(&mut self) -> Option<Tile> {
@@ -238,11 +242,11 @@ impl Bipai for Bipai4p {
     }
 
     fn lingshangzimo(&mut self) -> Option<Tile> {
-        None // TODO
+        unimplemented!()
     }
 
     fn kaigang(&mut self) {
-        // TODO
+        unimplemented!()
     }
 }
 
