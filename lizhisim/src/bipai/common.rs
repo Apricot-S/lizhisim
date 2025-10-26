@@ -13,6 +13,7 @@ pub(super) const NUM_HAND_TILES: usize = 13;
 /// 壁牌: Wall.
 pub(crate) trait Bipai {
     fn left_tile_count(&self) -> u8;
+    fn baopai_count(&self) -> u8;
     fn baopai_indicators(&self) -> &[Tile];
     fn libaopai_indicators(&self) -> &[Tile];
 

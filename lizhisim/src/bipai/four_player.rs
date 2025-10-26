@@ -66,6 +66,7 @@ impl HongbaopaiConfig {
 pub(crate) struct Bipai4p {
     tiles: [Tile; NUM_BIPAI_TILES],
     left_tile_count: u8,
+    baopai_count: u8,
     zimo_index: usize,
     lingshangzimo_count: usize,
 }
@@ -134,6 +135,7 @@ impl Bipai4p {
         Self {
             tiles,
             left_tile_count: NUM_ZIMOPAI as u8,
+            baopai_count: 1,
             zimo_index: FIRST_ZIMO_INDEX,
             lingshangzimo_count: 0,
         }
@@ -211,6 +213,7 @@ impl Bipai4p {
         Ok(Bipai4p {
             tiles,
             left_tile_count: NUM_ZIMOPAI as u8,
+            baopai_count: 1,
             zimo_index: FIRST_ZIMO_INDEX,
             lingshangzimo_count: 0,
         })
@@ -220,6 +223,10 @@ impl Bipai4p {
 impl Bipai for Bipai4p {
     fn left_tile_count(&self) -> u8 {
         self.left_tile_count
+    }
+
+    fn baopai_count(&self) -> u8 {
+        self.baopai_count
     }
 
     fn baopai_indicators(&self) -> &[Tile] {
@@ -265,7 +272,7 @@ impl Bipai for Bipai4p {
     }
 
     fn kaigang(&mut self) {
-        unimplemented!()
+        self.baopai_count += 1
     }
 }
 
