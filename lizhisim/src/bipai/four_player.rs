@@ -231,18 +231,16 @@ impl Bipai for Bipai4p {
         unimplemented!()
     }
 
-    fn zimo(&mut self) -> Option<Tile> {
-        if self.left_tile_count() == 0 {
-            return None;
-        }
+    fn zimo(&mut self) -> Tile {
+        debug_assert!(self.left_tile_count() > 0);
 
         let t = self.tiles[self.zimo_index];
         self.left_tile_count -= 1;
         self.zimo_index += 1;
-        Some(t)
+        t
     }
 
-    fn lingshangzimo(&mut self) -> Option<Tile> {
+    fn lingshangzimo(&mut self) -> Tile {
         unimplemented!()
     }
 
@@ -429,20 +427,6 @@ mod tests {
     }
 
     #[test]
-    fn left_tile_count_no_error_with_overdraw() {
-        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        tiles[13 * 4] = 35;
-        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
-        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
-
-        for _ in 0..(70 + 1) {
-            let _ = bipai.zimo();
-        }
-
-        assert_eq!(bipai.left_tile_count(), 0);
-    }
-
-    #[test]
     fn zimo_first() {
         let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
         tiles[13 * 4] = 35;
@@ -450,7 +434,7 @@ mod tests {
         let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
 
         let zimopai = bipai.zimo();
-        assert_eq!(zimopai, Some(t!(0p)));
+        assert_eq!(zimopai, t!(0p));
     }
 
     #[test]
@@ -462,36 +446,6 @@ mod tests {
 
         let _ = bipai.zimo();
         let zimopai = bipai.zimo();
-        assert_eq!(zimopai, Some(t!(5p)));
-    }
-
-    #[test]
-    fn zimo_no_tiles() {
-        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        tiles[13 * 4] = 35;
-        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
-        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
-
-        for _ in 0..70 {
-            let _ = bipai.zimo();
-        }
-
-        let zimopai = bipai.zimo();
-        assert_eq!(zimopai, None);
-    }
-
-    #[test]
-    fn zimo_no_error_with_overdraw() {
-        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        tiles[13 * 4] = 35;
-        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
-        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
-
-        for _ in 0..(70 + 1) {
-            let _ = bipai.zimo();
-        }
-
-        let zimopai = bipai.zimo();
-        assert_eq!(zimopai, None);
+        assert_eq!(zimopai, t!(5p));
     }
 }

@@ -18,7 +18,7 @@ pub(crate) trait Bipai {
     fn libaopai_indicators(&self) -> &[Tile];
 
     fn qipai(&self, player_index: usize) -> [Tile; NUM_HAND_TILES];
-    fn zimo(&mut self) -> Option<Tile>;
-    fn lingshangzimo(&mut self) -> Option<Tile>;
+    fn zimo(&mut self) -> Tile;
+    fn lingshangzimo(&mut self) -> Tile;
     fn kaigang(&mut self);
 }
