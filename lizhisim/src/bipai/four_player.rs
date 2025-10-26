@@ -200,8 +200,8 @@ impl Bipai4p {
             ));
         }
 
-        // The number of tiles has already been checked, so there is no error.
-        let config_ = HongbaopaiConfig::new(num_0m, num_0p, num_0s).unwrap();
+        let config_ = HongbaopaiConfig::new(num_0m, num_0p, num_0s)
+            .expect("The number of tiles has already been checked, so there is no error.");
 
         if config_ != *config {
             return Err(Bipai4pError::HongbaopaiConfigMismatch {
