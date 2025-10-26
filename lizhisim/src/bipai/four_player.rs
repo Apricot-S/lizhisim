@@ -257,8 +257,8 @@ impl Bipai for Bipai4p {
             .flat_map(|i| (0..4).map(move |j| i * 16 + player_index * 4 + j))
             .chain(std::iter::once(48 + player_index))
             .map(|pos| self.tiles[pos])
-            .collect::<Vec<_>>()
-            .try_into()
+            .collect::<ArrayVec<_, _>>()
+            .into_inner()
             .expect("hand must be exactly 13 tiles")
     }
 
