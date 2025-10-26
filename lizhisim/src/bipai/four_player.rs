@@ -427,10 +427,24 @@ mod tests {
     }
 
     fn get_bipai_for_test() -> Bipai4p {
-        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        tiles[4 * 4] = 34;
-        tiles[13 * 4] = 35;
-        tiles[22 * 4] = 36;
+        #[rustfmt::skip]
+        let tiles = [
+            tu8!(5s), tu8!(1p), tu8!(3s), tu8!(5m), tu8!(2p), tu8!(7z), tu8!(7p), tu8!(2m), tu8!(4z), tu8!(2z), tu8!(1z), tu8!(7s),
+            tu8!(4z), tu8!(5z), tu8!(3p), tu8!(7p), tu8!(9p), tu8!(3z), tu8!(3s), tu8!(8s), tu8!(9m), tu8!(1z), tu8!(4p), tu8!(3p),
+            tu8!(4z), tu8!(7p), tu8!(6s), tu8!(6p), tu8!(5z), tu8!(8p), tu8!(7s), tu8!(6z), tu8!(6z), tu8!(4z), tu8!(8m), tu8!(2z),
+            tu8!(7s), tu8!(7z), tu8!(1p), tu8!(8m), tu8!(2s), tu8!(1p), tu8!(4p), tu8!(2z), tu8!(9s), tu8!(7p), tu8!(3s), tu8!(4m),
+            tu8!(1m), tu8!(4p), tu8!(7m), tu8!(3p), tu8!(4s),
+
+            tu8!(1s), tu8!(0m), tu8!(3s), tu8!(7m), tu8!(8s), tu8!(4s), tu8!(7z), tu8!(8s), tu8!(2m), tu8!(2z), tu8!(6m), tu8!(4m),
+            tu8!(9s), tu8!(5s), tu8!(5p), tu8!(5z), tu8!(2s), tu8!(1m), tu8!(2s), tu8!(3z), tu8!(5m), tu8!(4s), tu8!(1s), tu8!(8m),
+            tu8!(3m), tu8!(6p), tu8!(7z), tu8!(6s), tu8!(0s), tu8!(3m), tu8!(4s), tu8!(1p), tu8!(0p), tu8!(8s), tu8!(9p), tu8!(8p),
+            tu8!(5z), tu8!(3z), tu8!(9p), tu8!(2p), tu8!(6p), tu8!(8p), tu8!(9s), tu8!(2s), tu8!(2m), tu8!(6m), tu8!(4m), tu8!(7s),
+            tu8!(5p), tu8!(3p), tu8!(1z), tu8!(4p), tu8!(9m), tu8!(3m), tu8!(9s), tu8!(3m), tu8!(6s), tu8!(6z), tu8!(5s), tu8!(6z),
+            tu8!(5p), tu8!(9m), tu8!(1s), tu8!(1m), tu8!(2p), tu8!(1z), tu8!(5m), tu8!(1s), tu8!(2p),
+
+            tu8!(8m), tu8!(6s), tu8!(6m), tu8!(7m), tu8!(6m), tu8!(1m), tu8!(3z), tu8!(9p), tu8!(9m), tu8!(7m), tu8!(4m), tu8!(2m),
+            tu8!(6p), tu8!(8p),
+        ];
         let config = HongbaopaiConfig::new(1, 1, 1).unwrap();
         Bipai4p::from_slice(&tiles, &config).unwrap()
     }
@@ -464,7 +478,7 @@ mod tests {
     #[test]
     fn baopai_indicators_no_kaigang() {
         let bipai = get_bipai_for_test();
-        assert_eq!(bipai.baopai_indicators(), vec![t!(6z)]);
+        assert_eq!(bipai.baopai_indicators(), vec![t!(7m)]);
     }
 
     #[test]
@@ -475,14 +489,14 @@ mod tests {
         }
         assert_eq!(
             bipai.baopai_indicators(),
-            vec![t!(6z), t!(6z), t!(5z), t!(5z), t!(4z)]
+            vec![t!(7m), t!(9p), t!(1m), t!(7m), t!(6s)]
         );
     }
 
     #[test]
     fn libaopai_indicators_no_kaigang() {
         let bipai = get_bipai_for_test();
-        assert_eq!(bipai.libaopai_indicators(), vec![t!(6z)]);
+        assert_eq!(bipai.libaopai_indicators(), vec![t!(9m)]);
     }
 
     #[test]
@@ -493,7 +507,7 @@ mod tests {
         }
         assert_eq!(
             bipai.libaopai_indicators(),
-            vec![t!(6z), t!(6z), t!(5z), t!(5z), t!(4z)]
+            vec![t!(9m), t!(3z), t!(6m), t!(6m), t!(8m)]
         );
     }
 
@@ -504,10 +518,10 @@ mod tests {
 
         #[rustfmt::skip]
         let expected = [
-            t!(1m), t!(1m), t!(1m), t!(1m),
-            t!(0m), t!(5m), t!(5m), t!(5m),
-            t!(9m), t!(9m), t!(9m), t!(9m),
-            t!(4p),
+            t!(5s), t!(1p), t!(3s), t!(5m),
+            t!(9p), t!(3z), t!(3s), t!(8s),
+            t!(6z), t!(4z), t!(8m), t!(2z),
+            t!(1m),
         ];
         assert_eq!(bingpai, expected);
     }
@@ -519,10 +533,11 @@ mod tests {
 
         #[rustfmt::skip]
         let expected = [
-            t!(4m), t!(4m), t!(4m), t!(4m),
-            t!(8m), t!(8m), t!(8m), t!(8m),
-            t!(3p), t!(3p), t!(3p), t!(3p),
-            t!(4p),
+            t!(4z), t!(5z), t!(3p), t!(7p),
+            t!(5z), t!(8p), t!(7s), t!(6z),
+            t!(9s), t!(7p), t!(3s), t!(4m),
+            t!(3p),
+            
         ];
         assert_eq!(bingpai, expected);
     }
@@ -532,7 +547,7 @@ mod tests {
         let mut bipai = get_bipai_for_test();
 
         let zimopai = bipai.zimo();
-        assert_eq!(zimopai, t!(0p));
+        assert_eq!(zimopai, t!(4s));
     }
 
     #[test]
@@ -541,7 +556,7 @@ mod tests {
 
         let _ = bipai.zimo();
         let zimopai = bipai.zimo();
-        assert_eq!(zimopai, t!(5p));
+        assert_eq!(zimopai, t!(1s));
     }
 
     #[test]
@@ -549,15 +564,19 @@ mod tests {
         let mut bipai = get_bipai_for_test();
 
         let zimopai = bipai.lingshangzimo();
-        assert_eq!(zimopai, t!(7z));
+        assert_eq!(zimopai, t!(8p));
     }
 
     #[test]
     fn lingshangzimo_last() {
         let mut bipai = get_bipai_for_test();
 
+        for _ in 0..3 {
+            let _ = bipai.lingshangzimo();
+        }
+
         let zimopai = bipai.lingshangzimo();
-        assert_eq!(zimopai, t!(7z));
+        assert_eq!(zimopai, t!(4m));
     }
 
     #[test]
@@ -566,6 +585,6 @@ mod tests {
 
         let _ = bipai.lingshangzimo();
         let zimopai = bipai.zimo();
-        assert_eq!(zimopai, t!(0p));
+        assert_eq!(zimopai, t!(4s));
     }
 }
