@@ -418,22 +418,25 @@ mod tests {
         }
     }
 
+    fn get_bipai_for_test() -> Bipai4p {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[4 * 4] = 34;
+        tiles[13 * 4] = 35;
+        tiles[22 * 4] = 36;
+        let config = HongbaopaiConfig::new(1, 1, 1).unwrap();
+        Bipai4p::from_slice(&tiles, &config).unwrap()
+    }
+
     #[test]
     fn left_tile_count_before_zimo() {
-        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        tiles[13 * 4] = 35;
-        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
-        let bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let bipai = get_bipai_for_test();
 
         assert_eq!(bipai.left_tile_count(), 70);
     }
 
     #[test]
     fn left_tile_count_after_first_zimo() {
-        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        tiles[13 * 4] = 35;
-        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
-        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let mut bipai = get_bipai_for_test();
 
         let _ = bipai.zimo();
         assert_eq!(bipai.left_tile_count(), 69);
@@ -441,10 +444,7 @@ mod tests {
 
     #[test]
     fn left_tile_count_no_tiles() {
-        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        tiles[13 * 4] = 35;
-        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
-        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let mut bipai = get_bipai_for_test();
 
         for _ in 0..70 {
             let _ = bipai.zimo();
@@ -454,16 +454,19 @@ mod tests {
     }
 
     #[test]
+    fn baopai_indicators_no_kaigang() {
+        let bipai = get_bipai_for_test();
+    }
+
+    #[test]
     fn qipai_index_0() {
-        let tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
-        let bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let bipai = get_bipai_for_test();
         let bingpai = bipai.qipai(0);
 
         #[rustfmt::skip]
         let expected = [
             t!(1m), t!(1m), t!(1m), t!(1m),
-            t!(5m), t!(5m), t!(5m), t!(5m),
+            t!(0m), t!(5m), t!(5m), t!(5m),
             t!(9m), t!(9m), t!(9m), t!(9m),
             t!(4p),
         ];
@@ -472,9 +475,7 @@ mod tests {
 
     #[test]
     fn qipai_index_3() {
-        let tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
-        let bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let bipai = get_bipai_for_test();
         let bingpai = bipai.qipai(3);
 
         #[rustfmt::skip]
@@ -489,10 +490,7 @@ mod tests {
 
     #[test]
     fn zimo_first() {
-        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        tiles[13 * 4] = 35;
-        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
-        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let mut bipai = get_bipai_for_test();
 
         let zimopai = bipai.zimo();
         assert_eq!(zimopai, t!(0p));
@@ -500,10 +498,7 @@ mod tests {
 
     #[test]
     fn zimo_second() {
-        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        tiles[13 * 4] = 35;
-        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
-        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let mut bipai = get_bipai_for_test();
 
         let _ = bipai.zimo();
         let zimopai = bipai.zimo();
@@ -512,9 +507,7 @@ mod tests {
 
     #[test]
     fn lingshangzimo_first() {
-        let tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
-        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let mut bipai = get_bipai_for_test();
 
         let zimopai = bipai.lingshangzimo();
         assert_eq!(zimopai, t!(7z));
@@ -522,9 +515,7 @@ mod tests {
 
     #[test]
     fn lingshangzimo_last() {
-        let tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
-        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let mut bipai = get_bipai_for_test();
 
         let zimopai = bipai.lingshangzimo();
         assert_eq!(zimopai, t!(7z));
@@ -532,10 +523,7 @@ mod tests {
 
     #[test]
     fn lingshangzimo_not_affect_zimo_index() {
-        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        tiles[13 * 4] = 35;
-        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
-        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let mut bipai = get_bipai_for_test();
 
         let _ = bipai.lingshangzimo();
         let zimopai = bipai.zimo();
