@@ -229,11 +229,14 @@ impl Bipai for Bipai4p {
         self.baopai_count
     }
 
-    fn baopai_indicators(&self) -> &[Tile] {
-        unimplemented!()
+    fn baopai_indicators(&self) -> Vec<Tile> {
+        (0..self.baopai_count as usize)
+            .map(move |i| NUM_BIPAI_TILES - NUM_LINGSHANGPAI - 2 * i - 1)
+            .map(|pos| self.tiles[pos])
+            .collect::<Vec<_>>()
     }
 
-    fn libaopai_indicators(&self) -> &[Tile] {
+    fn libaopai_indicators(&self) -> Vec<Tile> {
         unimplemented!()
     }
 
@@ -456,6 +459,7 @@ mod tests {
     #[test]
     fn baopai_indicators_no_kaigang() {
         let bipai = get_bipai_for_test();
+        assert_eq!(bipai.baopai_indicators(), vec![t!(6z)]);
     }
 
     #[test]
