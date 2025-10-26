@@ -228,7 +228,16 @@ impl Bipai for Bipai4p {
 
     fn qipai(&self, player_index: usize) -> [Tile; NUM_HAND_TILES] {
         debug_assert!(player_index < 4);
-        unimplemented!()
+
+        let indices = (0..3)
+            .flat_map(|i| (0..4).map(move |j| i * 16 + player_index * 4 + j))
+            .chain(std::iter::once(48 + player_index));
+
+        indices
+            .map(|pos| self.tiles[pos])
+            .collect::<Vec<_>>()
+            .try_into()
+            .expect("hand must be exactly 13 tiles")
     }
 
     fn zimo(&mut self) -> Tile {
@@ -424,6 +433,40 @@ mod tests {
         }
 
         assert_eq!(bipai.left_tile_count(), 0);
+    }
+
+    #[test]
+    fn qipai_index_0() {
+        let tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
+        let bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let bingpai = bipai.qipai(0);
+
+        #[rustfmt::skip]
+        let expected = [
+            t!(1m), t!(1m), t!(1m), t!(1m),
+            t!(5m), t!(5m), t!(5m), t!(5m),
+            t!(9m), t!(9m), t!(9m), t!(9m),
+            t!(4p),
+        ];
+        assert_eq!(bingpai, expected);
+    }
+
+    #[test]
+    fn qipai_index_3() {
+        let tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
+        let bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+        let bingpai = bipai.qipai(3);
+
+        #[rustfmt::skip]
+        let expected = [
+            t!(4m), t!(4m), t!(4m), t!(4m),
+            t!(8m), t!(8m), t!(8m), t!(8m),
+            t!(3p), t!(3p), t!(3p), t!(3p),
+            t!(4p),
+        ];
+        assert_eq!(bingpai, expected);
     }
 
     #[test]
