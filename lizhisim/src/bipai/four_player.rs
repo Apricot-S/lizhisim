@@ -10,6 +10,7 @@ use rand::seq::SliceRandom;
 use thiserror::Error;
 
 const NUM_BIPAI_TILES: usize = (9 * 3 + 7) * MAX_TILE_COPIES as usize;
+const NUM_LINGSHANGPAI: usize = 4;
 const RED_5M_INDEX: usize = tuz!(5m) * MAX_TILE_COPIES as usize;
 const RED_5P_INDEX: usize = tuz!(5p) * MAX_TILE_COPIES as usize;
 const RED_5S_INDEX: usize = tuz!(5s) * MAX_TILE_COPIES as usize;
@@ -66,6 +67,7 @@ pub(crate) struct Bipai4p {
     tiles: [Tile; NUM_BIPAI_TILES],
     left_tile_count: u8,
     zimo_index: usize,
+    lingshangzimo_count: usize,
 }
 
 #[derive(Debug, Error)]
@@ -133,6 +135,7 @@ impl Bipai4p {
             tiles,
             left_tile_count: NUM_ZIMOPAI as u8,
             zimo_index: FIRST_ZIMO_INDEX,
+            lingshangzimo_count: 0,
         }
     }
 
@@ -209,6 +212,7 @@ impl Bipai4p {
             tiles,
             left_tile_count: NUM_ZIMOPAI as u8,
             zimo_index: FIRST_ZIMO_INDEX,
+            lingshangzimo_count: 0,
         })
     }
 }
@@ -250,7 +254,13 @@ impl Bipai for Bipai4p {
     }
 
     fn lingshangzimo(&mut self) -> Tile {
-        unimplemented!()
+        debug_assert!(self.left_tile_count() > 0);
+        debug_assert!(self.lingshangzimo_count < NUM_LINGSHANGPAI);
+
+        let t = self.tiles[NUM_BIPAI_TILES - self.lingshangzimo_count - 1];
+        self.left_tile_count -= 1;
+        self.lingshangzimo_count += 1;
+        t
     }
 
     fn kaigang(&mut self) {
@@ -490,5 +500,37 @@ mod tests {
         let _ = bipai.zimo();
         let zimopai = bipai.zimo();
         assert_eq!(zimopai, t!(5p));
+    }
+
+    #[test]
+    fn lingshangzimo_first() {
+        let tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
+        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        let zimopai = bipai.lingshangzimo();
+        assert_eq!(zimopai, t!(7z));
+    }
+
+    #[test]
+    fn lingshangzimo_last() {
+        let tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
+        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        let zimopai = bipai.lingshangzimo();
+        assert_eq!(zimopai, t!(7z));
+    }
+
+    #[test]
+    fn lingshangzimo_not_affect_zimo_index() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[13 * 4] = 35;
+        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
+        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        let _ = bipai.lingshangzimo();
+        let zimopai = bipai.zimo();
+        assert_eq!(zimopai, t!(0p));
     }
 }

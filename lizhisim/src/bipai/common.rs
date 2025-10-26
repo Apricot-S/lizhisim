@@ -6,7 +6,6 @@ use crate::tile::Tile;
 
 pub(super) const MAX_TILE_COPIES: u8 = 4;
 pub(super) const NUM_WANGPAI: usize = 14;
-pub(super) const NUM_LINGSHANGPAI: usize = 4;
 pub(super) const MAX_GANG_COUNT: usize = 4;
 pub(super) const MAX_NUM_BAOPAI: usize = MAX_GANG_COUNT + 1;
 pub(super) const NUM_HAND_TILES: usize = 13;
