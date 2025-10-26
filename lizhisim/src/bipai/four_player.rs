@@ -5,6 +5,7 @@
 use super::common::{Bipai, MAX_NUM_BAOPAI, MAX_TILE_COPIES, NUM_HAND_TILES, NUM_WANGPAI};
 use crate::tile::{Tile, TileError};
 use crate::{t, tu8, tuz};
+use arrayvec::ArrayVec;
 use rand::Rng;
 use rand::seq::SliceRandom;
 use thiserror::Error;
@@ -229,20 +230,20 @@ impl Bipai for Bipai4p {
         self.baopai_count
     }
 
-    fn baopai_indicators(&self) -> Vec<Tile> {
+    fn baopai_indicators(&self) -> ArrayVec<Tile, MAX_NUM_BAOPAI> {
         // The top and bottom of each stack (幢) are reversed in the dead wall (王牌).
         (0..self.baopai_count as usize)
             .map(move |i| NUM_BIPAI_TILES - NUM_LINGSHANGPAI - 2 * i - 1)
             .map(|pos| self.tiles[pos])
-            .collect::<Vec<_>>()
+            .collect::<ArrayVec<_, _>>()
     }
 
-    fn libaopai_indicators(&self) -> Vec<Tile> {
+    fn libaopai_indicators(&self) -> ArrayVec<Tile, MAX_NUM_BAOPAI> {
         // The top and bottom of each stack (幢) are reversed in the dead wall (王牌).
         (0..self.baopai_count as usize)
             .map(move |i| NUM_BIPAI_TILES - NUM_LINGSHANGPAI - 2 * i - 1 - 1)
             .map(|pos| self.tiles[pos])
-            .collect::<Vec<_>>()
+            .collect::<ArrayVec<_, _>>()
     }
 
     fn qipai(&self, player_index: usize) -> [Tile; NUM_HAND_TILES] {
@@ -483,7 +484,7 @@ mod tests {
     #[test]
     fn baopai_indicators_no_kaigang() {
         let bipai = get_bipai_for_test();
-        assert_eq!(bipai.baopai_indicators(), vec![]);
+        assert_eq!(bipai.baopai_indicators(), ArrayVec::<_, _>::new());
     }
 
     #[test]
@@ -494,14 +495,14 @@ mod tests {
         }
         assert_eq!(
             bipai.baopai_indicators(),
-            vec![t!(7m), t!(9p), t!(1m), t!(7m), t!(6s)]
+            ArrayVec::<_, _>::from([t!(7m), t!(9p), t!(1m), t!(7m), t!(6s)]),
         );
     }
 
     #[test]
     fn libaopai_indicators_no_kaigang() {
         let bipai = get_bipai_for_test();
-        assert_eq!(bipai.libaopai_indicators(), vec![]);
+        assert_eq!(bipai.libaopai_indicators(), ArrayVec::<_, _>::new());
     }
 
     #[test]
@@ -512,7 +513,7 @@ mod tests {
         }
         assert_eq!(
             bipai.libaopai_indicators(),
-            vec![t!(9m), t!(3z), t!(6m), t!(6m), t!(8m)]
+            ArrayVec::<_, _>::from([t!(9m), t!(3z), t!(6m), t!(6m), t!(8m)]),
         );
     }
 
