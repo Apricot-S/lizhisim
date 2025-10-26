@@ -429,4 +429,19 @@ mod tests {
         let zimopai = bipai.zimo();
         assert_eq!(zimopai, None);
     }
+
+    #[test]
+    fn zimo_no_error_with_overdraw() {
+        let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
+        tiles[13 * 4] = 35;
+        let config = HongbaopaiConfig::new(0, 1, 0).unwrap();
+        let mut bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
+
+        for _ in 0..(70 + 1) {
+            let _ = bipai.zimo();
+        }
+
+        let zimopai = bipai.zimo();
+        assert_eq!(zimopai, None);
+    }
 }
