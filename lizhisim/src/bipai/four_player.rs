@@ -238,7 +238,11 @@ impl Bipai for Bipai4p {
     }
 
     fn libaopai_indicators(&self) -> Vec<Tile> {
-        unimplemented!()
+        // The top and bottom of each stack (幢) are reversed in the dead wall (王牌).
+        (0..self.baopai_count as usize)
+            .map(move |i| NUM_BIPAI_TILES - NUM_LINGSHANGPAI - 2 * i - 1 - 1)
+            .map(|pos| self.tiles[pos])
+            .collect::<Vec<_>>()
     }
 
     fn qipai(&self, player_index: usize) -> [Tile; NUM_HAND_TILES] {
@@ -471,6 +475,24 @@ mod tests {
         }
         assert_eq!(
             bipai.baopai_indicators(),
+            vec![t!(6z), t!(6z), t!(5z), t!(5z), t!(4z)]
+        );
+    }
+
+    #[test]
+    fn libaopai_indicators_no_kaigang() {
+        let bipai = get_bipai_for_test();
+        assert_eq!(bipai.libaopai_indicators(), vec![t!(6z)]);
+    }
+
+    #[test]
+    fn libaopai_indicators_4_kaigang() {
+        let mut bipai = get_bipai_for_test();
+        for _ in 0..4 {
+            bipai.kaigang();
+        }
+        assert_eq!(
+            bipai.libaopai_indicators(),
             vec![t!(6z), t!(6z), t!(5z), t!(5z), t!(4z)]
         );
     }
