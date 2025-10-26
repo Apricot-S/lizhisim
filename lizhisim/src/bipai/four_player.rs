@@ -135,7 +135,7 @@ impl Bipai4p {
         Self {
             tiles,
             left_tile_count: NUM_ZIMOPAI as u8,
-            baopai_count: 1,
+            baopai_count: 0,
             zimo_index: FIRST_ZIMO_INDEX,
             lingshangzimo_count: 0,
         }
@@ -213,7 +213,7 @@ impl Bipai4p {
         Ok(Bipai4p {
             tiles,
             left_tile_count: NUM_ZIMOPAI as u8,
-            baopai_count: 1,
+            baopai_count: 0,
             zimo_index: FIRST_ZIMO_INDEX,
             lingshangzimo_count: 0,
         })
@@ -248,7 +248,7 @@ impl Bipai for Bipai4p {
     fn qipai(&self, player_index: usize) -> [Tile; NUM_HAND_TILES] {
         debug_assert!(player_index < 4);
         debug_assert_eq!(self.left_tile_count, NUM_ZIMOPAI as u8);
-        debug_assert_eq!(self.baopai_count, 1);
+        debug_assert!(self.baopai_count <= 1);
         debug_assert_eq!(self.zimo_index, FIRST_ZIMO_INDEX);
         debug_assert_eq!(self.lingshangzimo_count, 0);
 
@@ -483,13 +483,13 @@ mod tests {
     #[test]
     fn baopai_indicators_no_kaigang() {
         let bipai = get_bipai_for_test();
-        assert_eq!(bipai.baopai_indicators(), vec![t!(7m)]);
+        assert_eq!(bipai.baopai_indicators(), vec![]);
     }
 
     #[test]
     fn baopai_indicators_4_kaigang() {
         let mut bipai = get_bipai_for_test();
-        for _ in 0..4 {
+        for _ in 0..5 {
             bipai.kaigang();
         }
         assert_eq!(
@@ -501,13 +501,13 @@ mod tests {
     #[test]
     fn libaopai_indicators_no_kaigang() {
         let bipai = get_bipai_for_test();
-        assert_eq!(bipai.libaopai_indicators(), vec![t!(9m)]);
+        assert_eq!(bipai.libaopai_indicators(), vec![]);
     }
 
     #[test]
     fn libaopai_indicators_4_kaigang() {
         let mut bipai = get_bipai_for_test();
-        for _ in 0..4 {
+        for _ in 0..5 {
             bipai.kaigang();
         }
         assert_eq!(
