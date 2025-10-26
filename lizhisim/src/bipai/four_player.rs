@@ -247,6 +247,10 @@ impl Bipai for Bipai4p {
 
     fn qipai(&self, player_index: usize) -> [Tile; NUM_HAND_TILES] {
         debug_assert!(player_index < 4);
+        debug_assert_eq!(self.left_tile_count, NUM_ZIMOPAI as u8);
+        debug_assert_eq!(self.baopai_count, 1);
+        debug_assert_eq!(self.zimo_index, FIRST_ZIMO_INDEX);
+        debug_assert_eq!(self.lingshangzimo_count, 0);
 
         (0..3)
             .flat_map(|i| (0..4).map(move |j| i * 16 + player_index * 4 + j))
@@ -258,7 +262,7 @@ impl Bipai for Bipai4p {
     }
 
     fn zimo(&mut self) -> Tile {
-        debug_assert!(self.left_tile_count() > 0);
+        debug_assert!(self.left_tile_count > 0);
 
         let t = self.tiles[self.zimo_index];
         self.left_tile_count -= 1;
@@ -267,7 +271,7 @@ impl Bipai for Bipai4p {
     }
 
     fn lingshangzimo(&mut self) -> Tile {
-        debug_assert!(self.left_tile_count() > 0);
+        debug_assert!(self.left_tile_count > 0);
         debug_assert!(self.lingshangzimo_count < NUM_LINGSHANGPAI);
 
         // The top and bottom of each stack (幢) are reversed in the dead wall (王牌).
