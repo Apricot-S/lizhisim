@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
+pub(crate) mod four_player;
+
 use crate::tile::Tile;
 use arrayvec::ArrayVec;
 use rand::Rng;

@@ -1,0 +1,11 @@
+// SPDX-FileCopyrightText: 2025 Apricot S.
+// SPDX-License-Identifier: MIT
+// This file is part of https://github.com/Apricot-S/lizhisim
+
+use super::bipai::Bipai;
+
+pub(crate) trait BipaiProvider<B: Bipai> {
+    type Error;
+
+    fn provide_bipai(&mut self) -> Result<B, Self::Error>;
+}

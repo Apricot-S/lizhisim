@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use super::bipai::{Bipai, MAX_NUM_BAOPAI, MAX_TILE_COPIES, NUM_HAND_TILES, NUM_WANGPAI};
+use super::{Bipai, MAX_NUM_BAOPAI, MAX_TILE_COPIES, NUM_HAND_TILES, NUM_WANGPAI};
 use crate::tile::{Tile, TileError};
 use crate::{t, tu8, tuz};
 use arrayvec::ArrayVec;
