@@ -4,15 +4,14 @@
 
 use super::Bipai;
 use super::BipaiProvider;
-use std::convert::Infallible;
 use std::marker::PhantomData;
 
-pub(crate) struct RandomBipaiProvider<B: Bipai> {
+pub(crate) struct FixedBipaiProvider<B: Bipai> {
     _marker: PhantomData<B>,
 }
 
-impl<B: Bipai> BipaiProvider<B> for RandomBipaiProvider<B> {
-    type Error = Infallible;
+impl<B: Bipai> BipaiProvider<B> for FixedBipaiProvider<B> {
+    type Error = B::Error;
 
     fn provide_bipai(&mut self) -> Result<B, Self::Error> {
         unimplemented!()
