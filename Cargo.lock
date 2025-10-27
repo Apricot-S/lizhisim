@@ -46,6 +46,7 @@ dependencies = [
  "arrayvec",
  "rand",
  "thiserror",
+ "xiangting",
 ]
 
 [[package]]
@@ -161,6 +162,15 @@ name = "wit-bindgen"
 version = "0.46.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f17a85883d4e6d00e8a97c586de764dabcc06133f7f1d55dce5cdc070ad7fe59"
+
+[[package]]
+name = "xiangting"
+version = "4.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "80f4d87fcff12b0b8b3b40aa15dc55cfa9c9c7e83b32d6cd18f1c470d25f4018"
+dependencies = [
+ "thiserror",
+]
 
 [[package]]
 name = "zerocopy"
