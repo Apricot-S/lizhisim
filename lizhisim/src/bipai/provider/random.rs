@@ -4,17 +4,43 @@
 
 use super::Bipai;
 use super::BipaiProvider;
+use rand::{Rng, SeedableRng};
 use std::convert::Infallible;
-use std::marker::PhantomData;
 
-pub(crate) struct RandomBipaiProvider<B: Bipai> {
-    _marker: PhantomData<B>,
+#[derive(Debug)]
+pub(crate) struct RandomBipaiProvider<B, R>
+where
+    B: Bipai,
+    R: Rng + SeedableRng + Clone,
+    B::Config: Clone,
+{
+    rng: R,
+    config: B::Config,
 }
 
-impl<B: Bipai> BipaiProvider<B> for RandomBipaiProvider<B> {
+impl<B, R> Clone for RandomBipaiProvider<B, R>
+where
+    B: Bipai,
+    R: Rng + SeedableRng + Clone,
+    B::Config: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            rng: self.rng.clone(),
+            config: self.config.clone(),
+        }
+    }
+}
+
+impl<B, R> BipaiProvider<B> for RandomBipaiProvider<B, R>
+where
+    B: Bipai,
+    R: Rng + SeedableRng + Clone,
+    B::Config: Clone,
+{
     type Error = Infallible;
 
     fn provide_bipai(&mut self) -> Result<B, Self::Error> {
-        unimplemented!()
+        Ok(Bipai::new(&mut self.rng, &self.config))
     }
 }
