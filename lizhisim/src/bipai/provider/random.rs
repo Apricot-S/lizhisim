@@ -18,6 +18,17 @@ where
     config: B::Config,
 }
 
+impl<B, R> RandomBipaiProvider<B, R>
+where
+    B: Bipai,
+    R: Rng + SeedableRng + Clone,
+    B::Config: Clone,
+{
+    fn new(rng: R, config: B::Config) -> Self {
+        Self { rng, config }
+    }
+}
+
 impl<B, R> Clone for RandomBipaiProvider<B, R>
 where
     B: Bipai,
