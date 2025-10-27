@@ -88,7 +88,30 @@ pub(crate) enum Bipai4pError {
 }
 
 impl Bipai4p {
-    pub(crate) fn new(rng: &mut impl Rng, config: &HongbaopaiConfig) -> Self {
+    fn apply_hongbaopai_config(tiles: &mut [Tile; NUM_BIPAI_TILES], config: &HongbaopaiConfig) {
+        Self::replace_with_hongbaopai(tiles, RED_5M_INDEX, t!(0m), config.m());
+        Self::replace_with_hongbaopai(tiles, RED_5P_INDEX, t!(0p), config.p());
+        Self::replace_with_hongbaopai(tiles, RED_5S_INDEX, t!(0s), config.s());
+    }
+
+    fn replace_with_hongbaopai(
+        tiles: &mut [Tile; NUM_BIPAI_TILES],
+        base_index: usize,
+        red: Tile,
+        count: u8,
+    ) {
+        for i in 0..count {
+            let idx = base_index + i as usize;
+            tiles[idx] = red;
+        }
+    }
+}
+
+impl Bipai for Bipai4p {
+    type Config = HongbaopaiConfig;
+    type Error = Bipai4pError;
+
+    fn new(rng: &mut impl Rng, config: &Self::Config) -> Self {
         #[rustfmt::skip]
         let mut tiles = [
             t!(1m), t!(1m), t!(1m), t!(1m),
@@ -142,28 +165,7 @@ impl Bipai4p {
         }
     }
 
-    fn apply_hongbaopai_config(tiles: &mut [Tile; NUM_BIPAI_TILES], config: &HongbaopaiConfig) {
-        Self::replace_with_hongbaopai(tiles, RED_5M_INDEX, t!(0m), config.m());
-        Self::replace_with_hongbaopai(tiles, RED_5P_INDEX, t!(0p), config.p());
-        Self::replace_with_hongbaopai(tiles, RED_5S_INDEX, t!(0s), config.s());
-    }
-
-    fn replace_with_hongbaopai(
-        tiles: &mut [Tile; NUM_BIPAI_TILES],
-        base_index: usize,
-        red: Tile,
-        count: u8,
-    ) {
-        for i in 0..count {
-            let idx = base_index + i as usize;
-            tiles[idx] = red;
-        }
-    }
-
-    pub(crate) fn from_slice(
-        bipai: &[u8],
-        config: &HongbaopaiConfig,
-    ) -> Result<Self, Bipai4pError> {
+    fn from_slice(bipai: &[u8], config: &Self::Config) -> Result<Self, Self::Error> {
         if bipai.len() != NUM_BIPAI_TILES {
             return Err(Bipai4pError::InvalidLength(bipai.len()));
         }
@@ -219,9 +221,7 @@ impl Bipai4p {
             lingshangzimo_count: 0,
         })
     }
-}
 
-impl Bipai for Bipai4p {
     fn left_tile_count(&self) -> u8 {
         self.left_tile_count
     }
