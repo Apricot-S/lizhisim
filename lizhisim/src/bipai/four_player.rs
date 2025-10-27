@@ -20,7 +20,7 @@ const NUM_ZIMOPAI: usize = NUM_BIPAI_TILES - NUM_HAND_TILES * 4 - NUM_WANGPAI;
 const FIRST_ZIMO_INDEX: usize = NUM_HAND_TILES * 4;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct HongbaopaiConfig {
+pub(crate) struct HongbaopaiCount {
     m: u8,
     p: u8,
     s: u8,
@@ -28,19 +28,19 @@ pub(crate) struct HongbaopaiConfig {
 
 #[derive(Debug, Error)]
 #[error("invalid number of red fives: m: {m}, p: {p}, s: {s}")]
-pub(crate) struct HongbaopaiConfigError {
+pub(crate) struct HongbaopaiCountError {
     pub(crate) m: u8,
     pub(crate) p: u8,
     pub(crate) s: u8,
 }
 
-impl HongbaopaiConfig {
+impl HongbaopaiCount {
     #[inline]
-    pub(crate) const fn new(m: u8, p: u8, s: u8) -> Result<Self, HongbaopaiConfigError> {
+    pub(crate) const fn new(m: u8, p: u8, s: u8) -> Result<Self, HongbaopaiCountError> {
         if m <= MAX_TILE_COPIES && p <= MAX_TILE_COPIES && s <= MAX_TILE_COPIES {
             Ok(Self { m, p, s })
         } else {
-            Err(HongbaopaiConfigError { m, p, s })
+            Err(HongbaopaiCountError { m, p, s })
         }
     }
 
@@ -63,6 +63,11 @@ impl HongbaopaiConfig {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct Bipai4pConfig {
+    pub(crate) hongbaopai_count: HongbaopaiCount,
+}
+
 #[derive(Debug)]
 pub(crate) struct Bipai4p {
     tiles: [Tile; NUM_BIPAI_TILES],
@@ -80,18 +85,18 @@ pub(crate) enum Bipai4pError {
     Tile(#[from] TileError),
     #[error("tile {0:?} appears {1} times instead of 4")]
     InvalidTileCount(Tile, u8),
-    #[error("red five config mismatch: expected {expected:?}, found {found:?}")]
-    HongbaopaiConfigMismatch {
-        expected: HongbaopaiConfig,
-        found: HongbaopaiConfig,
+    #[error("config mismatch: expected {expected:?}, found {found:?}")]
+    ConfigMismatch {
+        expected: Bipai4pConfig,
+        found: Bipai4pConfig,
     },
 }
 
 impl Bipai4p {
-    fn apply_hongbaopai_config(tiles: &mut [Tile; NUM_BIPAI_TILES], config: &HongbaopaiConfig) {
-        Self::replace_with_hongbaopai(tiles, RED_5M_INDEX, t!(0m), config.m());
-        Self::replace_with_hongbaopai(tiles, RED_5P_INDEX, t!(0p), config.p());
-        Self::replace_with_hongbaopai(tiles, RED_5S_INDEX, t!(0s), config.s());
+    fn apply_hongbaopai_count(tiles: &mut [Tile; NUM_BIPAI_TILES], count: &HongbaopaiCount) {
+        Self::replace_with_hongbaopai(tiles, RED_5M_INDEX, t!(0m), count.m());
+        Self::replace_with_hongbaopai(tiles, RED_5P_INDEX, t!(0p), count.p());
+        Self::replace_with_hongbaopai(tiles, RED_5S_INDEX, t!(0s), count.s());
     }
 
     fn replace_with_hongbaopai(
@@ -108,7 +113,7 @@ impl Bipai4p {
 }
 
 impl Bipai for Bipai4p {
-    type Config = HongbaopaiConfig;
+    type Config = Bipai4pConfig;
     type Error = Bipai4pError;
 
     fn new(rng: &mut impl Rng, config: &Self::Config) -> Self {
@@ -153,7 +158,7 @@ impl Bipai for Bipai4p {
             t!(7z), t!(7z), t!(7z), t!(7z),
         ];
 
-        Self::apply_hongbaopai_config(&mut tiles, config);
+        Self::apply_hongbaopai_count(&mut tiles, &config.hongbaopai_count);
         tiles.shuffle(rng);
 
         Self {
@@ -203,11 +208,12 @@ impl Bipai for Bipai4p {
             ));
         }
 
-        let config_ = HongbaopaiConfig::new(num_0m, num_0p, num_0s)
+        let hongbaopai_count = HongbaopaiCount::new(num_0m, num_0p, num_0s)
             .expect("The number of tiles has already been checked, so there is no error.");
+        let config_ = Bipai4pConfig { hongbaopai_count };
 
         if config_ != *config {
-            return Err(Bipai4pError::HongbaopaiConfigMismatch {
+            return Err(Bipai4pError::ConfigMismatch {
                 expected: config.clone(),
                 found: config_,
             });
@@ -296,24 +302,24 @@ mod tests {
     use rand::{SeedableRng, rngs::StdRng};
 
     #[test]
-    fn hongbaopai_config_valid_all_0() {
-        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
-        assert_eq!(config.m(), 0);
-        assert_eq!(config.p(), 0);
-        assert_eq!(config.s(), 0);
+    fn hongbaopai_count_valid_all_0() {
+        let count = HongbaopaiCount::new(0, 0, 0).unwrap();
+        assert_eq!(count.m(), 0);
+        assert_eq!(count.p(), 0);
+        assert_eq!(count.s(), 0);
     }
 
     #[test]
-    fn hongbaopai_config_valid_all_4() {
-        let config = HongbaopaiConfig::new(4, 4, 4).unwrap();
-        assert_eq!(config.m(), 4);
-        assert_eq!(config.p(), 4);
-        assert_eq!(config.s(), 4);
+    fn hongbaopai_count_valid_all_4() {
+        let count = HongbaopaiCount::new(4, 4, 4).unwrap();
+        assert_eq!(count.m(), 4);
+        assert_eq!(count.p(), 4);
+        assert_eq!(count.s(), 4);
     }
 
     #[test]
-    fn hongbaopai_config_invalid_m_5() {
-        let err = HongbaopaiConfig::new(5, 0, 0).unwrap_err();
+    fn hongbaopai_count_invalid_m_5() {
+        let err = HongbaopaiCount::new(5, 0, 0).unwrap_err();
         assert_eq!(err.m, 5);
         assert_eq!(err.p, 0);
         assert_eq!(err.s, 0);
@@ -322,7 +328,9 @@ mod tests {
     #[test]
     fn new_bipai() {
         let mut rng = StdRng::seed_from_u64(42);
-        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(0, 1, 2).unwrap(),
+        };
         let bipai = Bipai4p::new(&mut rng, &config);
 
         let mut counts = [0u8; 34];
@@ -352,7 +360,9 @@ mod tests {
         tiles[13 * 4] = 35;
         tiles[22 * 4] = 36;
         tiles[22 * 4 + 1] = 36;
-        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(0, 1, 2).unwrap(),
+        };
         let bipai = Bipai4p::from_slice(&tiles, &config).unwrap();
 
         let mut counts = [0u8; 34];
@@ -379,7 +389,9 @@ mod tests {
     #[test]
     fn from_slice_invalid_135_tiles() {
         let tiles = (0..135).map(|t| t / 4).collect::<Vec<u8>>();
-        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(0, 0, 0).unwrap(),
+        };
         let err = Bipai4p::from_slice(&tiles, &config).unwrap_err();
 
         assert!(matches!(err, Bipai4pError::InvalidLength(135)));
@@ -388,7 +400,9 @@ mod tests {
     #[test]
     fn from_slice_invalid_137_tiles() {
         let tiles = (0..137).map(|t| t / 4).collect::<Vec<u8>>();
-        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(0, 0, 0).unwrap(),
+        };
         let err = Bipai4p::from_slice(&tiles, &config).unwrap_err();
 
         assert!(matches!(err, Bipai4pError::InvalidLength(137)));
@@ -398,7 +412,9 @@ mod tests {
     fn from_slice_invalid_tiles_id() {
         let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
         tiles[135] = 37;
-        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(0, 0, 0).unwrap(),
+        };
         let err = Bipai4p::from_slice(&tiles, &config).unwrap_err();
 
         assert!(matches!(err, Bipai4pError::Tile(TileError::OutOfRange(37))));
@@ -408,7 +424,9 @@ mod tests {
     fn from_slice_invalid_1m_5_copies() {
         let mut tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
         tiles[135] = 0;
-        let config = HongbaopaiConfig::new(0, 0, 0).unwrap();
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(0, 0, 0).unwrap(),
+        };
         let err = Bipai4p::from_slice(&tiles, &config).unwrap_err();
 
         if let Bipai4pError::InvalidTileCount(tile, 5) = err {
@@ -421,12 +439,19 @@ mod tests {
     #[test]
     fn from_slice_invalid_config_mismatch() {
         let tiles = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
-        let config = HongbaopaiConfig::new(0, 1, 2).unwrap();
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(0, 1, 2).unwrap(),
+        };
         let err = Bipai4p::from_slice(&tiles, &config).unwrap_err();
 
-        if let Bipai4pError::HongbaopaiConfigMismatch { expected, found } = err {
+        if let Bipai4pError::ConfigMismatch { expected, found } = err {
             assert_eq!(expected, config);
-            assert_eq!(found, HongbaopaiConfig::new(0, 0, 0).unwrap());
+            assert_eq!(
+                found,
+                Bipai4pConfig {
+                    hongbaopai_count: HongbaopaiCount::new(0, 0, 0).unwrap()
+                }
+            );
         } else {
             panic!("unexpected error: {:?}", err);
         }
@@ -451,7 +476,9 @@ mod tests {
             tu8!(8m), tu8!(6s), tu8!(6m), tu8!(7m), tu8!(6m), tu8!(1m), tu8!(3z), tu8!(9p), tu8!(9m), tu8!(7m), tu8!(4m), tu8!(2m),
             tu8!(6p), tu8!(8p),
         ];
-        let config = HongbaopaiConfig::new(1, 1, 1).unwrap();
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(1, 1, 1).unwrap(),
+        };
         Bipai4p::from_slice(&tiles, &config).unwrap()
     }
 

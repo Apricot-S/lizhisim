@@ -2,5 +2,8 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-pub(crate) mod bipai;
+mod bipai;
+
 pub(crate) mod four_player;
+
+pub(crate) use bipai::Bipai;
