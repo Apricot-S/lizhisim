@@ -7,7 +7,7 @@ use super::BipaiProvider;
 use rand::{Rng, SeedableRng};
 use std::convert::Infallible;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub(crate) struct RandomBipaiProvider<B, R>
 where
     B: Bipai,

@@ -7,7 +7,7 @@ use super::BipaiProvider;
 use std::collections::VecDeque;
 use thiserror::Error;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub(crate) struct FixedBipaiProvider<B>
 where
     B: Bipai,
@@ -52,4 +52,9 @@ where
 
         Bipai::from_slice(&bipai, &self.config).map_err(|e| FixedBipaiProviderError::Bipai(e))
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 }

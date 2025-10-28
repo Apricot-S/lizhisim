@@ -68,7 +68,7 @@ pub(crate) struct Bipai4pConfig {
     pub(crate) hongbaopai_count: HongbaopaiCount,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct Bipai4p {
     tiles: [Tile; NUM_BIPAI_TILES],
     left_tile_count: u8,
