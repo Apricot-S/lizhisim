@@ -13,7 +13,7 @@ where
     B: Bipai,
     B::Config: Clone,
 {
-    bipai: VecDeque<Vec<u8>>,
+    bipai_list: VecDeque<Vec<u8>>,
     config: B::Config,
 }
 
@@ -25,6 +25,22 @@ pub(crate) enum FixedBipaiProviderError<B: Bipai> {
     Bipai(B::Error),
 }
 
+impl<B> FixedBipaiProvider<B>
+where
+    B: Bipai,
+    B::Config: Clone,
+{
+    pub(crate) fn new<I>(bipai_list: I, config: B::Config) -> Self
+    where
+        I: IntoIterator<Item = Vec<u8>>,
+    {
+        Self {
+            bipai_list: bipai_list.into_iter().collect(),
+            config,
+        }
+    }
+}
+
 impl<B> Clone for FixedBipaiProvider<B>
 where
     B: Bipai,
@@ -32,7 +48,7 @@ where
 {
     fn clone(&self) -> Self {
         Self {
-            bipai: self.bipai.clone(),
+            bipai_list: self.bipai_list.clone(),
             config: self.config.clone(),
         }
     }
@@ -46,7 +62,7 @@ where
     type Error = FixedBipaiProviderError<B>;
 
     fn provide_bipai(&mut self) -> Result<B, Self::Error> {
-        let Some(bipai) = self.bipai.pop_front() else {
+        let Some(bipai) = self.bipai_list.pop_front() else {
             return Err(FixedBipaiProviderError::Empty);
         };
 
