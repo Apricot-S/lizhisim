@@ -82,11 +82,8 @@ mod tests {
         let mut provider1 = RandomBipaiProvider::<Bipai4p, _>::new(rng, config);
         let mut provider2 = provider1.clone();
 
-        let mut bipai1 = provider1.provide_bipai().unwrap();
-        let mut bipai2 = provider2.provide_bipai().unwrap();
-
-        let tiles1 = (0..70).map(|_| bipai1.zimo()).collect::<Vec<_>>();
-        let tiles2 = (0..70).map(|_| bipai2.zimo()).collect::<Vec<_>>();
-        assert_eq!(tiles1, tiles2);
+        let bipai1 = provider1.provide_bipai().unwrap();
+        let bipai2 = provider2.provide_bipai().unwrap();
+        assert_eq!(bipai1, bipai2);
     }
 }
