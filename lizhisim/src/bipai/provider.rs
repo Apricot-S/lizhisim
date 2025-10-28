@@ -5,7 +5,7 @@
 pub(crate) mod fixed;
 pub(crate) mod random;
 
-use super::bipai::Bipai;
+use super::core::Bipai;
 
 pub(crate) trait BipaiProvider<B: Bipai>: Clone {
     type Error;

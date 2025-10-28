@@ -72,7 +72,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::bipai::four_player::{
+    use super::super::super::core::four_player::{
         Bipai4p, Bipai4pConfig, Bipai4pError, HongbaopaiCount,
     };
     use super::*;

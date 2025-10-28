@@ -58,7 +58,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::bipai::four_player::{Bipai4p, Bipai4pConfig, HongbaopaiCount};
+    use super::super::super::core::four_player::{Bipai4p, Bipai4pConfig, HongbaopaiCount};
     use super::*;
     use rand::{SeedableRng, rngs::StdRng};
 
