@@ -75,7 +75,7 @@ mod tests {
     use super::super::super::bipai::four_player::{Bipai4p, Bipai4pConfig, HongbaopaiCount};
     use super::*;
 
-    fn tet_bipai_list_for_test() -> Vec<Vec<u8>> {
+    fn get_bipai_list_for_test() -> Vec<Vec<u8>> {
         let tiles1 = (0..136).map(|t| t / 4).collect::<Vec<u8>>();
         let tiles2 = (0..136).rev().map(|t| t / 4).collect::<Vec<u8>>();
         vec![tiles1, tiles2]
@@ -83,7 +83,7 @@ mod tests {
 
     #[test]
     fn provide_bipai_returns_new_instance() {
-        let bipai_list = tet_bipai_list_for_test();
+        let bipai_list = get_bipai_list_for_test();
         let config = Bipai4pConfig {
             hongbaopai_count: HongbaopaiCount::new(0, 0, 0).unwrap(),
         };
@@ -94,7 +94,7 @@ mod tests {
 
     #[test]
     fn cloned_provide_bipai_returns_same_bipai() {
-        let bipai_list = tet_bipai_list_for_test();
+        let bipai_list = get_bipai_list_for_test();
         let config = Bipai4pConfig {
             hongbaopai_count: HongbaopaiCount::new(0, 0, 0).unwrap(),
         };
@@ -108,7 +108,7 @@ mod tests {
 
     #[test]
     fn provide_bipai_returns_error_when_empty() {
-        let bipai_list = tet_bipai_list_for_test();
+        let bipai_list = get_bipai_list_for_test();
         let config = Bipai4pConfig {
             hongbaopai_count: HongbaopaiCount::new(0, 0, 0).unwrap(),
         };
