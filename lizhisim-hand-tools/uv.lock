@@ -21,7 +21,7 @@ wheels = [
 ]
 
 [[package]]
-name = "lizhisim-hand-calc"
+name = "lizhisim-hand-tools"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

@@ -3,7 +3,7 @@ requires = ["maturin>=1.9,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "lizhisim_hand_calc"
+name = "lizhisim-hand-tools"
 version = "0.1.0"
 description = "Rust bindings for mahjong hand calculator"
 authors = [{ name = "Apricot S." }]

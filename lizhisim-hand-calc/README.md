@@ -1,1 +1,0 @@
-# lizhisim-hand-calc
