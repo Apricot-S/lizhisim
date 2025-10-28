@@ -55,3 +55,38 @@ where
         Ok(Bipai::new(&mut self.rng, &self.config))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::super::super::bipai::four_player::{Bipai4p, Bipai4pConfig, HongbaopaiCount};
+    use super::*;
+    use rand::{SeedableRng, rngs::StdRng};
+
+    #[test]
+    fn provide_bipai_returns_new_instance() {
+        let rng = StdRng::seed_from_u64(42);
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(1, 1, 1).unwrap(),
+        };
+        let mut provider = RandomBipaiProvider::<Bipai4p, _>::new(rng, config);
+
+        provider.provide_bipai().unwrap();
+    }
+
+    #[test]
+    fn cloned_provide_bipai_returns_same_bipai() {
+        let rng = StdRng::seed_from_u64(42);
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(1, 1, 1).unwrap(),
+        };
+        let mut provider1 = RandomBipaiProvider::<Bipai4p, _>::new(rng, config);
+        let mut provider2 = provider1.clone();
+
+        let mut bipai1 = provider1.provide_bipai().unwrap();
+        let mut bipai2 = provider2.provide_bipai().unwrap();
+
+        let tiles1 = (0..70).map(|_| bipai1.zimo()).collect::<Vec<_>>();
+        let tiles2 = (0..70).map(|_| bipai2.zimo()).collect::<Vec<_>>();
+        assert_eq!(tiles1, tiles2);
+    }
+}
