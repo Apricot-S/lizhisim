@@ -19,7 +19,7 @@ where
 
 #[derive(Debug, Error)]
 pub(crate) enum FixedBipaiProviderError<B: Bipai> {
-    #[error("no bipai left to provide")]
+    #[error("no wall left to provide")]
     Empty,
     #[error(transparent)]
     Bipai(B::Error),
