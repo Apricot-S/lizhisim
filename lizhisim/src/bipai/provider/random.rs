@@ -24,7 +24,7 @@ where
     R: Rng + SeedableRng + Clone,
     B::Config: Clone,
 {
-    fn new(rng: R, config: B::Config) -> Self {
+    pub(crate) const fn new(rng: R, config: B::Config) -> Self {
         Self { rng, config }
     }
 }
