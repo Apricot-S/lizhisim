@@ -72,7 +72,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::bipai::four_player::{Bipai4p, Bipai4pConfig, HongbaopaiCount};
+    use super::super::super::bipai::four_player::{
+        Bipai4p, Bipai4pConfig, Bipai4pError, HongbaopaiCount,
+    };
     use super::*;
 
     fn get_bipai_list_for_test() -> Vec<Vec<u8>> {
@@ -120,6 +122,20 @@ mod tests {
         assert!(matches!(
             provider.provide_bipai().unwrap_err(),
             FixedBipaiProviderError::Empty
+        ));
+    }
+
+    #[test]
+    fn provide_bipai_returns_error_on_invalid_input() {
+        let bipai_list = vec![vec![]];
+        let config = Bipai4pConfig {
+            hongbaopai_count: HongbaopaiCount::new(0, 0, 0).unwrap(),
+        };
+        let mut provider = FixedBipaiProvider::<Bipai4p>::new(bipai_list, config);
+
+        assert!(matches!(
+            provider.provide_bipai().unwrap_err(),
+            FixedBipaiProviderError::Bipai(Bipai4pError::InvalidLength(0))
         ));
     }
 }
