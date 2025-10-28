@@ -2,6 +2,7 @@
 resolver = "3"
 members = [
     "lizhisim",
+    "lizhisim-hand-calc",
 ]
 
 [workspace.package]
