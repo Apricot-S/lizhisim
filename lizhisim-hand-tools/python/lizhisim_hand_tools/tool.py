@@ -35,15 +35,15 @@ class Tool:
 
     def calculate_fu_fan(
         self,
-        bingpai: list[int],
-        hulepai: int,
+        bingpai136: list[int],
+        hulepai37: int,
     ) -> FuFanAnalysis:
-        assert len(bingpai) in (1, 4, 7, 10, 13)
-        assert 0 <= hulepai <= 33
+        assert len(bingpai136) in (1, 4, 7, 10, 13)
+        assert 0 <= hulepai37 < 37
 
         response = self._hand_calculator.estimate_hand_value(
-            tiles=bingpai,
-            win_tile=hulepai,
+            tiles=bingpai136,
+            win_tile=hulepai37,
         )
 
         if response.error is not None:

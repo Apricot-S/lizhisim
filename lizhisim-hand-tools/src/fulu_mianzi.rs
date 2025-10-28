@@ -3,9 +3,11 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 use crate::tile::Tile;
+use pyo3::prelude::*;
 
 /// Position of the claimed tile in the melded sequence.
 /// Used in [`FuluMianzi::Shunzi`](self::FuluMianzi::Shunzi).
+#[pyclass(eq, eq_int, rename_all = "UPPERCASE")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ClaimedTilePosition {
     /// The claimed tile is the lowest in the sequence.
@@ -37,6 +39,7 @@ pub enum ClaimedTilePosition {
 /// // 7-777s (Open Kan 7s)
 /// let minggangzi = FuluMianzi::Minggangzi(24);
 /// ```
+#[pyclass]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FuluMianzi {
     /// 順子: Sequence.
