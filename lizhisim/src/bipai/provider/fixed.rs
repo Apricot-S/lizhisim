@@ -4,23 +4,52 @@
 
 use super::Bipai;
 use super::BipaiProvider;
+use std::collections::VecDeque;
 use thiserror::Error;
 
-#[derive(Debug, Clone)]
-pub(crate) struct FixedBipaiProvider {}
+#[derive(Debug)]
+pub(crate) struct FixedBipaiProvider<B>
+where
+    B: Bipai,
+    B::Config: Clone,
+{
+    bipai: VecDeque<Vec<u8>>,
+    config: B::Config,
+}
 
 #[derive(Debug, Error)]
 pub(crate) enum FixedBipaiProviderError<B: Bipai> {
     #[error("")]
     Empty,
     #[error(transparent)]
-    Bipai(#[from] B::Error),
+    Bipai(B::Error),
 }
 
-impl<B: Bipai> BipaiProvider<B> for FixedBipaiProvider {
+impl<B> Clone for FixedBipaiProvider<B>
+where
+    B: Bipai,
+    B::Config: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            bipai: self.bipai.clone(),
+            config: self.config.clone(),
+        }
+    }
+}
+
+impl<B> BipaiProvider<B> for FixedBipaiProvider<B>
+where
+    B: Bipai,
+    B::Config: Clone,
+{
     type Error = FixedBipaiProviderError<B>;
 
     fn provide_bipai(&mut self) -> Result<B, Self::Error> {
-        unimplemented!()
+        let Some(bipai) = self.bipai.pop_front() else {
+            return Err(FixedBipaiProviderError::Empty);
+        };
+
+        Bipai::from_slice(&bipai, &self.config).map_err(|e| FixedBipaiProviderError::Bipai(e))
     }
 }
