@@ -17,3 +17,4 @@ path = "src/lib.rs"
 
 [dependencies]
 pyo3 = { version = "0.27.1", features = ["extension-module"] }
+thiserror.workspace = true
