@@ -14,8 +14,8 @@ rust-version = "1.90"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/Apricot-S/lizhisim"
-categories = ["simulation"]
 keywords = ["mahjong", "riichi"]
+categories = ["simulation"]
 
 [workspace.metadata.release]
 tag-prefix = ""
