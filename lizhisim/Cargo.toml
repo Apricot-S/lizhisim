@@ -20,4 +20,4 @@ anyhow = "1.0.100"
 arrayvec = "0.7.6"
 rand = "0.9.2"
 thiserror.workspace = true
-xiangting = "5.0.0"
+xiangting = "5.0.2"
