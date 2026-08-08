@@ -25,7 +25,7 @@
 3. 牌譜 ID から元牌譜を取得し、raw data の hash と対象 `Round` を固定する。
 4. 元牌譜から regression/golden test を作り、LizhiSim の event と照合する。
 
-牌譜の取得・保存・匿名化手順はADR-0009で一度改定し、その後[ADR-0010](0010-mahjong-soul-record-conformance.md)で再改定する。現在はuserがproject外で取得した`majsoul-record`を、変換用app crateによるCI用最小`game_log` fixtureとCI外full-record testの二段階で利用する。
+牌譜の取得・保存・匿名化手順はADR-0009、ADR-0010を経て[ADR-0011](0011-one-pass-majsoul-conformance.md)で再改定する。現在はCIの手書き最小fixtureと、user管理`majsoul-record`を逐次decode・比較するCI外full-record testの二段階で利用する。
 
 先行実装そのものを一次資料または期待値の唯一の根拠にはしない。元牌譜を取得できない項目は `blocked` とする。
 

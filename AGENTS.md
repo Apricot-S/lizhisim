@@ -54,8 +54,8 @@
 - ルール本文を大量転載しない。事実を構造化して要約し、出典へリンクする。
 - 実装・検証の優先順位は、雀魂段位戦（四人/三人）、天鳳段位戦（四人/三人）、麻雀一番街段位戦（四人/三人）の順とする。
 - 雀魂は公式詳細ルールを一次資料とし、記載のない corner case は Cryolite/kanachan の `src/simulation` と検証記録を手掛かりにする。最終的な test evidence は、記載された牌譜 ID から元牌譜を取得して作ることを推奨する。
-- `majsoul-record`の取得はuserがproject外で行い、取得toolを作らない。変換用app crateはlocal `majsoul-record`だけを入力にし、`game_log`へ変換するときplayer名を匿名化する。牌譜IDとreplay URLはsource locatorとして利用できる。
-- Gitには編集済みの最小corner-case `game_log` fixtureだけを置いてCIで検証する。完全な`majsoul-record`と完全な変換済み`game_log`はGitへ置かず、user管理corpusによるfull-record検証をCI外で定期実行する。
+- `majsoul-record`の取得はuserがproject外で行い、取得toolを作らない。conformance app crateはlocal `majsoul-record`を逐次decode・projectし、中間`game_log`を必須にせずLizhiSimと1パスで比較する。牌譜IDとreplay URLはsource locatorとして利用できる。
+- Gitには手書きの最小corner-case fixtureだけを置いてCIで検証する。完全な`majsoul-record`と診断用に出力した完全な`game_log`はGitへ置かず、user管理corpusによるfull-record検証をCI外で定期実行する。
 
 ## 6. 実装開始後の Rust 規約
 

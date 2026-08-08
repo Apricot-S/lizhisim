@@ -217,7 +217,7 @@ correctness test と分ける。固定 workload と環境 metadata を持ち、�
 2. 天鳳段位戦（四人/三人）
 3. 麻雀一番街段位戦（四人/三人）
 
-雀魂では [公式詳細ルール](https://mahjongsoul.com/news/46)を一次資料にする。記載外の corner case は [Cryolite/kanachan `src/simulation`](https://github.com/Cryolite/kanachan/tree/main/src/simulation) と [牌譜 ID 付き検証記録](https://gist.github.com/Cryolite/a026f41713f6a7ca88713737f5c2cfb6)から候補を得る。[ADR-0010](adr/0010-mahjong-soul-record-conformance.md)に従い、userがproject外で取得した`majsoul-record`を変換用app crateでdecodeし、匿名化した`game_log`へ変換する。編集済み最小`game_log` fixtureはCIで、`majsoul-record`から毎回decodeする完全牌譜corpusはCI外で検証する。
+雀魂では [公式詳細ルール](https://mahjongsoul.com/news/46)を一次資料にする。記載外の corner case は [Cryolite/kanachan `src/simulation`](https://github.com/Cryolite/kanachan/tree/main/src/simulation) と [牌譜 ID 付き検証記録](https://gist.github.com/Cryolite/a026f41713f6a7ca88713737f5c2cfb6)から候補を得る。[ADR-0011](adr/0011-one-pass-majsoul-conformance.md)に従い、CIでは必要な遷移を手書きした最小fixtureを検証する。CI外ではconformance appがuser管理の`majsoul-record`を逐次decode・projectし、中間`game_log`を必須にせずLizhiSimとcheckpointごとに比較する。
 
 元牌譜を取得できない corner case は test list に残し、理由付きで `blocked` とする。先行実装からコードをコピーせず、状態分割・規則差分・牌譜 locator を調査資料として利用する。
 

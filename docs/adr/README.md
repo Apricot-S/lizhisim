@@ -23,7 +23,8 @@
 | [0007](0007-content-addressed-source-evidence.md) | Superseded | 公式資料をcontent-addressed private evidenceとして保存する |
 | [0008](0008-source-review-without-copying.md) | Accepted | 公式資料を複製せずURL・取得日時・確認記録で追跡する |
 | [0009](0009-minimized-game-record-evidence.md) | Superseded | 牌譜を保存せず承認済み最小fixtureへ変換する |
-| [0010](0010-mahjong-soul-record-conformance.md) | Accepted | `majsoul-record`を外部入力として二段階検証する |
+| [0010](0010-mahjong-soul-record-conformance.md) | Superseded | `majsoul-record`を外部入力として二段階検証する |
+| [0011](0011-one-pass-majsoul-conformance.md) | Accepted | `majsoul-record`を1パスで逐次conformance検証する |
 
 ## Template
 

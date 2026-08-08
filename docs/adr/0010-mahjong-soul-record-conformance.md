@@ -1,10 +1,11 @@
 # ADR-0010: `majsoul-record`を外部入力として二段階検証する
 
-- Status: Accepted
+- Status: Superseded
 - Date: 2026-08-09
 - Deciders: Project owner
 - Supersedes: [ADR-0009](0009-minimized-game-record-evidence.md)
 - Amends: [ADR-0005](0005-mahjong-soul-first.md)の牌譜evidence手順
+- Superseded by: [ADR-0011](0011-one-pass-majsoul-conformance.md)
 
 ## Context
 

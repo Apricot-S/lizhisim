@@ -92,8 +92,8 @@ Goal: 東風/東南など一つの対局を終え、雀魂段位戦・四人 pre
 
 Slices:
 
-- `majsoul-record`から`game_log`へのlocal converter appとsource event trace
-- CI用constructed corner-case fixtureとCI外full-record conformance harness
+- `majsoul-record`のlocal one-pass conformance appとsource event trace
+- CI用手書きcorner-case fixtureとCI外full-record conformance harness
 - 連荘、本場、供託、対局進行
 - all-last、延長、飛び、同点
 - オカ/ウマ/順位精算
@@ -232,7 +232,7 @@ Goal: 実験データを安全に出力し、意味論を変えず scale-out す
 | async runtime | Phase 5 | Open; Phase 1 では不要 |
 | event/trajectory storage | Phase 5/8 | Open |
 | 公式資料のreview記録 | Gate A/Phase 3 | Decided: 原資料を複製せずURL・取得日時・確認記録を保存（ADR-0008） |
-| 雀魂牌譜evidence | Gate A/Phase 3 | Decided: CIの最小fixtureとCI外のraw full-record検証（ADR-0010） |
+| 雀魂牌譜evidence | Gate A/Phase 3 | Decided: CIの手書き最小fixtureとCI外の1パスfull-record検証（ADR-0011） |
 | 最初の verified preset | Gate A | Decided: 雀魂段位戦・四人（ADR-0005） |
 | performance target hardware | Phase 5 | Open |
 

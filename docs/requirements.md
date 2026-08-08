@@ -103,8 +103,8 @@
 | DATA-005 | Must | 不完全な run、失敗、キャンセルを成功 run と区別して保存する。 |
 | DATA-006 | Should | policy 学習用 trajectory、評価集計、デバッグ用完全イベントを別 view として生成する。 |
 | DATA-007 | Should | 古い schema を読み込む migration を core から分離できる。 |
-| DATA-008 | Must | userがproject外で取得した`majsoul-record`をlocal inputとして読み、player名を匿名化して`game_log`へ変換するapp crateを提供する。牌譜取得機能は含めない。 |
-| DATA-009 | Must | 編集済み最小`game_log` corner-case testをCIで実行し、Git外の完全な`majsoul-record`/変換済み`game_log` corpusをCI外で逐次conformance testできる。 |
+| DATA-008 | Must | userがproject外で取得した`majsoul-record`をlocal inputとして逐次decode・projectし、中間`game_log`を必須にせずLizhiSimと比較するconformance app crateを提供する。牌譜取得機能は含めない。 |
+| DATA-009 | Must | 手書きの最小corner-case testをCIで実行し、Git外の完全な`majsoul-record` corpusをCI外で1パスconformance testできる。 |
 
 ## 10. 非機能要求
 

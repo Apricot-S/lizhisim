@@ -196,7 +196,7 @@ event は少なくとも experiment、competition、table match、round の stre
 | `lizhisim-adapter-xiangting` | `xiangting` port 実装 |
 | `lizhisim-adapter-hule` | `hule` port 実装 |
 | `lizhisim-app` | 実験設定の composition root |
-| 変換用app crate（crate名未決） | userがlocalに置いた`majsoul-record`のdecode、匿名化、`game_log`への変換、full-record conformance。取得機能は持たない |
+| conformance app crate（crate名未決） | userがlocalに置いた`majsoul-record`のdecode、projection、匿名化、LizhiSimとの1パスfull-record比較、diff report。取得機能は持たず、`game_log`出力は任意の診断機能とする |
 
 crate 分割は循環依存を避ける手段であり、最初から細分化する目的ではない。walking skeleton で変更頻度と compile cost を計測し、ADR で確定する。
 
