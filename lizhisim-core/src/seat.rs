@@ -44,4 +44,9 @@ mod tests {
             Seat::<FourPlayer>::ALL.map(Some)
         );
     }
+
+    #[test]
+    fn four_player_seat_rejects_first_out_of_range_index() {
+        assert_eq!(Seat::<FourPlayer>::try_from_index(4), None);
+    }
 }
