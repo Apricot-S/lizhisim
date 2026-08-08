@@ -11,9 +11,4 @@ repository.workspace = true
 keywords.workspace = true
 categories.workspace = true
 
-[lib]
-name = "lizhisim"
-path = "src/lib.rs"
-
 [dependencies]
-thiserror.workspace = true
