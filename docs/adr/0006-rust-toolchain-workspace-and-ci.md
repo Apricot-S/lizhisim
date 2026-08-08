@@ -18,7 +18,8 @@ Phase 0 の空 scaffoldingにも、実装開始時の再現可能な開発環境
 - 通常jobのcommandは`cargo fmt -- --check`、`cargo clippy -- -D warnings`、`cargo build --verbose`、`cargo test --verbose`とする。
 - docs-rs 相当の検査は nightly と `cargo docs-rs` を使う。
 - dependency auditは`deny.toml`と`EmbarkStudios/cargo-deny-action@v2`を使い、通常CIとは別のworkflowで`cargo deny check`を実行する。当面は`main`へのpushと`main`向けpull requestだけを対象にする。Actionの`rust-version`は`rust-toolchain.toml`と同じ1.97.1に固定し、toolchain更新時に同期する。
-- Markdown lint、リンク検査は未導入として追跡し、存在しない gate を完了扱いしない。
+- Markdown lintは`DavidAnson/markdownlint-cli2-action@v23`、repository内の相対リンク検査は`lycheeverse/lychee-action@v2`を使い、通常CIとは別のdocumentation workflowで実行する。当面は`main`へのpushと`main`向けpull requestだけを対象にする。
+- link checkは`--offline`とし、外部URLの可用性をmerge gateへ含めない。
 - domain の責務境界が実測できるまで crate を細分化しない。
 
 ## Consequences
@@ -26,13 +27,14 @@ Phase 0 の空 scaffoldingにも、実装開始時の再現可能な開発環境
 - ローカル開発の compiler は patch version まで再現できる。
 - ローカル開発と通常のCI jobは同じRust 1.97.1 toolchainを使う。compiler versionの差による検査結果のずれを避けられる。
 - 空 crate のCI成功はドメインの正しさを意味しない。
-- dependency supply-chain検査はCIで再現できる。文書検査は引き続きopen decisionである。
+- dependency supply-chain検査と文書検査をCIで再現できる。
 
 ## Alternatives considered
 
 - 最初から複数 crateに分割する: 境界の変更頻度と compile costを測れないため採用しない。
 - CIで`stable` channelを明示する: `rust-toolchain.toml`と異なるcompilerを検査する意図はないため採用しない。
 - dependency auditを通常CI workflowへ同居させる: 実行責務と結果を分離するため採用しない。
+- 外部URLもmergeごとに検査する: 外部serviceの一時障害で開発を止めるため採用しない。
 
 ## Follow-up
 

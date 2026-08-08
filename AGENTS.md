@@ -90,7 +90,7 @@
 - 標準検証は `cargo fmt -- --check`、`cargo clippy -- -D warnings`、`cargo build --verbose`、`cargo test --verbose` とする。通常のCI jobはrepositoryの`rust-toolchain.toml`を使い、加えてnightlyの`cargo docs-rs`を実行する。
 - dependency auditは`deny.toml`を規範として、独立したGitHub Actions workflowで`cargo deny check`を実行する。
 - cargo-deny Actionの`rust-version`は`rust-toolchain.toml`の`channel`と一致させ、toolchain更新時に同じ変更で更新する。
-- Markdown lint、リンク検査は未導入である。存在しない command を推測して成功条件へ含めない。
+- Markdownは`markdownlint-cli2`、repository内の相対リンクは`lychee --offline`を使う独立したGitHub Actions workflowで検査する。外部URLの疎通はこのgateへ含めない。
 
 ## 9. 文書と変更管理
 

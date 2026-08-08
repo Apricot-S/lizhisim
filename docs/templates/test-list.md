@@ -1,4 +1,4 @@
-# Test list: <topic>
+# Test list: {topic}
 
 ## Metadata
 
@@ -30,7 +30,7 @@
 
 ## Cycle log
 
-### Cycle 1 — <selected behavior>
+### Cycle 1 — {selected behavior}
 
 - Red command:
 - Red reason observed:

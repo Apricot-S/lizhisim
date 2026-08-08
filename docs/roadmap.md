@@ -32,6 +32,7 @@ Exit gate:
 - [x] 最小 workspace/crate boundary（root workspace + `lizhisim` library scaffolding）
 - [x] format、lint、build、test、docs-rs の CI command
 - [x] `cargo-deny`によるdependency auditと独立CI workflow
+- [x] Markdown lintとrepository内リンク検査の独立CI workflow
 - [ ] canonical serialization と stable hash の候補
 - [ ] async runtime を必要とする時点と選定基準
 - [x] 最初の基準プリセット（雀魂段位戦・四人）

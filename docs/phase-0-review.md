@@ -18,9 +18,9 @@ Phase 0から実装へ進む判断を、文書の存在ではなく確認可能�
 - [x] 最小workspaceと空library crateがある。
 - [x] format、Clippy、build、test、docs-rsのCIがある。
 - [x] `cargo-deny`によるdependency auditの設定と独立CI workflowがある。
-- [ ] Markdown lintとローカルリンク検査をCI gateにするか決める。
+- [x] Markdown lintとローカルリンク検査の独立CI workflowがある。
 
-未決の文書検査は実装開始を自動的にはblockしない。production dependency追加時は`deny.toml`のlicense、ban、source方針をreviewする。
+production dependency追加時は`deny.toml`のlicense、ban、source方針をreviewする。外部URLの定期検査はmerge gateとは分離し、必要になった時点で検討する。
 
 ## 3. Rules and evidence
 

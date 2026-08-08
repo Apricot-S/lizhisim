@@ -294,9 +294,11 @@ cargo clippy -- -D warnings
 cargo build --verbose
 cargo test --verbose
 cargo deny check
+markdownlint-cli2 "**/*.md" "#target/**"
+lychee --offline --no-progress --root-dir . "**/*.md"
 ```
 
-通常のCI jobもversionを別指定せず、repositoryの`rust-toolchain.toml`を使ってformat、Clippy、build、testを実行する。CIは加えてnightlyの`cargo docs-rs`を実行する。`cargo deny check`は`deny.toml`を使う独立workflowで実行する。cargo-deny Actionの`rust-version`はtoolchain fileから自動取得されないため、`rust-toolchain.toml`更新時に同じ値へ更新する。Markdown lintとローカルリンク検査は未決であり、導入時にこの節と`AGENTS.md`を更新する。空scaffoldingがbuildできることと、ドメインの振る舞いが検証済みであることを混同しない。
+通常のCI jobもversionを別指定せず、repositoryの`rust-toolchain.toml`を使ってformat、Clippy、build、testを実行する。CIは加えてnightlyの`cargo docs-rs`を実行する。`cargo deny check`は`deny.toml`を使う独立workflowで実行する。cargo-deny Actionの`rust-version`はtoolchain fileから自動取得されないため、`rust-toolchain.toml`更新時に同じ値へ更新する。Markdown lintとrepository内リンク検査も独立workflowで実行し、外部URLはmerge gateに含めない。ローカルcommandは各toolを導入済みの場合に利用できる。空scaffoldingがbuildできることと、ドメインの振る舞いが検証済みであることを混同しない。
 
 ## 13. Definition of Done
 
