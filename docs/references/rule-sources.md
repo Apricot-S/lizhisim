@@ -4,7 +4,8 @@
 
 プリセットの値を確定するための一次資料と、まだ足りない証跡を管理する。これはルール値そのものの一覧ではない。公式資料は改定され得るため、実装時には URL だけでなく取得 snapshot、版、対象期間、内容 hash を preset metadata に固定する。
 
-初回調査日: **2026-08-08 (Asia/Tokyo)**
+- 初回調査日: **2026-08-08 (Asia/Tokyo)**
+- 最終更新日: **2026-08-09 (Asia/Tokyo)**
 
 ## 2. 証跡 grade
 
@@ -21,7 +22,7 @@ Grade は資料品質であり、preset の実装・検証状態ではない。G
 
 | 対象 | 公式一次資料 | Grade | 確認できた範囲 | 次の監査 |
 |---|---|---:|---|---|
-| 雀魂 四人/三人段位戦 | [雀魂かんたんスタートガイド](https://mahjongsoul.com/startguide/assets/jantama_startguide.pdf) | C | 段位戦、room、四人/三人 mode への公式導線 | game 内「段位戦ルール説明」と段位 point 表を app version/region 付きで取得 |
+| 雀魂 四人/三人段位戦 | [雀魂 段位戦詳細ルール](https://mahjongsoul.com/news/46) | B | 公式の詳細ルール本文。明記されない corner case がある | 下記の Kanachan 検証記録から牌譜 ID を抽出し、元牌譜を再取得して回帰 test にする |
 | 天鳳 四人/三人段位戦 | [オンライン対戦麻雀 天鳳 / マニュアル](https://tenhou.net/man/index.html) | B | 段位/Rate、卓、対局・大会機能の公式 manual | 段位戦 4/3 人の mode code、卓内ルール、pt 表を個別条項へ mapping |
 | 麻雀一番街 四人/三人段位戦 | [麻雀一番街 公式サイト](https://www.mahjong-jp.com/) | C | 公式 service と game 内規約への入口 | game 内 help の卓内ルール、段位 point、room eligibility を app version/region 付きで取得 |
 | 龍龍 四人/三人段位戦 | [龍龍 ルール](https://ron2.jp/rule/) | B | 四人東風/東南、三麻差分、赤、飛び、アガリ止め、点数等の公開本文 | 段位制度、room/mode 別 point、改定履歴を追加し、WRC 差分の対象版を照合 |
@@ -39,6 +40,27 @@ game 内表示しかない場合、最低限次を記録する。
 - 同じ内容を別 reviewer が確認した記録
 
 非公式 Wiki、攻略 site、SNS 投稿は一次資料の欠落発見に使えるが、値確定の唯一の根拠にしない。
+
+### 雀魂の補助検証資料
+
+| 資料 | 位置付け | 使用方法 |
+|---|---|---|
+| [Cryolite/kanachan `src/simulation`](https://github.com/Cryolite/kanachan/tree/main/src/simulation) | 雀魂牌譜との照合実績がある先行実装 | corner case の候補、状態分割、必要な test 観点を発見する。コードを一次資料扱いせず、license を確認せずコピーしない |
+| [Cryolite の雀魂シミュレーション検証記録](https://gist.github.com/Cryolite/a026f41713f6a7ca88713737f5c2cfb6) | 牌譜 ID 付きの検証記録 | 記載された牌譜 ID から元牌譜を改めて取得し、該当 `Round` を最小 regression/golden test にする |
+
+推奨する evidence chain:
+
+```text
+雀魂公式詳細ルール
+  -> 記載外の corner case を Kanachan/検証記録から発見
+  -> 記載された牌譜 ID の元牌譜を取得
+  -> raw 牌譜を保存・hash 化
+  -> 最小 test list を作成
+  -> red -> green -> refactor
+  -> LizhiSim の event と元牌譜を照合
+```
+
+Kanachan の挙動だけを期待値にしない。最終的な根拠を取得済み牌譜と公式ルールに戻し、取得不能な牌譜に依存する項目は `verified` にしない。
 
 ## 4. 競技団体・リーグ
 

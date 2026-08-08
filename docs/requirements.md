@@ -14,7 +14,7 @@
 | CORE-004 | Must | 行為の優先順位と複数ロンを、応答到着順に依存せずルールどおり決定する。 |
 | CORE-005 | Must | フリテン、リーチ後の制約、槓成立時点、嶺上・海底・河底、ドラ更新の境界を明示的に表現する。 |
 | CORE-006 | Must | 外部から不正 action を受けても状態を部分更新せず、型付きエラーまたは設定済みの失格方針へ遷移する。 |
-| CORE-007 | Must | 局の遷移は古い状態を消費し、次状態、完了、または型付き中断点のいずれかを返す。 |
+| CORE-007 | Must | `Round` の遷移は古い状態を消費し、次状態、完了、または型付き中断点のいずれかを返す。 |
 | CORE-008 | Must | 通常のドメイン遷移は panic せず、入力領域に対して全域関数として扱える。 |
 
 ## 3. 手牌評価と点数計算
@@ -41,6 +41,7 @@
 | RULE-007 | Must | 旧プリセットを破壊的更新せず、新しい版を追加する。 |
 | RULE-008 | Must | カスタム設定は、どの verified preset から何を変更したかに依存せず、解決済み完全設定として保存できる。 |
 | RULE-009 | Should | 2 つのルール設定を意味のある項目名で比較し、差分 report を生成できる。 |
+| RULE-010 | Must | 実装・検証は、雀魂段位戦（四人/三人）、天鳳段位戦（四人/三人）、麻雀一番街段位戦（四人/三人）の順で優先する。 |
 
 ## 5. 半荘・対局
 
@@ -81,7 +82,7 @@
 
 | ID | 優先度 | 要求 |
 |---|---|---|
-| COMP-001 | Must | Competition、Stage、Round、Table Assignment、Table Match、Standing を卓内状態から分離する。 |
+| COMP-001 | Must | Competition、Stage、Matchday、Table Assignment、Table Match、Standing を卓内状態から分離する。`Round` は局にのみ使う。 |
 | COMP-002 | Must | 個人戦とチーム戦、固定 roster と stage ごとの lineup を扱える。 |
 | COMP-003 | Must | 段位戦の参加資格、マッチング、順位結果からのポイント更新、昇段・降段を版管理できる。 |
 | COMP-004 | Must | 総当たり、指定 schedule、スイス式相当、予選足切り、ノックアウト、グループから決勝を構成できる。 |
@@ -115,7 +116,7 @@
 | NFR-006 | Must | 公式文書の著作権を尊重し、プリセットには値と出典のみを保持する。 |
 | NFR-007 | Should | core の correctness test は GPU や network なしで実行できる。 |
 | NFR-008 | Should | 単一 process から開始し、意味論を変えず複数 process へ拡張できる。 |
-| NFR-009 | Should | Rust stable を使い、MSRV は実装開始時に依存関係を確認して固定する。 |
+| NFR-009 | Should | Rust stable、Edition 2024、MSRV 1.97 を使う。変更時は依存関係を確認し ADR を更新する。 |
 
 ## 11. 制約
 
@@ -130,7 +131,7 @@
 
 以下は実装開始前または該当 milestone 前に ADR で決める。
 
-- 最初に固定する Rust toolchain と MSRV
+- `rust-toolchain.toml` の channel/profile/component（MSRV 1.97 と Edition 2024 は manifest で固定済み）
 - event/trajectory の永続化形式
 - in-process queue の async runtime
 - 安定 hash と canonical serialization

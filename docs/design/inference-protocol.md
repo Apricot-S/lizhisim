@@ -10,8 +10,8 @@
 
 初期 decision kind 候補:
 
-- `ChooseDiscard` — 通常打牌、リーチ打牌、暗槓、加槓、北抜き、ツモを含む turn decision
-- `ChooseCall` — pass、ロン、ポン、チー、明槓を含む call-window slot
+- `ChooseTurnAction` — 通常打牌、立直打牌、暗槓、加槓、北抜き、自摸和を含む turn decision
+- `ChooseCallResponse` — pass、和了、ポン、チー、明槓を含む call-window slot
 - `ChooseAbortiveDraw` — 九種九牌など選択権がある規則
 - `ChooseContinuation` — all-last の続行選択を公式規則が認める場合
 
@@ -27,7 +27,7 @@
 |---|---|
 | `request_id` | global または run 内で一意、idempotency key |
 | `experiment_id` | run の分離 |
-| `table_match_id` / `hand_id` | 所属する卓と局 |
+| `table_match_id` / `round_id` | 所属する卓と `Round` |
 | `call_window_id` | call request の barrier、該当時のみ |
 | `actor` | 観測主体の seat/agent |
 | `decision_kind` | 期待する応答型 |
@@ -72,7 +72,7 @@ backend metadata は学習・運用観測用であり、domain transition へ渡
 7. continuation ownership を compare-and-consume し、二重再開を防ぐ。
 8. accepted event を追記してから core を再開する。
 
-不正 action を自動的に pass や tsumogiri へ置き換えない。置換方針が必要な実験は `InvalidResponsePolicy` として明示し、元の不正応答と代替 action を両方 event 化する。
+不正 action を自動的に pass や自摸切りへ置き換えない。置換方針が必要な実験は `InvalidResponsePolicy` として明示し、元の不正応答と代替 action を両方 event 化する。
 
 ## 6. Pending continuation の所有
 
@@ -148,7 +148,7 @@ Opened -> Collecting -> Ready -> Resolved
                     \-> Cancelled
 ```
 
-各 slot は `Pending | Responded | TimedOut | Cancelled` のいずれかで、全 required slot が terminal のとき `Ready` になる。最初のロン応答で他要求を即 cancel してはならない。複数ロンまたは三家和の可能性を失うためである。
+各 slot は `Pending | Responded | TimedOut | Cancelled` のいずれかで、全 required slot が terminal のとき `Ready` になる。最初の和了応答で他要求を即 cancel してはならない。複数和了または三家和の可能性を失うためである。
 
 head-bump rule でも、seat priority 上より前の候補の応答が未確定なら待つ。timeout policy による pass が確定した後に解決する。
 
@@ -165,7 +165,7 @@ wall clock は core に入れず、scheduler が次の typed result を作る。
 
 - retry same backend
 - retry fallback backend with same model artifact
-- deterministic default（pass、tsumogiri など）
+- deterministic default（pass、自摸切りなど）
 - forfeit actor/table match
 - fail experiment
 
@@ -183,9 +183,9 @@ Observation schema は rule-independent core feature と optional feature blocks
 
 候補情報:
 
-- own concealed tiles、meld、drawn tile
-- public discards、meld、riichi、kita、dora indicators
-- points、seat/round wind、honba、deposits
+- own `bingpai`、`fulu`、摸牌
+- public 打牌、`fulu`、`lizhi`、北抜き、宝牌表示
+- points、seat、場風、本場、供託
 - wall/remaining draw の公開情報
 - match progression と rule features
 - action history の必要範囲
@@ -195,7 +195,7 @@ rule feature を省いて同じ model を異なるルールで使う場合、モ
 
 完全情報 view から observation を作る projection は pure function とし、以下をテストする。
 
-- 他家の concealed tile identity を含まない。
+- 他家の `bingpai` に属する牌 identity を含まない。
 - 未公開 wall order を含まない。
 - seat rotation に対する相対表現が一貫する。
 - 赤牌、北抜き、三麻除外牌を schema どおり表す。
@@ -209,9 +209,9 @@ rule feature を省いて同じ model を異なるルールで使う場合、モ
 
 - `ActionSchemaVersion` ごとに ID の意味が不変。
 - discard copy と tile kind の区別が必要な場面を表現できる。
-- riichi + discard を原子的に選べる。
-- 複数の chi/kan decomposition を区別できる。
-- pass/ron/tsumo/kita を decision kind と整合させる。
+- 立直 + 打牌を原子的に選べる。
+- 複数のチー/槓 decomposition を区別できる。
+- pass/和了/自摸和/北抜きを decision kind と整合させる。
 - legal set から domain action への decode が全単射として検査できる。
 
 ## 14. Trajectory
@@ -242,7 +242,7 @@ timeout、backend failure、administrative cancel は terminal outcome と区別
 - runnable/suspended/completed table 数
 - timeout/retry/duplicate/late/invalid response 数
 - GPU utilization/memory/OOM
-- table throughput、hand throughput、decision throughput
+- table throughput、round throughput、decision throughput
 
 高 cardinality の table/request ID を通常 metric label にしない。trace または sampled log で相関する。
 

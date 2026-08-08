@@ -115,11 +115,11 @@ sequenceDiagram
     T->>B: call request C / window 42
     B->>A: batched inference
     B->>C: batched inference
-    C-->>B: pon
-    A-->>B: ron
+    C-->>B: fulu response
+    A-->>B: hule response
     B-->>T: responses (arrival order retained only for metrics)
     T->>T: resolve window 42 by rule priority
-    Note over T: ron wins even if it arrived later
+    Note over T: hule has rule priority even if it arrived later
 ```
 
 ## 5. イベント駆動実行
@@ -162,7 +162,7 @@ batch は最大件数、最大 token/byte、最古要求の待ち時間、優先
 
 GPU 演算そのものの bitwise determinism が保証できない場合は、選択済み action を event として保存し、対局 replay は action event から決定的に行う。モデルの再推論と対局の再生を混同しない。
 
-event は少なくとも experiment、competition、table match、hand の stream に分け、stream 内 sequence を単調増加させる。wall clock timestamp は観測情報であり、順序の根拠にしない。
+event は少なくとも experiment、competition、table match、round の stream に分け、stream 内 sequence を単調増加させる。wall clock timestamp は観測情報であり、順序の根拠にしない。
 
 ## 8. エラー分類
 
@@ -212,3 +212,4 @@ crate 分割は循環依存を避ける手段であり、最初から細分化�
 - [ADR-0001: イベント駆動・型付き継続を採用する](../adr/0001-event-driven-typed-continuations.md)
 - [ADR-0002: ルールを層別化し出典付き不変版として管理する](../adr/0002-versioned-rule-layers.md)
 - [ADR-0003: 大会ドメインを卓内エンジンから分離する](../adr/0003-separate-competition-domain.md)
+- [ADR-0004: 麻雀用語はピンインを基本とし、Roundを局専用にする](../adr/0004-pinyin-terminology-and-round.md)

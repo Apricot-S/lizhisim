@@ -39,7 +39,7 @@ Source evidence
 
 | 領域 | 主な option |
 |---|---|
-| 人数 | yonma / sanma |
+| 人数 | four-player / three-player |
 | 使用牌 | 34 種の copy 数、三麻の除外牌、総牌数 |
 | 赤牌 | 萬子・筒子・索子ごとの赤 5 copy 数、赤牌のドラ扱い |
 | 北 | 通常牌/役牌/客風、抜き可否、抜きドラ、手牌扱い、抜いた直後の補充元、槍北可否 |
@@ -56,7 +56,7 @@ Source evidence
 | リーチ | 必要点数、残りツモ条件、供託、フリテンリーチ、オープンリーチ等の local rule |
 | 和了選択 | 見逃し後の同巡/以後フリテン、リーチ後の見逃し |
 | 応答窓 | 同時ロン、head bump、複数ロン、三家和流局、seat priority |
-| timeout | 卓内ルールではなく実験方針として pass/tsumogiri/forfeit を選ぶ |
+| timeout | 卓内ルールではなく実験方針として pass/自摸切り/forfeit を選ぶ |
 
 ### 3.3 流局
 
@@ -79,7 +79,7 @@ Source evidence
 | 一翻縛り | 常時、場による変更 |
 | 喰いタン/後付け | 可否 |
 | 一発・裏・槓ドラ・槓裏 | 個別可否 |
-| 役一覧 | 門前限定、食い下がり、local yaku |
+| 役一覧 | 門前限定、食い下がり、local 役 |
 | 役満 | 一覧、複合、double variant、責任払い対象 |
 | 数え役満 | 不採用/役満/三倍満上限など |
 | 人和 | 不採用、通常役、満貫、倍満、役満など明示型 |
@@ -117,16 +117,16 @@ Source evidence
 | 領域 | 主な option |
 |---|---|
 | 初期値 | 開始点、返し点、起家/座順 |
-| 規定場 | 東風、東南、任意の round sequence |
+| 規定場 | 東風、東南、任意の場の進行順 |
 | 連荘 | 親和了、親聴牌、流局種別ごとの継続 |
 | 本場 | 増減条件、上限 |
 | 延長 | 南入/西入等、必要トップ点、最大場、サドンデス |
 | 終了 | 飛び条件（負/0以下）、目標点、時間管理 event |
 | all-last | アガリ止め、聴牌止め、順位条件、続行選択の有無 |
 | 同点 | 起家順、同順位、順位点分配、追加局 |
-| 精算 | oka、uma/順位点、残供託、1000点単位変換 |
+| 精算 | オカ、ウマ/順位点、残供託、1000点単位変換 |
 
-終了判定は `HandSettlement` 適用後の一か所で行い、和了処理と流局処理に重複させない。
+終了判定は `RoundSettlement` 適用後の一か所で行い、和了処理と流局処理に重複させない。
 
 ## 5. CompetitionPolicy と RankingPolicy
 
@@ -182,18 +182,26 @@ hash:       sha256:<canonical validated content>
 
 | Family ID（予定） | 対象 | Table/Match | Ranking | Phase 0 の監査状態 |
 |---|---|---|---|---|
-| `jp.mahjongsoul.ranked.yonma` | 雀魂 四人段位戦 | 必須 | 必須 | 公式 guide は確認、完全値は game 内証跡が必要 |
-| `jp.mahjongsoul.ranked.sanma` | 雀魂 三人段位戦 | 必須 | 必須 | 同上 |
-| `jp.tenhou.ranked.yonma` | 天鳳 四人段位戦 | 必須 | 必須 | 公式 manual を基点に mode 差分監査が必要 |
-| `jp.tenhou.ranked.sanma` | 天鳳 三人段位戦 | 必須 | 必須 | 同上 |
-| `jp.riichicity.ranked.yonma` | 麻雀一番街 四人段位戦 | 必須 | 必須 | 公式 Web に完全仕様なし、game 内証跡待ち |
-| `jp.riichicity.ranked.sanma` | 麻雀一番街 三人段位戦 | 必須 | 必須 | 同上 |
-| `jp.ron2.ranked.yonma` | 龍龍 四人段位戦 | 必須 | 必須 | 公式ルールページ確認、段位制度を追加監査 |
-| `jp.ron2.ranked.sanma` | 龍龍 三人段位戦 | 必須 | 必須 | 同上 |
+| `jp.mahjongsoul.ranked.four_player` | 雀魂 四人段位戦 | 必須 | 必須 | [公式詳細ルール](https://mahjongsoul.com/news/46)を基点に牌譜検証する |
+| `jp.mahjongsoul.ranked.three_player` | 雀魂 三人段位戦 | 必須 | 必須 | 同上 |
+| `jp.tenhou.ranked.four_player` | 天鳳 四人段位戦 | 必須 | 必須 | 公式 manual を基点に mode 差分監査が必要 |
+| `jp.tenhou.ranked.three_player` | 天鳳 三人段位戦 | 必須 | 必須 | 同上 |
+| `jp.riichicity.ranked.four_player` | 麻雀一番街 四人段位戦 | 必須 | 必須 | 公式 Web に完全仕様なし、game 内証跡待ち |
+| `jp.riichicity.ranked.three_player` | 麻雀一番街 三人段位戦 | 必須 | 必須 | 同上 |
+| `jp.ron2.ranked.four_player` | 龍龍 四人段位戦 | 必須 | 必須 | 公式ルールページ確認、段位制度を追加監査 |
+| `jp.ron2.ranked.three_player` | 龍龍 三人段位戦 | 必須 | 必須 | 同上 |
 
 サービス内の room/卓別に卓内ルールが同じで段位ポイントだけ違う場合、`TableRules` を複製せず複数の `RankingPolicy` を組み合わせる。
 
-### 7.2 競技ルール
+### 7.2 実装・検証の優先順位
+
+1. **雀魂段位戦（四人/三人）**: 膨大な牌譜を検証 corpus にでき、Cryolite/kanachan の `src/simulation` に雀魂牌譜と照合済みの先行実装がある。
+2. **天鳳段位戦（四人/三人）**: 雀魂との差分が比較的小さく、牌譜が公開されている。
+3. **麻雀一番街段位戦（四人/三人）**: 雀魂との差分が比較的小さい。
+
+この優先順位は family 全体の完成順である。四人 `Round` core の vertical slice と三人固有機能は段階的に実装してよいが、別の競技 preset を先に `verified` にして優先順位を迂回しない。
+
+### 7.3 競技ルール
 
 | Family ID（予定） | 対象 | 主な variation | Phase 0 の監査状態 |
 |---|---|---|---|
@@ -221,7 +229,7 @@ preset:
   sources: [source-snapshot-id]
 
 table_rules:
-  player_set: yonma
+  player_set: four_player
   tiles: { ...fully resolved... }
   actions: { ...fully resolved... }
   draws: { ...fully resolved... }
@@ -240,16 +248,16 @@ match_rules:
 
 ## 9. Semantic validation の例
 
-- `player_set = sanma` なら seat 数、順位点数、支払 vector が 3。
-- 除外した tile に赤 copy や yaku requirement を設定できない。
+- `player_set = three_player` なら seat 数、順位点数、支払 vector が 3。
+- 除外した牌に赤 copy や役要件を設定できない。
 - 北抜き可なら北牌と replacement draw policy が存在する。
-- `multiple_ron = head_bump` と `triple_ron_abort = true` のような競合を拒否する。
+- 複数和了方式の head bump と三家和流局のような競合を拒否する。
 - リーチ必要点が 0 未満でない。供託と終了時残供託処理がある。
-- max kan と dead wall の補充牌数が整合する。
+- 最大槓数と王牌の補充牌数が整合する。
 - 数え役満を不採用にした場合も上限点が定義される。
 - 連荘または延長に循環上限がなくても、麻雀上の正当な長期継続として scheduler が扱える。
-- placement bonus の要素数が人数と一致し、oka/source/sink を含む精算 conservation が説明できる。
-- rule が要求する yaku/scoring capability を `hule` adapter が宣言している。
+- placement bonus の要素数が人数と一致し、オカ/source/sink を含む精算 conservation が説明できる。
+- rule が要求する役/点数 capability を `hule` adapter が宣言している。
 
 ## 10. 公式資料の監査手順
 
@@ -285,3 +293,5 @@ match_rules:
 - 未公開 `hule` の対応範囲次第で preset capability が制限される。
 
 これらは preset の版、source mapping、unsupported clause、contract test で管理する。
+
+実装順と検証根拠の判断は [ADR-0005](../adr/0005-mahjong-soul-first.md) に記録する。

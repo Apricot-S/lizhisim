@@ -4,7 +4,7 @@
 
 一つの半荘は参加者の得点と順位を返せば完結する。一方、段位戦は母集団と queue、league は schedule と累積順位、tournament は勝ち上がりと再配置を持つ。卓内 engine がこれらを知ると、同じ M リーグ卓内ルールを別の大会で再利用できず、半荘のテストに season 全体が必要になる。
 
-Competition domain は `TableMatchSpec` を発行し、`TableMatchResult` を受け取る唯一の関係にする。
+Competition domain は `TableMatchSpec` を発行し、`TableMatchResult` を受け取る唯一の関係にする。`Round` は局を意味するため、competition の日程単位には使わない。
 
 ```mermaid
 flowchart TB
@@ -40,9 +40,9 @@ flowchart TB
 - team league の semifinal
 - 条件を満たすまで続く決勝
 
-### 2.3 Round
+### 2.3 Matchday
 
-一つ以上の `TableAssignment` を束ねる。Round が同時刻である必要はないが、次 round の組合せが前 round 全結果に依存する場合の barrier になる。オンライン段位戦では round barrier を持たず、matchmaking window を round 相当として event 化できる。
+一つ以上の `TableAssignment` を束ねる。`Matchday` が同時刻や暦上の一日である必要はないが、次の組合せが前 `Matchday` の全結果に依存する場合の barrier になる。オンライン段位戦では `Matchday` barrier を持たず、matchmaking window を別の scheduling event として扱える。
 
 ### 2.4 TableAssignment
 
@@ -52,7 +52,7 @@ flowchart TB
 - 使用する table/match rule version
 - model version/agent binding
 - wall/RNG key policy
-- round/stage/table identity
+- matchday/stage/table identity
 - completion/failure policy
 
 assignment 以後に座順を暗黙 randomize しない。randomize する policy の選択結果を assignment event に記録する。
@@ -65,7 +65,7 @@ raw match results と administrative adjustment から再計算可能な materia
 
 参考になる要素:
 
-- season、division、round、fixture、standing の分離
+- season、division、matchday、fixture、standing の分離
 - schedule と試合結果の分離
 - 勝点、得失点、tie-break の ordered rules
 - promotion/relegation、playoff、未消化試合
@@ -90,13 +90,13 @@ Stage は format enum と policy の組合せで構成する。
 
 事前に全 assignment を固定する。公式 league の再現、座順指定、broadcast order に向く。未消化、延期、無効試合は event で管理する。
 
-### 4.2 Round robin / balanced league
+### 4.2 Round-robin / balanced league
 
 参加人数と卓人数に応じ、同卓回数と座順偏りを最小化する schedule を生成する。完全な組合せが不可能な場合、optimizer の目的関数と tie-break seed を記録する。
 
 ### 4.3 Swiss-like
 
-各 round 後の standing または strength band に基づき近い参加者を同卓させる。再同卓回避、team conflict、seat balance を制約にする。二者 Swiss の既存式をそのまま使わず、multi-party matching policy として定義する。
+各 `Matchday` 後の standing または strength band に基づき近い参加者を同卓させる。再同卓回避、team conflict、seat balance を制約にする。二者 Swiss の既存式をそのまま使わず、multi-party matching policy として定義する。
 
 ### 4.4 Ladder / ranked queue
 
@@ -137,7 +137,7 @@ hard constraints と soft objectives を分ける。
 
 Hard の例:
 
-- 同一 participant を同じ round の複数卓へ割り当てない。
+- 同一 participant を同じ `Matchday` の複数卓へ割り当てない。
 - 必要人数を満たす。
 - 同一 team から一人まで、など stage 固有制約。
 - 失格・未登録 participant を除外する。
@@ -196,16 +196,16 @@ update_rank(
 たとえば同じ雀魂四麻卓内ルールを複数 room が使い、段位 point だけ異なるなら次のように合成する。
 
 ```text
-TableRules:   mahjongsoul-yonma-rules@X
-MatchRules:   mahjongsoul-yonma-south@Y
-RankingPolicy: mahjongsoul-gold-room-yonma@Z
+TableRules:   mahjongsoul-four-player-rules@X
+MatchRules:   mahjongsoul-four-player-south@Y
+RankingPolicy: mahjongsoul-gold-room-four-player@Z
 ```
 
 実験記録には三つの解決済み ID/hash を残す。
 
 ## 7. チーム戦
 
-`Team` は participant の集合、`Lineup` は特定 round/table へ出す participant の割当である。
+`Team` は participant の集合、`Lineup` は特定 `Matchday`/table へ出す participant の割当である。
 
 - roster eligibility と lineup selection を分ける。
 - 一人あたり最低/最大出場数を stage constraint にできる。
@@ -293,7 +293,7 @@ stateDiagram-v2
 実装順は機能別 horizontal layer ではなく、次の縦切りを候補とする。
 
 1. 固定 4 名、固定座順、固定牌山、1 半荘、結果集計
-2. 8 名 2 卓 x 複数 round、固定 schedule、standing
+2. 8 名 2 卓 x 複数 `Matchday`、固定 schedule、standing
 3. 結果依存の上位進出と final
 4. rating band を使う四麻 ranked queue
 5. team roster/lineup と team standing

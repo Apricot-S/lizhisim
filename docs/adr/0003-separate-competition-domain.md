@@ -12,7 +12,7 @@ LizhiSim は一卓だけでなく、段位戦、league、team 戦、tournament �
 
 ## Decision
 
-- Competition を独立 domain とし、`Competition -> Stage -> Round -> TableAssignment` の aggregate を持つ。
+- Competition を独立 domain とし、`Competition -> Stage -> Matchday -> TableAssignment` の aggregate を持つ。`Round` は局にのみ使う。
 - 卓内 engine との interface は `TableMatchSpec` と `TableMatchResult` に限定する。
 - schedule/assignment、aggregation、completion、advancement、ranking を差し替え可能な pure policy とする。
 - assignment、seat、tie-break、carry-over、penalty、ruling を event 化する。

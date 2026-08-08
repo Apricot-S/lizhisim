@@ -26,12 +26,12 @@ Exit gate:
 
 実装開始前に決定する。
 
-- [ ] Rust stable toolchain / MSRV / edition
-- [ ] 最小 workspace/crate boundary
+- [x] MSRV 1.97 / Edition 2024（manifest で固定済み。toolchain profile は未決）
+- [x] 最小 workspace/crate boundary（root workspace + `lizhisim` library scaffolding）
 - [ ] format、lint、test、dependency audit の CI command
 - [ ] canonical serialization と stable hash の候補
 - [ ] async runtime を必要とする時点と選定基準
-- [ ] 最初の基準プリセット（推奨: 公式情報が明確な四人競技ルール）
+- [ ] 最初の基準プリセット（雀魂段位戦・四人）
 - [ ] 最初の active test list
 
 Decision output:
@@ -47,10 +47,10 @@ Goal: GPU、network、実 scoring crate なしで、固定牌山の小さな一�
 
 Vertical slices:
 
-1. PlayerSet、Seat、Tile、Points、IDs の検証済み値型
-2. fixed `Yonma` rule fixture と wall
-3. deal -> draw -> `ChooseDiscard` suspension
-4. typed response validation -> discard event
+1. `PlayerSet`、`Seat`、`Points`、IDs と、glossary で確定した牌関連の検証済み値型
+2. fixed `FourPlayer` rule fixture と固定牌山
+3. 配牌から最初の action request を発行して suspension
+4. typed response validation から action event を確定
 5. call 候補なし -> next draw
 6. canonical event stream -> replay state hash
 
@@ -73,7 +73,7 @@ Slices:
 - exhaustive/abortive draw
 - `xiangting` adapter contract
 - `hule` port/fake、利用可能なら adapter contract
-- 支払 ledger と hand result
+- 支払 ledger と `RoundResult`
 
 Exit gate:
 
@@ -84,13 +84,13 @@ Exit gate:
 
 ## Phase 3 — 四人対局と最初の verified preset
 
-Goal: 東風/東南など一つの対局を終え、公式 preset 一つを verified にする。
+Goal: 東風/東南など一つの対局を終え、雀魂段位戦・四人 preset を最初の `verified` にする。
 
 Slices:
 
-- 連荘、本場、供託、round progression
+- 連荘、本場、供託、対局進行
 - all-last、延長、飛び、同点
-- oka/uma/順位精算
+- オカ/ウマ/順位精算
 - rule schema/canonical hash/registry
 - source mapping と golden scenario
 - complete match replay
@@ -103,22 +103,22 @@ Exit gate:
 
 ## Phase 4 — 三人麻雀
 
-Goal: 三麻固有差分を first-class type と rule で扱う。
+Goal: 三人麻雀固有差分を first-class type と rule で扱い、雀魂段位戦・三人 preset を `verified` にする。
 
 Slices:
 
 - tile set と seat type
-- 北抜きと replacement/chankan
+- 北抜きと replacement/槍槓
 - チー禁止と call priority
 - 三麻ツモ支払 variation、本場、ノーテン
-- sanma match progression/settlement
-- オンライン三麻基準 preset 1 件
+- three-player match progression/settlement
+- 雀魂段位戦・三人 preset
 
 Exit gate:
 
-- yonma path への条件分岐汚染がない
+- four-player path への条件分岐汚染がない
 - 三麻 property/contract/golden tests
-- verified sanma preset 1 件
+- verified three-player preset 1 件
 
 ## Phase 5 — 非同期多数卓と推論 batching
 
@@ -168,12 +168,12 @@ Goal: [必須 catalog](design/rules-and-presets.md#7-必須プリセット-catal
 
 推奨順:
 
-1. WRC または M リーグなど一次資料が公開された四人ルール
-2. 最高位戦、日本プロ麻雀連盟、日本プロ麻雀協会、麻将連合、RMU variations
-3. 龍龍 四人/三人
-4. 天鳳 四人/三人
-5. 雀魂 四人/三人（game 内証跡を確保後）
-6. 麻雀一番街 四人/三人（game 内証跡を確保後）
+1. 雀魂段位戦 四人/三人
+2. 天鳳段位戦 四人/三人
+3. 麻雀一番街段位戦 四人/三人
+4. 龍龍 四人/三人
+5. WRC、M リーグ
+6. 最高位戦、日本プロ麻雀連盟、日本プロ麻雀協会、麻将連合、RMU variations
 
 各 family は個別 test list と review を持つ。数を優先して `draft` を `verified` にしない。
 
@@ -219,13 +219,14 @@ Goal: 実験データを安全に出力し、意味論を変えず scale-out す
 | Decision | Needed by | 状態 |
 |---|---|---|
 | `hule` の API/license/capability | Phase 2/Release | Blocked: 未公開 |
-| Rust MSRV/toolchain | Gate A | Open |
+| Rust MSRV/edition | Gate A | Decided: Rust 1.97 / Edition 2024 |
+| `rust-toolchain.toml` profile/components | Gate A | Open |
 | canonical serialization/hash | Phase 1 | Open |
 | observation/action schema | Phase 1/5 | Open |
 | async runtime | Phase 5 | Open; Phase 1 では不要 |
 | event/trajectory storage | Phase 5/8 | Open |
-| game 内 rule evidence の保存方法 | Phase 7 | Open |
-| 最初の verified preset | Gate A | Open |
+| 雀魂牌譜 evidence の保存・匿名化・hash 方法 | Gate A/Phase 3 | Open |
+| 最初の verified preset | Gate A | Decided: 雀魂段位戦・四人（ADR-0005） |
 | performance target hardware | Phase 5 | Open |
 
 open は作業停止を意味しない。必要になる直前まで test で学び、不可逆な選択だけを ADR で先に固定する。

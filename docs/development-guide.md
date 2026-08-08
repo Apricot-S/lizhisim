@@ -2,9 +2,11 @@
 
 ## 1. 現在の作業範囲
 
-現在は Phase 0 であり、許可される成果物は要求、設計、ADR、調査台帳、test list の雛形である。ユーザーが実装開始を明示するまで Cargo workspace や Rust コードを作らない。
+現在は Phase 0 であり、許可される成果物は要求、設計、ADR、調査台帳、test list の雛形である。Cargo workspace と空の library crate scaffolding は存在するが、ユーザーが実装開始を明示するまで振る舞いを持つ Rust コード、crate、dependency を追加しない。
 
 文書だけを変更する場合も、変更理由、要求 ID、文書間リンク、未決事項を確認する。設計が変わる場合は ADR を追加または supersede する。
+
+識別子を追加する前に [用語集](glossary.md) を確認する。対応する行がなければ「ユーザー決定待ち」表へ空欄で追加し、ユーザーがピンインまたは英語識別子を決めるまで production 名を作らない。日本語ローマ字やその場限りの英訳で仮置きしない。
 
 ## 2. 実装開始 gate
 
@@ -12,7 +14,7 @@
 
 - Phase 0 文書が review 済み。
 - 最初の vertical slice と対象プリセットが決まっている。
-- Rust toolchain/MSRV と workspace 境界が ADR で決まっている。
+- manifest に記載済みの Edition 2024 / Rust 1.97 と workspace 境界を ADR で追認している。
 - `xiangting` の採用版と license を確認している。
 - `hule` の取得方法、license、API、capability が確認できるか、明示的な test double 期間が承認されている。
 - 最初の test list が作成されている。
@@ -96,7 +98,7 @@ refactor で新しい振る舞いを追加しない。必要なら test list へ
 
 推奨する最初の slice 例:
 
-1. 固定済み四人ルールと固定牌山を検証して一局を開始する。
+1. 固定済み四人ルールと固定牌山を検証して一つの `Round` を開始する。
 2. 一人へ捨牌要求を発行して typed continuation で中断する。
 3. 合法な捨牌応答を返す。
 4. 誰にも鳴き候補がなければ次のツモ状態へ進む。
@@ -136,8 +138,8 @@ shrinking 後の反例を regression test へ残す。
 
 同じ suite を fake と実 adapter に適用する。
 
-- `ShantenPort` と `xiangting` adapter
-- `WinEvaluationPort` と `hule` adapter
+- `XiangtingPort` と `xiangting` adapter
+- `HuleEvaluationPort` と `hule` adapter
 - inference backend
 - event store
 
@@ -179,7 +181,7 @@ correctness test と分ける。固定 workload と環境 metadata を持ち、�
 ### 7.1 `xiangting`
 
 1. version、MSRV、license、公開 API、三麻牌構成の扱いを確認する。
-2. domain の `ShantenPort` contract を fake で red/green にする。
+2. domain の `XiangtingPort` contract を fake で red/green にする。
 3. adapter に同じ contract suite を適用する。
 4. 既知牌姿と property/differential corpus を追加する。
 5. crate 型を adapter 外へ export していないことを review する。
@@ -208,6 +210,16 @@ correctness test と分ける。固定 workload と環境 metadata を持ち、�
 7. review と golden suite 後に `verified` にする。
 
 同時に多数 preset を埋めず、最初の一つで schema の不足を学び、次の preset を追加する。schema 変更で既存版の canonical content が変わる場合は migration/新 schema 版として扱う。
+
+### 8.1 実装順
+
+1. 雀魂段位戦（四人/三人）
+2. 天鳳段位戦（四人/三人）
+3. 麻雀一番街段位戦（四人/三人）
+
+雀魂では [公式詳細ルール](https://mahjongsoul.com/news/46)を一次資料にする。記載外の corner case は [Cryolite/kanachan `src/simulation`](https://github.com/Cryolite/kanachan/tree/main/src/simulation) と [牌譜 ID 付き検証記録](https://gist.github.com/Cryolite/a026f41713f6a7ca88713737f5c2cfb6)から候補を得る。ただし先行実装の出力だけを期待値にせず、牌譜 ID の元牌譜を取得し、raw data の hash、対象 `Round`、期待 event を test evidence として固定する。
+
+元牌譜を取得できない corner case は test list に残し、理由付きで `blocked` とする。先行実装からコードをコピーせず、状態分割・規則差分・牌譜 locator を調査資料として利用する。
 
 ## 9. Bug 修正
 
@@ -274,7 +286,7 @@ git status --short
 rg --files
 ```
 
-リンク検査 tool、Markdown lint、Rust の format/lint/test command は実装・CI 導入時に確定し、この節と `AGENTS.md` を更新する。存在しない workspace を前提に `cargo test` を現時点の手順へ書かない。
+リンク検査 tool、Markdown lint、Rust の format/lint/test command は実装・CI 導入時に確定し、この節と `AGENTS.md` を更新する。空 scaffolding が build できることと、ドメインの振る舞いが検証済みであることを混同しない。
 
 ## 13. Definition of Done
 
