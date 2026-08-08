@@ -36,7 +36,7 @@
 - [x] `TileKind`は赤牌を含む37種類を定義する。
 - [x] `TileKind`の内部indexは通常34種類の後に`M0`、`P0`、`S0`を置く。
 - [x] `M0`、`P0`、`S0`を`hong_baopai`と判定する。
-- [ ] `5m`、`5p`、`5s`以外を赤牌として構築できない。
+- [x] `M0`、`P0`、`S0`以外を`hong_baopai`と判定しない。
 - [ ] 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる。
 - [ ] `TileKind`ごとの枚数不足、枚数超過、除外牌混入を拒否し、部分的な状態を返さない。
 - [ ] `Bipai`の順序を固定すると、14枚配牌を正規化した最初の`Zimo`が一意に決まる。
@@ -73,7 +73,7 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 選択していた`hong_baopai`判定testがgreenとなり、refactor要否の確認まで完了したため。
+- Why: 選択していた通常牌の`hong_baopai`否定testがmutantによるred検証を経てgreenとなり、refactor要否の確認まで完了したため。
 
 ## Cycle log
 
@@ -113,6 +113,9 @@
 - 2026-08-09: `cargo test -p lizhisim-core tile::tests::zero_numbered_suit_kinds_are_hong_baopai`を実行し、`is_hong_baopai`未実装のため失敗するredを確認した。
 - 2026-08-09: `M0`、`P0`、`S0`だけに一致する`const fn is_hong_baopai`を実装してgreenにした。refactor変更なし。
 - 2026-08-09: workspace全7 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
+- 2026-08-09: 次項目を「`M0`、`P0`、`S0`以外を`hong_baopai`と判定しない」へ具体化し、通常34種類の結果を一assertionへ集約したtestを追加した。既存matchが満たすためmutantでredを確認する。
+- 2026-08-09: test追加時点ではgreenだった。`M5`も`hong_baopai`とするmutantを一時適用し、通常牌の誤分類で失敗するredを確認してから3種類だけのmatchへ復元した。
+- 2026-08-09: 復元後に選択testと全8 testがgreen。refactor変更なし。Clippy `-D warnings`、format、`git diff --check`が成功した。
 
 ## Completion review
 

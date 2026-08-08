@@ -84,4 +84,14 @@ mod tests {
             [true; 3],
         );
     }
+
+    #[test]
+    fn base_kinds_are_not_hong_baopai() {
+        assert!(
+            TileKind::ALL[..34]
+                .iter()
+                .copied()
+                .all(|tile_kind| !tile_kind.is_hong_baopai())
+        );
+    }
 }
