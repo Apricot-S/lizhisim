@@ -125,8 +125,8 @@
 | 筒子1〜9 | 9 | `P1`〜`P9` | compact notationの候補は`P1`〜`P9` |
 | 索子1〜9 | 9 | `S1`〜`S9` | compact notationの候補は`S1`〜`S9` |
 | 赤`5m`、赤`5p`、赤`5s` | 3 | `M0`, `P0`, `S0` | 候補は`M5Red`、`P5Red`、`S5Red` |
-| 東、南、西、北 | 4 | `Dong`、`Nan`、`Xi`、`Bei` | ピンイン候補は`Dong`、`Nan`、`Xi`、`Bei` |
-| 白、發、中 | 3 | `Bai`、`Fa`、`Zhong` | ピンイン候補は`Bai`、`Fa`、`Zhong` |
+| 東、南、西、北 | 4 | `Z1`、`Z2`、`Z3`、`Z4` | ピンイン候補は`Dong`、`Nan`、`Xi`、`Bei` |
+| 白、發、中 | 3 | `Z5`、`Z6`、`Z7` | ピンイン候補は`Bai`、`Fa`、`Zhong` |
 
 ## 6. 曖昧語を避ける
 
