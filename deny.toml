@@ -13,6 +13,7 @@ allow = [
     "Unicode-3.0",
 ]
 exceptions = []
+copyleft = "deny"
 
 [bans]
 multiple-versions = "warn"
