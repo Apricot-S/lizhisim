@@ -41,10 +41,14 @@ Source evidence
 |---|---|
 | 人数 | four-player / three-player |
 | 使用牌 | 34 種の copy 数、三麻の除外牌、総牌数 |
-| 赤牌 | 萬子・筒子・索子ごとの赤 5 copy 数、赤牌のドラ扱い |
+| 赤牌 | `5m`・`5p`・`5s`ごとの赤 copy 数（各0〜4）、赤牌のドラ扱い |
 | 北 | 通常牌/役牌/客風、抜き可否、抜きドラ、手牌扱い、抜いた直後の補充元、槍北可否 |
 | 王牌 | 王牌枚数、嶺上枚数、ドラ表示位置、最大槓数 |
 | 配牌 | 親子枚数、第一ツモの扱い、自動配牌差の正規化 |
+
+赤牌設定は`5m`、`5p`、`5s`を独立に0〜4枚とし、各値が同じkindの総copy数を超えないことを検証する。`1m`等の数牌や字牌を赤牌にする一般化は行わない。
+
+親へ14枚を配る方式と、親へ13枚を配って第一`Zimo`を行う方式は、[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)に従い、内部ではどちらも`RoundStarted`後の最初の`Zimo`へ正規化する。設定は最初の牌がinitial deal由来かlive wall由来かを表し、`moqie`を別のrule optionとして重複設定しない。
 
 ### 3.2 行為
 
@@ -182,8 +186,8 @@ hash:       sha256:<canonical validated content>
 
 | Family ID（予定） | 対象 | Table/Match | Ranking | Phase 0 の監査状態 |
 |---|---|---|---|---|
-| `jp.mahjongsoul.ranked.four_player` | 雀魂 四人段位戦 | 必須 | 必須 | [公式詳細ルール](https://mahjongsoul.com/news/46)を基点に牌譜検証する |
-| `jp.mahjongsoul.ranked.three_player` | 雀魂 三人段位戦 | 必須 | 必須 | 同上 |
+| `mahjongsoul.ranked.four_player` | 雀魂 四人段位戦 | 必須 | 必須 | [公式詳細ルール](https://mahjongsoul.com/news/46)を基点に牌譜検証する |
+| `mahjongsoul.ranked.three_player` | 雀魂 三人段位戦 | 必須 | 必須 | 同上 |
 | `jp.tenhou.ranked.four_player` | 天鳳 四人段位戦 | 必須 | 必須 | 公式 manual を基点に mode 差分監査が必要 |
 | `jp.tenhou.ranked.three_player` | 天鳳 三人段位戦 | 必須 | 必須 | 同上 |
 | `jp.riichicity.ranked.four_player` | 麻雀一番街 四人段位戦 | 必須 | 必須 | 公式 Web に完全仕様なし、game 内証跡待ち |

@@ -58,11 +58,14 @@ primitive obsession を避け、少なくとも次を区別する。
 
 - kind ごとの copy 数と総牌数
 - 赤牌が同 kind の copy 数を超えない
+- 赤牌にできるのは`5m`、`5p`、`5s`だけで、各kindを独立に0〜4枚へ設定できる
 - 三麻で除外された牌が配牌・山・ドラ循環に現れない
 - 北抜きを使う場合の北牌の存在と扱い
 - 王牌、嶺上牌、ドラ表示位置と槓上限の整合
 
 牌山生成は adapter の責務だが、生成後の牌山は完全な値として core に渡す。再現性の最も強い記録は牌 copy の順序そのものであり、seed のみの保存は RNG 実装版が固定されている場合に限る。
+
+親へ14枚を配るruleも、親へ13枚を配って第一`Zimo`を行うruleも、coreでは`bingpai`最大13枚と分離した`zimopai`へ正規化する。initial deal由来の14枚目はcanonical event上の最初の`Zimo`にするが、その直後に同じ牌を`Dapai`してもlive wall由来の`zimopai`を捨てたとは扱わない。詳細は[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)に従う。
 
 ## 5. Typestate
 

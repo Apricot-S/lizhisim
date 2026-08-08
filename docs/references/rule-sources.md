@@ -43,6 +43,8 @@ game 内表示しかない場合、最低限次を記録する。
 
 ### 雀魂の補助検証資料
 
+最初の四人walking skeletonが参照する値と未確定事項は、[雀魂四人 walking skeleton RuleClaim mapping](mahjong-soul-walking-skeleton-rule-claims.md)で管理する。
+
 | 資料 | 位置付け | 使用方法 |
 |---|---|---|
 | [Cryolite/kanachan `src/simulation`](https://github.com/Cryolite/kanachan/tree/main/src/simulation) | 雀魂牌譜との照合実績がある先行実装 | corner case の候補、状態分割、必要な test 観点を発見する。コードを一次資料扱いせず、license を確認せずコピーしない |

@@ -25,6 +25,7 @@
 | [0009](0009-minimized-game-record-evidence.md) | Superseded | 牌譜を保存せず承認済み最小fixtureへ変換する |
 | [0010](0010-mahjong-soul-record-conformance.md) | Superseded | `majsoul-record`を外部入力として二段階検証する |
 | [0011](0011-one-pass-majsoul-conformance.md) | Accepted | `majsoul-record`を1パスで逐次conformance検証する |
+| [0012](0012-normalize-dealer-first-draw.md) | Accepted | 親の14枚配牌を最初の`Zimo`へ正規化する |
 
 ## Template
 

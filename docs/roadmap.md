@@ -53,7 +53,7 @@ Vertical slices:
 
 1. `PlayerSet`、`Seat`、`Points`、IDs と、glossary で確定した牌関連の検証済み値型
 2. fixed `FourPlayer` rule fixture と固定牌山
-3. 配牌から最初の action request を発行して suspension
+3. 配牌を最初の`Zimo`へ正規化し、最初のaction requestを発行してsuspension
 4. typed response validation から action event を確定
 5. call 候補なし -> next draw
 6. canonical event stream -> replay state hash

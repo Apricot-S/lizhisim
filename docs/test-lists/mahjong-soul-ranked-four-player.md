@@ -8,7 +8,7 @@
 - Status: Planned（実装開始の明示指示まで選択しない）
 - Requirements: `CORE-001`, `CORE-006`, `CORE-007`, `AI-001`, `AI-002`, `AI-003`, `DATA-002`, `DATA-003`, `NFR-001`, `RULE-010`
 - ADR / design: [ADR-0001](../adr/0001-event-driven-typed-continuations.md), [ADR-0005](../adr/0005-mahjong-soul-first.md), [domain model](../design/domain-model.md)
-- Rule sources / clauses: [雀魂段位戦詳細ルールと補助資料](../references/rule-sources.md#雀魂の補助検証資料)
+- Rule sources / clauses: [雀魂段位戦詳細ルールと補助資料](../references/rule-sources.md#雀魂の補助検証資料)、[最小RuleClaim mapping](../references/mahjong-soul-walking-skeleton-rule-claims.md)
 
 ## Scope
 
@@ -18,8 +18,8 @@
 
 ## Source readiness
 
-- [ ] 雀魂公式ページの取得日時、対象mode、locale、内容hashを記録する。
-- [ ] walking skeletonが依存する設定値を`RuleClaim`へmappingする。
+- [x] 雀魂公式ページの取得日時、対象mode、localeを`SourceReview`へ記録する。原資料の内容hashはverifiedの必須条件にしない。
+- [x] walking skeletonが依存する設定値を`RuleClaim`へmappingし、未確定値を`blocked`にする。
 - [ ] 牌譜から発見した項目は、必要な遷移を手書きした最小fixtureにし、source牌譜ID、対象`Round`、source event範囲、構成意図、fixture hashを記録する。
 - [ ] 同じsource`majsoul-record`をCI外full-record corpusへ登録し、中間`game_log`を必須にせず毎回逐次decode・projectしてLizhiSimと比較できる。
 - [ ] 最初の不一致reportに牌譜ID、`Round`、source event index、期待値、実際値、状態要約が含まれる。
@@ -33,12 +33,14 @@
 - [ ] `TileKind`と赤牌を含む`TileCopy`を区別する。
 - [ ] 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる。
 - [ ] copy数不足、重複、除外牌混入を拒否し、部分的な状態を返さない。
-- [ ] `Bipai`の順序を固定すると配牌と最初の`zimo`が一意に決まる。
+- [ ] `Bipai`の順序を固定すると、14枚配牌を正規化した最初の`Zimo`が一意に決まる。
 - [ ] Property: 配牌、`bingpai`、`Bipai`の間でtile conservationが保たれる。
 
 ### Typed suspension
 
-- [ ] 配牌後、最初のactorだけに`Dapai`要求を発行して中断する。
+- [ ] `RoundStarted`後、initial deal由来の最初の`Zimo`を発行し、親だけに`Dapai`要求を発行して中断する。
+- [ ] initial deal由来の牌を最初に`Dapai`した場合、`moqie = false`として記録する。
+- [ ] live wall由来の`zimopai`を直後に`Dapai`した場合、`moqie = true`として記録する。
 - [ ] 要求はrequest ID、table ID、actor、観測schema、合法action、continuation tokenを持つ。
 - [ ] `Observation<Seat>`は他seatの`bingpai`と未公開`TileCopy`を含まない。
 - [ ] `OmniscientView`は`Observation<Seat>`と型で交換できない。
