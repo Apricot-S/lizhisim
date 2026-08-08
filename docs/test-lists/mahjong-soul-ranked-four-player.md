@@ -30,9 +30,9 @@
 ### Values and configuration
 
 - [ ] 四人用の全`Seat`を構築でき、範囲外seatを構築できない。
-- [ ] `TileKind`と赤牌を含む`TileCopy`を区別する。
+- [ ] 赤`5m`、赤`5p`、赤`5s`を含む37種類の`TileKind`を構築でき、それ以外の赤牌を構築できない。
 - [ ] 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる。
-- [ ] copy数不足、重複、除外牌混入を拒否し、部分的な状態を返さない。
+- [ ] `TileKind`ごとの枚数不足、枚数超過、除外牌混入を拒否し、部分的な状態を返さない。
 - [ ] `Bipai`の順序を固定すると、14枚配牌を正規化した最初の`Zimo`が一意に決まる。
 - [ ] Property: 配牌、`bingpai`、`Bipai`の間でtile conservationが保たれる。
 
@@ -42,7 +42,7 @@
 - [ ] initial deal由来の牌を最初に`Dapai`した場合、`moqie = false`として記録する。
 - [ ] live wall由来の`zimopai`を直後に`Dapai`した場合、`moqie = true`として記録する。
 - [ ] 要求はrequest ID、table ID、actor、観測schema、合法action、continuation tokenを持つ。
-- [ ] `Observation<Seat>`は他seatの`bingpai`と未公開`TileCopy`を含まない。
+- [ ] `Observation<Seat>`は他seatの`bingpai`と未公開`TileKind`の個数を含まない。
 - [ ] `OmniscientView`は`Observation<Seat>`と型で交換できない。
 - [ ] 合法な`Dapai`応答で古い状態を消費し、対応eventを一度だけ発行する。
 - [ ] 異なるactor、未知action、schema不一致、未知requestを拒否し、状態を変更しない。

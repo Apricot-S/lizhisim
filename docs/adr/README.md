@@ -26,6 +26,7 @@
 | [0010](0010-mahjong-soul-record-conformance.md) | Superseded | `majsoul-record`を外部入力として二段階検証する |
 | [0011](0011-one-pass-majsoul-conformance.md) | Accepted | `majsoul-record`を1パスで逐次conformance検証する |
 | [0012](0012-normalize-dealer-first-draw.md) | Accepted | 親の14枚配牌を最初の`Zimo`へ正規化する |
+| [0013](0013-tile-kind-without-copy-identity.md) | Accepted | 赤牌を含む37種類の`TileKind`を使い牌の個別identityを持たない |
 
 ## Template
 

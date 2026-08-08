@@ -34,13 +34,13 @@
 | `MS4-WS-001` | `table_rules.player_set` | `four_player` | `mahjongsoul-ranked-rules` / `四人麻雀` | `Seat`の個数と範囲を決める | `review` |
 | `MS4-WS-002` | `match_rules.initial.starting_points_per_seat` | `25000` | `mahjongsoul-ranked-rules` / `四人麻雀 > 基本ルール > 配原` | 初期状態と観測に点数を含める場合の値を決める | `review` |
 | `MS4-WS-003` | `table_rules.tiles.red_tile_copy_count.total` | `3` | `mahjongsoul-ranked-rules` / `四人麻雀 > 基本ルール > 赤ドラ` | 雀魂基準の全`Bipai`でtile conservationを検査する | `reviewed` |
-| `MS4-WS-004` | `table_rules.tiles.red_tile_copy_count.by_tile_kind` | `5m = 1, 5p = 1, 5s = 1` | `mahjongsoul-game-behavior-2026-08-09` / project owner review | 赤牌を含む完全な`TileCopy`集合を作る | `reviewed` |
+| `MS4-WS-004` | `table_rules.tiles.red_count_by_kind` | `5m = 1, 5p = 1, 5s = 1` | `mahjongsoul-game-behavior-2026-08-09` / project owner review | 赤牌を含む完全な`TileKind` multisetを作る | `reviewed` |
 | `MS4-WS-005` | `table_rules.dealing.dealer_initial_tile_count` | `14` | `mahjongsoul-game-behavior-2026-08-09` / project owner review | 雀魂の開始状態を正規化する | `reviewed` |
-| `MS4-WS-006` | `table_rules.tiles.copy_count.by_tile_kind` | 全34kindが各4枚 | `mahjongsoul-game-behavior-2026-08-09` / project owner review | 完全な`TileCopy`集合とtile conservationを検査する | `reviewed` |
+| `MS4-WS-006` | `table_rules.tiles.count_by_kind` | 通常の5は各3枚、赤の5は各1枚、その他は各4枚 | `mahjongsoul-game-behavior-2026-08-09` / project owner review | 37種類の完全なmultisetとtile conservationを検査する | `reviewed` |
 
 全claimの`preset_family`は`mahjongsoul.ranked.four_player`、`applicability`は段位戦・四人、`simulator_scope`は`computational`とする。公式Web pageに基づくclaimの`source_id`は`mahjongsoul-ranked-rules`、`source_retrieved_at_utc`は`2026-08-08T19:27:19Z`とする。project ownerによるgame挙動確認を根拠にするclaimは、review記録と確認日をsource locatorとして保持する。
 
-四人の`TileCopy`は各kindに4枚ある。`5m`、`5p`、`5s`だけは、それぞれ赤1枚と通常3枚で構成する。それ以外のkindに赤牌はない。
+赤牌を通常牌と同じものとして数えた34種類は各4枚である。37種類の`TileKind`へ解決すると、通常の`5m`、`5p`、`5s`が各3枚、対応する赤牌が各1枚、その他が各4枚となる。同じ`TileKind`の複数枚を個別には識別しない。
 
 ## 4. RuleClaimではないwalking skeleton条件
 
@@ -61,7 +61,7 @@
 | Test list item | 必要なclaim | 選択条件 |
 |---|---|---|
 | 四人用の全`Seat`を構築でき、範囲外seatを構築できない | `MS4-WS-001` | project owner review後に選択可能 |
-| `TileKind`と赤牌を含む`TileCopy`を区別する | なし | domain型のtestとして選択可能。雀魂の赤牌内訳は主張しない |
+| 赤牌を区別した37種類の`TileKind`を構築できる | なし | domain型のtestとして選択可能。牌の個別identityは作らない |
 | 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる | `MS4-WS-001`, `MS4-WS-003`, `MS4-WS-004`, `MS4-WS-006` | 対応claimのreview後 |
 | 固定`Bipai`から最初のrequest、応答、次の状態を得る | `MS4-WS-005`と使用するfixture | [ADR-0012](../adr/0012-normalize-dealer-first-draw.md)の正規化を適用する |
 

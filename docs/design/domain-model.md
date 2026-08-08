@@ -52,18 +52,22 @@ primitive obsession を避け、少なくとも次を区別する。
 
 ## 4. 牌と牌山
 
-牌の意味上の種類と、赤牌を含む物理 copy は別の型にする。宝牌表示、`bingpai`、河では identity が必要な箇所だけ物理 copy を持ち、model feature へ射影するときに種類と赤牌 flag へ変換する。これらの型名は glossary で確定後に付ける。
+`TileKind`は通常の34種類に赤`5m`、赤`5p`、赤`5s`を加えた37種類とする。同じ`TileKind`の複数枚は個別identityを持たず、個数またはmultisetとして表す。core domainに`TileCopy`を置かない。
+
+`bingpai`、`zimopai`、`he`、`Bipai`、canonical eventは`TileKind`だけを保持する。`Bipai`の再現可能な記録は、重複を許す`TileKind`の順序である。天鳳の0〜135 ID等はsource projectorがtrace用metadataとして保持できるが、canonical state、event、`StateHash`、agentの`Observation`には含めない。
+
+`xiangting`や`hule`が34種類のcount表現を要求する場合、adapter境界で赤牌を対応する通常の5へ射影する。34種類用の別domain識別子は、必要性が確認されるまで追加しない。
 
 牌構成ルールは次を検証する。
 
-- kind ごとの copy 数と総牌数
-- 赤牌が同 kind の copy 数を超えない
+- 37種類それぞれの個数と総牌数
+- 赤`5m`、赤`5p`、赤`5s`と対応する通常牌の合計が、設定された各5の枚数を超えない
 - 赤牌にできるのは`5m`、`5p`、`5s`だけで、各kindを独立に0〜4枚へ設定できる
 - 三麻で除外された牌が配牌・山・ドラ循環に現れない
 - 北抜きを使う場合の北牌の存在と扱い
 - 王牌、嶺上牌、ドラ表示位置と槓上限の整合
 
-牌山生成は adapter の責務だが、生成後の牌山は完全な値として core に渡す。再現性の最も強い記録は牌 copy の順序そのものであり、seed のみの保存は RNG 実装版が固定されている場合に限る。
+牌山生成はadapterの責務だが、生成後の牌山は`TileKind`の完全な列としてcoreに渡す。seedのみの保存はRNG実装版が固定されている場合に限る。
 
 親へ14枚を配るruleも、親へ13枚を配って第一`Zimo`を行うruleも、coreでは`bingpai`最大13枚と分離した`zimopai`へ正規化する。initial deal由来の14枚目はcanonical event上の最初の`Zimo`にするが、その直後に同じ牌を`Dapai`してもlive wall由来の`zimopai`を捨てたとは扱わない。詳細は[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)に従う。
 
@@ -200,7 +204,7 @@ command/response と event を区別する。event は起きた事実を過去�
 
 ## 12. 不変条件の例
 
-- 有効な牌 copy は卓全体で重複せず、設定された総数を保つ。
+- 各`TileKind`の個数は卓全体で設定値を保ち、すべての場所の合計が総牌数と一致する。
 - 各 phase の `bingpai` 枚数は `fulu`、槓、北抜きと整合する。
 - 点数移動の合計は、卓外 penalty/オカなど明示的 source/sink がない限りゼロである。
 - request は一つの table lifecycle と continuation に属する。

@@ -195,7 +195,7 @@ rule feature を省いて同じ model を異なるルールで使う場合、モ
 
 完全情報 view から observation を作る projection は pure function とし、以下をテストする。
 
-- 他家の `bingpai` に属する牌 identity を含まない。
+- 他家の`bingpai`に属する`TileKind`とその個数を含まない。
 - 未公開 wall order を含まない。
 - seat rotation に対する相対表現が一貫する。
 - 赤牌、北抜き、三麻除外牌を schema どおり表す。

@@ -29,7 +29,7 @@ RoundStarted
 - `origin = live_wall`の牌を直後に`Dapai`した場合、`moqie = true`とする。
 - rule設定はdealerの開始方式を表すenumとし、`moqie`を独立したrule booleanとして重複設定しない。`moqie`は`Zimo`のoriginと選択した`Dapai`から導く。
 - `RoundStarted`時点のsource表現が14枚でも、canonical event streamとcore stateには正規化後の最初の`Zimo`を含める。
-- source recordが14枚目のidentityをどう表すかはservice projectorの契約testで確定し、根拠なく並び順を仮定しない。
+- source recordが14枚目の`TileKind`をどう表すかはservice projectorの契約testで確定し、根拠なく並び順を仮定しない。
 
 概念上の設定値は次の二値である。schema上の識別子はinitial schema設計時に確定する。
 
@@ -54,7 +54,7 @@ dealer_first_draw_origin
 
 - 14枚配牌のsource recordとcanonical event列が一対一にはならず、syntheticな最初の`Zimo`をtraceする必要がある。
 - 利用者は`origin = initial_deal`の`zimopai`が配牌の一部であることを理解する必要がある。
-- service projectorは14枚目のidentityとsource locatorを正しく対応付ける必要がある。
+- service projectorは14枚目の`TileKind`とsource locatorを正しく対応付ける必要がある。
 
 ## Alternatives considered
 
@@ -71,4 +71,4 @@ Rejected. 状態形状は統一できるが、第一`Dapai`の`moqie`情報を�
 - initial rule schemaで開始方式のenumとvalidationを定義する。
 - 雀魂walking skeletonに、initial deal由来の牌を最初に打つと`moqie = false`となるtestを追加する。
 - live wall由来の第一`Zimo`では同じ操作が`moqie = true`となる対照testを追加する。
-- `majsoul-record` projectorで14枚目のidentityとsynthetic event traceを検証する。
+- `majsoul-record` projectorで14枚目の`TileKind`とsynthetic event traceを検証する。

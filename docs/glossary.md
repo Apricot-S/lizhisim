@@ -31,7 +31,7 @@
 
 | 日本語での説明 | 原語・由来 | 規範形 | Rust 型・variant 例 |
 |---|---|---|---|
-| 牌、牌種、物理的な牌 | 英語（例外） | `tile` | `Tile`, `TileKind`, `TileCopy` |
+| 牌種（赤牌を区別する37種類） | 英語（例外） | `tile` | `TileKind` |
 | 牌山 | 壁牌 | `bipai` | `Bipai` |
 | 摸牌・ツモ動作 | 自摸 | `zimo` | `Zimo` |
 | 打牌 | 打牌 | `dapai` | `Dapai` |
