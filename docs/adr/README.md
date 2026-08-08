@@ -20,6 +20,8 @@
 | [0004](0004-pinyin-terminology-and-round.md) | Accepted | 麻雀用語はピンインを基本とし、Roundを局専用にする |
 | [0005](0005-mahjong-soul-first.md) | Accepted | 雀魂段位戦を最優先のルール実装・検証対象にする |
 | [0006](0006-rust-toolchain-workspace-and-ci.md) | Accepted | Rust toolchain、初期 workspace、CI baselineを固定する |
+| [0007](0007-content-addressed-source-evidence.md) | Superseded | 公式資料をcontent-addressed private evidenceとして保存する |
+| [0008](0008-source-review-without-copying.md) | Accepted | 公式資料を複製せずURL・取得日時・確認記録で追跡する |
 
 ## Template
 

@@ -262,7 +262,7 @@ match_rules:
 ## 10. 公式資料の監査手順
 
 1. [公式ルール出典台帳](../references/rule-sources.md) に一次資料を登録する。
-2. URL、title、版、effective date、取得日時を記録し、可能なら内容 hash を保存する。
+2. [ADR-0008](../adr/0008-source-review-without-copying.md)に従い原資料を複製せず、URL、title、版、effective date、取得日時、確認者を`SourceReview`へ記録する。
 3. game 内のみの仕様は app version、region、画面遷移、画像 hash を記録する。認証情報や個人情報は保存しない。
 4. 条項を設定項目へ一対一または一対多で mapping する。
 5. シミュレーション対象外の物理条項も別表へ mapping し、欠落扱いにしない。

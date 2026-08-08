@@ -27,7 +27,7 @@ production dependency追加時は`deny.toml`のlicense、ban、source方針をre
 - [x] 必須preset catalogと実装優先順位が定義されている。
 - [x] 雀魂段位戦・四人が最初の基準presetに決定している。
 - [x] 公式ルール、Kanachan、検証記録、元牌譜のevidence chainが定義されている。
-- [ ] 雀魂公式ページのsource snapshot/hash保存方式を決める。
+- [x] 雀魂公式ページを複製せず、URL・取得日時・確認記録で追跡する方式を決める（[ADR-0008](adr/0008-source-review-without-copying.md)）。
 - [ ] 雀魂牌譜の取得、匿名化、保存、hash方針を決める。
 - [ ] walking skeletonが必要とする最小`RuleClaim` mappingを作る。
 

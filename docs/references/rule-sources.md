@@ -92,27 +92,30 @@ WRC 公式 2025 文書、JPML が大会で用いる WRC 系、龍龍の「WRCル
 
 卓内ルール、対局 mode、room eligibility、段位 point は別資料・別更新周期の場合がある。一つの画面だけで「段位戦 preset」を verified にしない。
 
-## 6. Source snapshot record
+## 6. Source review record
 
-実装時に source ごとに次の record を作る。保存形式は Phase 0 では未決定。
+公式資料の記録は[ADR-0008](../adr/0008-source-review-without-copying.md)に従う。原資料をprivate storageを含むproject管理下へ原則複製せず、GitにはURL、取得日時、確認者、locator、必要最小限のclaimだけを保存する。
 
 ```text
-SourceSnapshot
+SourceReview
   source_id
   organization_or_service
   title
   canonical_url
+  final_url
   document_version
   effective_from / effective_to
-  retrieved_at
+  retrieved_at_utc
+  reviewed_at_utc / reviewed_by
   locale / region / app_version
-  content_hash
+  source_locator
   evidence_grade
+  availability
   supersedes
   notes
 ```
 
-Web page が後から書き換わるため、URL と `retrieved_at` だけでは再現資料として不十分である。著作権上の全文再配布を避けながら、許容される snapshot または条項 hash/引用範囲の保存方法を Implementation Gate A までに決める。
+最低限、URLと取得日時があればrecordを作成できる。不明な版、対象期間、locatorは推測せずnotesへ記録する。project ownerの確認記録をrule value reviewの承認とし、本文、PDF、DOM、screenshotの保存やcontent hashをverifiedの必須条件にしない。
 
 ## 7. Clause mapping record
 
@@ -123,7 +126,9 @@ RuleClaim
   config_path
   normalized_value
   source_id
+  source_retrieved_at_utc
   source_locator (section/article/page/screen)
+  reviewed_by / reviewed_at_utc
   applicability
   simulator_scope: computational | administrative | physical | unsupported
   reviewer

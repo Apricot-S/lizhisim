@@ -229,6 +229,7 @@ Goal: 実験データを安全に出力し、意味論を変えず scale-out す
 | observation/action schema | Phase 1/5 | Open |
 | async runtime | Phase 5 | Open; Phase 1 では不要 |
 | event/trajectory storage | Phase 5/8 | Open |
+| 公式資料のreview記録 | Gate A/Phase 3 | Decided: 原資料を複製せずURL・取得日時・確認記録を保存（ADR-0008） |
 | 雀魂牌譜 evidence の保存・匿名化・hash 方法 | Gate A/Phase 3 | Open |
 | 最初の verified preset | Gate A | Decided: 雀魂段位戦・四人（ADR-0005） |
 | performance target hardware | Phase 5 | Open |
