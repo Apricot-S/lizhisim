@@ -36,6 +36,7 @@
 10. [公式ルール出典台帳](docs/references/rule-sources.md)
 11. [用語集](docs/glossary.md)
 12. [設計判断記録](docs/adr/README.md)
+13. [Phase 0 review](docs/phase-0-review.md)
 
 開発者・AI エージェント向けの作業規約は [AGENTS.md](AGENTS.md) を参照してください。
 

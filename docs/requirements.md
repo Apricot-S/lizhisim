@@ -131,11 +131,9 @@
 
 以下は実装開始前または該当 milestone 前に ADR で決める。
 
-- `rust-toolchain.toml` の channel/profile/component（MSRV 1.97 と Edition 2024 は manifest で固定済み）
 - event/trajectory の永続化形式
 - in-process queue の async runtime
 - 安定 hash と canonical serialization
 - action/observation schema の最初の形状
 - `hule` の配布方法、capability、ライセンス
 - throughput 基準値とベンチマーク環境
-- 最初に verified とする基準プリセット

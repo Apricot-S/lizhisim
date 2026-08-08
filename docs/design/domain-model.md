@@ -46,7 +46,7 @@ primitive obsession を避け、少なくとも次を区別する。
 - `RuleSetId`, `RuleContentHash`, `SchemaVersion`, `ModelArtifactHash`
 - `EventSequence`, `RngKey`, `StateHash`
 
-牌、牌山、本場、供託、場風、親などの麻雀固有概念にも別々の値型が必要だが、識別子は [用語集のユーザー決定待ち](../glossary.md#5-ユーザー決定待ち) である。英訳や日本語ローマ字の仮名を production 名として先行採用しない。
+牌、牌山、本場、供託、場風、親などの麻雀固有概念にも、[用語集](../glossary.md#21-牌行為進行)で確定した `Tile`、`Bipai`、`Ben`、`Lizhibang`、`Quanfengpai`、`Zhuangjia` などの別々の値型を与える。
 
 得点は単位を型で分ける。1000 点を 1.0 とした大会ポイント、卓上の点棒、段位ポイントを同じ整数型で加算できてはならない。
 
@@ -108,7 +108,7 @@ apply_action(
 
 ## 7. Action
 
-model 向けの安定 `ActionId` と、domain の `TypedAction` を分ける。個別 variant の識別子は glossary で確定してから追加する。既存参照に `dapai`, `zimo`, `chi`, `peng`, `angang`, `daminggang`, `jiagang` があっても、自動採用はしない。
+model 向けの安定 `ActionId` と、domain の `TypedAction` を分ける。個別 variant は glossary で確定した `Zimo`、`Dapai`、`Chi`、`Peng`、`Angang`、`Daminggang`、`Jiagang`、`Rong` などを使う。これは識別子の確定であり、単一の巨大な action enum を採用する決定ではない。
 
 ```text
 ModelActionId --decode + legal set--> TypedAction

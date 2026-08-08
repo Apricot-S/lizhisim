@@ -213,3 +213,4 @@ crate 分割は循環依存を避ける手段であり、最初から細分化�
 - [ADR-0002: ルールを層別化し出典付き不変版として管理する](../adr/0002-versioned-rule-layers.md)
 - [ADR-0003: 大会ドメインを卓内エンジンから分離する](../adr/0003-separate-competition-domain.md)
 - [ADR-0004: 麻雀用語はピンインを基本とし、Roundを局専用にする](../adr/0004-pinyin-terminology-and-round.md)
+- [ADR-0006: Rust toolchain、初期 workspace、CI baselineを固定する](../adr/0006-rust-toolchain-workspace-and-ci.md)

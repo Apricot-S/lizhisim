@@ -19,6 +19,7 @@
 | [0003](0003-separate-competition-domain.md) | Accepted | 大会ドメインを卓内エンジンから分離する |
 | [0004](0004-pinyin-terminology-and-round.md) | Accepted | 麻雀用語はピンインを基本とし、Roundを局専用にする |
 | [0005](0005-mahjong-soul-first.md) | Accepted | 雀魂段位戦を最優先のルール実装・検証対象にする |
+| [0006](0006-rust-toolchain-workspace-and-ci.md) | Accepted | Rust toolchain、初期 workspace、CI baselineを固定する |
 
 ## Template
 

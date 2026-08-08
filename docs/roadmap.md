@@ -22,17 +22,20 @@ Exit gate:
 - 下記の実装前決定が完了する。
 - ユーザーが実装開始を明示する。
 
+詳細な判定状況は [Phase 0 review](phase-0-review.md) で追跡する。
+
 ## Implementation Gate A — Toolchain と最初の slice
 
 実装開始前に決定する。
 
-- [x] MSRV 1.97 / Edition 2024（manifest で固定済み。toolchain profile は未決）
+- [x] MSRV 1.97 / Edition 2024、開発 toolchain 1.97.1 / default profile
 - [x] 最小 workspace/crate boundary（root workspace + `lizhisim` library scaffolding）
-- [ ] format、lint、test、dependency audit の CI command
+- [x] format、lint、build、test、docs-rs の CI command
+- [x] `cargo-deny`によるdependency auditと独立CI workflow
 - [ ] canonical serialization と stable hash の候補
 - [ ] async runtime を必要とする時点と選定基準
-- [ ] 最初の基準プリセット（雀魂段位戦・四人）
-- [ ] 最初の active test list
+- [x] 最初の基準プリセット（雀魂段位戦・四人）
+- [x] 最初の planned test list（実装開始時まで `Selected: None`）
 
 Decision output:
 
@@ -220,7 +223,7 @@ Goal: 実験データを安全に出力し、意味論を変えず scale-out す
 |---|---|---|
 | `hule` の API/license/capability | Phase 2/Release | Blocked: 未公開 |
 | Rust MSRV/edition | Gate A | Decided: Rust 1.97 / Edition 2024 |
-| `rust-toolchain.toml` profile/components | Gate A | Open |
+| `rust-toolchain.toml` profile/components | Gate A | Decided: Rust 1.97.1 / default profile |
 | canonical serialization/hash | Phase 1 | Open |
 | observation/action schema | Phase 1/5 | Open |
 | async runtime | Phase 5 | Open; Phase 1 では不要 |

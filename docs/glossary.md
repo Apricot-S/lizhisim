@@ -24,6 +24,39 @@
 | 和了 | 和了 | `hule` | `HuleContext`, `HuleEvaluation` | 採用予定 crate とユーザー指定方針 |
 | 立直 | 立直 | `lizhi` | `LizhiState`, `LizhiDeclared` | プロジェクト名・既存方針 |
 
+### 2.1 牌・行為・進行
+
+以下はユーザー確認済みの規範形である。`tile` は関連 crate や先行実装との整合を優先して英語を採用する明示的な例外である。
+
+| 日本語での説明 | 原語・由来 | 規範形 | Rust 型・variant 例 |
+|---|---|---|---|
+| 牌、牌種、物理的な牌 | 英語（例外） | `tile` | `Tile`, `TileKind`, `TileCopy` |
+| 牌山 | 壁牌 | `bipai` | `Bipai` |
+| 摸牌・ツモ動作 | 自摸 | `zimo` | `Zimo` |
+| 打牌 | 打牌 | `dapai` | `Dapai` |
+| チー | 吃 | `chi` | `Chi` |
+| ポン | 碰 | `peng` | `Peng` |
+| 暗槓 | 暗槓 | `angang` | `Angang` |
+| 大明槓 | 大明槓 | `daminggang` | `Daminggang` |
+| 加槓 | 加槓 | `jiagang` | `Jiagang` |
+| ロン | 栄 | `rong` | `Rong` |
+| 荒牌平局 | 荒牌平局 | `huangpai_pingju` | `HuangpaiPingju` |
+| 北抜き | 抜北 | `babei` | `Babei` |
+| 王牌 | 王牌 | `wangpai` | `Wangpai` |
+| 宝牌・ドラ | 宝牌 | `baopai` | `Baopai` |
+| 里宝牌・裏ドラ | 里宝牌 | `li_baopai` | `LiBaopai` |
+| 紅宝牌・赤ドラ | 紅宝牌 | `hong_baopai` | `HongBaopai` |
+| 抜北宝牌・抜きドラ | 抜北宝牌 | `babei_baopai` | `BabeiBaopai` |
+| 場 | 場 | `chang` | `Chang` |
+| 本場 | 本 | `ben` | `Ben` |
+| 立直棒・供託 | 立直棒 | `lizhibang` | `Lizhibang` |
+| 親・荘家 | 荘家 | `zhuangjia` | `Zhuangjia` |
+| 子・散家 | 散家 | `sanjia` | `Sanjia` |
+| 場風 | 圏風牌 | `quanfengpai` | `Quanfengpai` |
+| 自風 | 門風牌 | `menfengpai` | `Menfengpai` |
+| 河・捨て牌列 | 河 | `he` | `He` |
+| 責任払い | 包 | `bao` | `Bao` |
+
 ## 3. 確定済みの英語用語
 
 麻雀固有の用語ではない architecture/competition 概念に使う。
@@ -75,38 +108,7 @@
 
 ## 5. ユーザー決定待ち
 
-次の概念は設計で必要になるが、LizhiSim の正規識別子はまだ決めない。参考欄は既存実装に見られる表記であり、自動採用を意味しない。ユーザーが「採用識別子」欄を決めた後、この表から確定済み表へ移す。
-
-| 日本語での説明 | 既存参照・候補 | 採用識別子（ユーザー記入） | コメント（ユーザー記入） |
-|---|---|---|
-| 牌、牌種、物理的な牌 | Kanachan: `pai` 系 | `tile` | 例外的にピンインではなく英語を採用する(kanachanやxiangtingなども同様の方針) |
-| 牌山 | Kanachan: `paishan` | `bipai` | 壁牌(bìpái) |
-| 摸牌・ツモ動作 | Kanachan: `zimo` | `zimo` | - |
-| 打牌 | Kanachan: `dapai` | `dapai` | - |
-| チー | Kanachan: `chi` | `chi` | 吃(chī) |
-| ポン | Kanachan: `peng` | `peng` | 碰(pèng) |
-| 暗槓 | Kanachan: `angang` | `angang` | - |
-| 大明槓 | Kanachan: `daminggang` | `daminggang` | - |
-| 加槓 | Kanachan: `jiagang` | `jiagang` | - |
-| ロン | Kanachan: `rong` | `rong` | 栄 |
-| 荒牌平局 | Kanachan: `huangpai_pingju` | `huangpai_pingju` | - |
-| 北抜き | — | `babei` | 抜北(bá běi); 雀魂中国語版より |
-| 王牌 | — | `wangpai` | - |
-| 宝牌・ドラ | — | `baopai` | - |
-| 里宝牌・裏ドラ | — | `li_baopai` | - |
-| 紅宝牌・赤ドラ | — | `hong_baopai` | - |
-| 抜北宝牌・抜きドラ | — | `babei_baopai` | - |
-| 場 | - | `chang` | 東場・南場 |
-| 本場 | — | `ben` | 本 |
-| 立直棒・供託 | — | `lizhibang` | - |
-| 親・荘家 | — | `zhuangjia` | - |
-| 子・散家 | — | `sanjia` | - |
-| 場風 | — | `quanfengpai` | 圏風牌 |
-| 自風 | — | `menfengpai` | 門風牌 |
-| 河・捨て牌列 | — | `he` | - |
-| 責任払い | — | `bao` | 包 |
-
-参考: [Cryolite/kanachan `src/simulation`](https://github.com/Cryolite/kanachan/tree/main/src/simulation)
+現在、決定待ちの用語はない。新しい麻雀固有概念が必要になった時点で、識別子欄を空欄にした表をこの節へ追加し、ユーザーの決定を待つ。
 
 ## 6. 曖昧語を避ける
 

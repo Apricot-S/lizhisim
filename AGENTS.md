@@ -87,7 +87,10 @@
 - 同時ロン、鳴き競合、キャンセル、遅延応答、再送は決定的なスケジューラテストを持つ。
 - replay にはイベント列だけでなく終端状態の安定 hash を検証する。
 - プリセットには出典上の差分を示す golden test を用意する。
-- 実装開始後の標準コマンドは workspace 作成時に本ファイルへ追記する。存在しないコマンドを推測して記載しない。
+- 標準検証は `cargo fmt -- --check`、`cargo clippy -- -D warnings`、`cargo build --verbose`、`cargo test --verbose` とする。通常のCI jobはrepositoryの`rust-toolchain.toml`を使い、加えてnightlyの`cargo docs-rs`を実行する。
+- dependency auditは`deny.toml`を規範として、独立したGitHub Actions workflowで`cargo deny check`を実行する。
+- cargo-deny Actionの`rust-version`は`rust-toolchain.toml`の`channel`と一致させ、toolchain更新時に同じ変更で更新する。
+- Markdown lint、リンク検査は未導入である。存在しない command を推測して成功条件へ含めない。
 
 ## 9. 文書と変更管理
 

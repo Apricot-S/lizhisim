@@ -286,7 +286,17 @@ git status --short
 rg --files
 ```
 
-リンク検査 tool、Markdown lint、Rust の format/lint/test command は実装・CI 導入時に確定し、この節と `AGENTS.md` を更新する。空 scaffolding が build できることと、ドメインの振る舞いが検証済みであることを混同しない。
+Rust の標準検証 command は次のとおりである。
+
+```powershell
+cargo fmt -- --check
+cargo clippy -- -D warnings
+cargo build --verbose
+cargo test --verbose
+cargo deny check
+```
+
+通常のCI jobもversionを別指定せず、repositoryの`rust-toolchain.toml`を使ってformat、Clippy、build、testを実行する。CIは加えてnightlyの`cargo docs-rs`を実行する。`cargo deny check`は`deny.toml`を使う独立workflowで実行する。cargo-deny Actionの`rust-version`はtoolchain fileから自動取得されないため、`rust-toolchain.toml`更新時に同じ値へ更新する。Markdown lintとローカルリンク検査は未決であり、導入時にこの節と`AGENTS.md`を更新する。空scaffoldingがbuildできることと、ドメインの振る舞いが検証済みであることを混同しない。
 
 ## 13. Definition of Done
 

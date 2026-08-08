@@ -1,6 +1,10 @@
 # Test lists
 
-実装開始後、振る舞い単位の test list をこの directory に置く。現 Phase 0 では実装対象が選択されていないため、active test list はまだない。
+振る舞い単位のtest listをこのdirectoryに置く。Phase 0では実装対象を選択せず、planned listの`Selected`は`None`に保つ。ユーザーが実装開始を明示した後、一項目だけをactiveにする。
+
+## Planned
+
+- [雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md) — 最初の基準presetに向けた計画。未選択・未実装。
 
 新規作成時は [template](../templates/test-list.md) を複製し、[開発手順書](../development-guide.md) の `test list -> one -> red -> green -> refactor` に従う。
 
