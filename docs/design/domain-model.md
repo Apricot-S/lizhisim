@@ -210,7 +210,7 @@ command/response と event を区別する。event は起きた事実を過去�
 - request は一つの table lifecycle と continuation に属する。
 - continuation は高々一回だけ消費される。
 - event sequence は stream 内で単調増加し欠番を検出できる。
-- `Observation<Seat>` はその seat がまだ知り得ない tile copy を含まない。
+- `Observation<Seat>`はそのseatがまだ知り得ない`TileKind`と個数を含まない。
 - `TableMatchResult` の順位は player set の全 seat を重複なく含む。
 
 これらは example test だけでなく property/model-based test の対象にする。

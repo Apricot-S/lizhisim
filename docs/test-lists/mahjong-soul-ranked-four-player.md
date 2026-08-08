@@ -33,7 +33,9 @@
 - [x] 四人用index 0〜3を対応する`Seat`へ変換できる。
 - [x] 四人用index 4を`Seat`へ変換できない。
 - [x] 範囲外errorは失敗したindexと四人用seat数を保持する。
-- [ ] 赤`5m`、赤`5p`、赤`5s`を含む37種類の`TileKind`を構築でき、それ以外の赤牌を構築できない。
+- [ ] `TileKind`は赤牌を含む37種類を定義する。
+- [ ] 赤牌として赤`5m`、赤`5p`、赤`5s`を構築できる。
+- [ ] `5m`、`5p`、`5s`以外を赤牌として構築できない。
 - [ ] 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる。
 - [ ] `TileKind`ごとの枚数不足、枚数超過、除外牌混入を拒否し、部分的な状態を返さない。
 - [ ] `Bipai`の順序を固定すると、14枚配牌を正規化した最初の`Zimo`が一意に決まる。
@@ -94,6 +96,7 @@
 - 2026-08-09: `cargo test -p lizhisim-core seat::tests::out_of_range_error_reports_index_and_seat_count`を実行し、`SeatIndexOutOfRange`に期待fieldがないため失敗するredを確認した。
 - 2026-08-09: `thiserror`で`SeatIndexOutOfRange { index, seat_count }`を実装し、選択testをgreenにした。`thiserror 2.0.20`のMIT licenseは`deny.toml`のallow listと既存`THIRD-PARTY-NOTICES.md`に整合する。
 - 2026-08-09: refactor変更なし。workspace全4 testとClippy `-D warnings`が成功。ローカルに`cargo-deny` subcommandがないため`cargo deny check`は未実行で、既存のdependency audit CIで検査する。
+- 2026-08-09: `Seat`範囲のreviewを完了。四人用の個数、有効index変換、範囲外拒否、診断情報をtest済み。index読出しと`ThreePlayer`は最初のconsumerまたは三人対応まで追加しない。
 
 ## Completion review
 
