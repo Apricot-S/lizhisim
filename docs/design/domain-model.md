@@ -54,7 +54,21 @@ primitive obsession を避け、少なくとも次を区別する。
 
 `TileKind`は通常の34種類に赤`5m`、赤`5p`、赤`5s`を加えた37種類とする。同じ`TileKind`の複数枚は個別identityを持たず、個数またはmultisetとして表す。core domainに`TileCopy`を置かない。
 
-`bingpai`、`zimopai`、`he`、`Bipai`、canonical eventは`TileKind`だけを保持する。`Bipai`の再現可能な記録は、重複を許す`TileKind`の順序である。天鳳の0〜135 ID等はsource projectorがtrace用metadataとして保持できるが、canonical state、event、`StateHash`、agentの`Observation`には含めない。
+`bingpai`は`TileKind`の内部indexに対応する`[u8; 37]`の所持枚数配列として保持し、
+個々の牌を並べた可変長列としては保持しない。`zimopai`、`he`、canonical eventは
+牌の実個体を区別せず`TileKind`を保持する。
+
+四人用`Bipai`は`[TileKind; 136]`と非公開cursorで保持する。`Zimo`では要素を移動せず、
+cursorを進める。三人用`Bipai`の固定長と型構成は、三人麻雀の設計時に決定する。
+`Bipai`の再現可能な記録は、重複を許す`TileKind`の順序である。天鳳の0〜135 ID等は
+source projectorがtrace用metadataとして保持できるが、canonical state、event、
+`StateHash`、agentの`Observation`には含めない。
+
+四人の配牌には`Bipai`のindex 0〜51を使う。各seatは3回の4枚取りで
+`i * 16 + seat_index * 4 + j`の12枚を受け取り、最後にindex `48 + seat_index`の
+1枚を受け取る。配牌後のcursorは52とし、親のinitial deal由来の14枚目を
+index 52から最初の`Zimo`として正規化する。したがって通常の`Zimo`をindex 0から
+開始しない。
 
 `xiangting`や`hule`が34種類のcount表現を要求する場合、adapter境界で赤牌を対応する通常の5へ射影する。34種類用の別domain識別子は、必要性が確認されるまで追加しない。
 
