@@ -33,7 +33,7 @@
 - [x] 四人用index 0〜3を対応する`Seat`へ変換できる。
 - [x] 四人用index 4を`Seat`へ変換できない。
 - [x] 範囲外errorは失敗したindexと四人用seat数を保持する。
-- [ ] `TileKind`は赤牌を含む37種類を定義する。
+- [x] `TileKind`は赤牌を含む37種類を定義する。
 - [ ] 赤牌として赤`5m`、赤`5p`、赤`5s`を構築できる。
 - [ ] `5m`、`5p`、`5s`以外を赤牌として構築できない。
 - [ ] 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる。
@@ -72,7 +72,7 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 選択していた範囲外errorの診断情報testがgreenとなり、refactor要否とdependency metadataの確認まで完了したため。
+- Why: 選択していた37種類の`TileKind`定義testがgreenとなり、refactor要否の確認まで完了したため。
 
 ## Cycle log
 
@@ -97,6 +97,12 @@
 - 2026-08-09: `thiserror`で`SeatIndexOutOfRange { index, seat_count }`を実装し、選択testをgreenにした。`thiserror 2.0.20`のMIT licenseは`deny.toml`のallow listと既存`THIRD-PARTY-NOTICES.md`に整合する。
 - 2026-08-09: refactor変更なし。workspace全4 testとClippy `-D warnings`が成功。ローカルに`cargo-deny` subcommandがないため`cargo deny check`は未実行で、既存のdependency audit CIで検査する。
 - 2026-08-09: `Seat`範囲のreviewを完了。四人用の個数、有効index変換、範囲外拒否、診断情報をtest済み。index読出しと`ThreePlayer`は最初のconsumerまたは三人対応まで追加しない。
+- 2026-08-09: `TileKind`識別子を確定。赤牌は`M0`、`P0`、`S0`、字牌variantはピンイン、compact notationは`Z1`〜`Z7`とする。
+- 2026-08-09: 「`TileKind`は赤牌を含む37種類を定義する」を選択し、`TileKind::ALL`の長さを検証する一assertionのtestを追加した。
+- 2026-08-09: `cargo test -p lizhisim-core tile::tests::tile_kind_defines_thirty_seven_kinds`を実行し、`TileKind`未定義のため失敗するredを確認した。
+- 2026-08-09: 確定した37 variantと`TileKind::ALL`だけを実装しgreenにした。compact notation変換や赤牌判定は実装していない。
+- 2026-08-09: refactor変更なし。workspace全5 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
+- 2026-08-09: 字牌variantを`Z1`〜`Z7`へ統一し、ピンインをinline commentで保持した。数牌variantと`ALL`は種類ごとの横並びにし、`#[rustfmt::skip]`でlayoutを固定した。既存testはgreenを維持。
 
 ## Completion review
 
