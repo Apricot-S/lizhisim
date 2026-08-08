@@ -6,11 +6,11 @@
 #[rustfmt::skip]
 pub enum TileKind {
     // wanzi
-    M1, M2, M3, M4, M5, M6, M7, M8, M9, M0,
+    M1, M2, M3, M4, M5, M6, M7, M8, M9,
     // tongzi
-    P1, P2, P3, P4, P5, P6, P7, P8, P9, P0,
+    P1, P2, P3, P4, P5, P6, P7, P8, P9,
     // suozi
-    S1, S2, S3, S4, S5, S6, S7, S8, S9, S0,
+    S1, S2, S3, S4, S5, S6, S7, S8, S9,
     // zipai
     Z1, // dong
     Z2, // nan
@@ -19,6 +19,8 @@ pub enum TileKind {
     Z5, // bai
     Z6, // fa
     Z7, // zhong
+    // hong_baopai
+    M0, P0, S0,
 }
 
 impl TileKind {
@@ -26,13 +28,13 @@ impl TileKind {
     pub const ALL: [Self; 37] = [
         // wanzi
         Self::M1, Self::M2, Self::M3, Self::M4, Self::M5,
-        Self::M6, Self::M7, Self::M8, Self::M9, Self::M0,
+        Self::M6, Self::M7, Self::M8, Self::M9,
         // tongzi
         Self::P1, Self::P2, Self::P3, Self::P4, Self::P5,
-        Self::P6, Self::P7, Self::P8, Self::P9, Self::P0,
+        Self::P6, Self::P7, Self::P8, Self::P9,
         // suozi
         Self::S1, Self::S2, Self::S3, Self::S4, Self::S5,
-        Self::S6, Self::S7, Self::S8, Self::S9, Self::S0,
+        Self::S6, Self::S7, Self::S8, Self::S9,
         // zipai
         Self::Z1, // dong
         Self::Z2, // nan
@@ -41,6 +43,8 @@ impl TileKind {
         Self::Z5, // bai
         Self::Z6, // fa
         Self::Z7, // zhong
+        // hong_baopai
+        Self::M0, Self::P0, Self::S0,
     ];
 }
 
@@ -51,5 +55,21 @@ mod tests {
     #[test]
     fn tile_kind_defines_thirty_seven_kinds() {
         assert_eq!(TileKind::ALL.len(), 37);
+    }
+
+    #[test]
+    #[rustfmt::skip]
+    fn tile_kind_orders_base_kinds_before_red_kinds() {
+        assert_eq!(TileKind::ALL, [
+            TileKind::M1, TileKind::M2, TileKind::M3, TileKind::M4, TileKind::M5,
+            TileKind::M6, TileKind::M7, TileKind::M8, TileKind::M9,
+            TileKind::P1, TileKind::P2, TileKind::P3, TileKind::P4, TileKind::P5,
+            TileKind::P6, TileKind::P7, TileKind::P8, TileKind::P9,
+            TileKind::S1, TileKind::S2, TileKind::S3, TileKind::S4, TileKind::S5,
+            TileKind::S6, TileKind::S7, TileKind::S8, TileKind::S9,
+            TileKind::Z1, TileKind::Z2, TileKind::Z3, TileKind::Z4,
+            TileKind::Z5, TileKind::Z6, TileKind::Z7,
+            TileKind::M0, TileKind::P0, TileKind::S0,
+        ]);
     }
 }

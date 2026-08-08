@@ -13,6 +13,7 @@
 ## Decision
 
 - `TileKind`は通常の34種類に赤`5m`、赤`5p`、赤`5s`を加えた37種類とする。
+- 内部indexは通常34種類を0〜33、`M0`、`P0`、`S0`を34〜36の順にする。canonical serializationの数値表現は別途決定する。
 - core domainに`TileCopy`または同種牌の個別identityを表す型を置かない。
 - 同じ`TileKind`の複数枚は個数またはmultisetとして表す。
 - `Bipai`は重複を許す`TileKind`の順序として記録する。

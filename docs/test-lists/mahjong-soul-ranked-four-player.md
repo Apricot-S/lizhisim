@@ -34,6 +34,7 @@
 - [x] 四人用index 4を`Seat`へ変換できない。
 - [x] 範囲外errorは失敗したindexと四人用seat数を保持する。
 - [x] `TileKind`は赤牌を含む37種類を定義する。
+- [x] `TileKind`の内部indexは通常34種類の後に`M0`、`P0`、`S0`を置く。
 - [ ] 赤牌として赤`5m`、赤`5p`、赤`5s`を構築できる。
 - [ ] `5m`、`5p`、`5s`以外を赤牌として構築できない。
 - [ ] 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる。
@@ -72,7 +73,7 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 選択していた37種類の`TileKind`定義testがgreenとなり、refactor要否の確認まで完了したため。
+- Why: 選択していた`TileKind`内部index順序testがgreenとなり、refactor要否の確認まで完了したため。
 
 ## Cycle log
 
@@ -103,6 +104,11 @@
 - 2026-08-09: 確定した37 variantと`TileKind::ALL`だけを実装しgreenにした。compact notation変換や赤牌判定は実装していない。
 - 2026-08-09: refactor変更なし。workspace全5 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: 字牌variantを`Z1`〜`Z7`へ統一し、ピンインをinline commentで保持した。数牌variantと`ALL`は種類ごとの横並びにし、`#[rustfmt::skip]`でlayoutを固定した。既存testはgreenを維持。
+- 2026-08-09: 内部indexを通常34種類の後に`M0`、`P0`、`S0`とする方針を決定。canonical serializationの数値表現とはまだ結び付けない。
+- 2026-08-09: index順序を`TileKind::ALL`全体で比較する一assertionのtestを選択した。
+- 2026-08-09: `cargo test -p lizhisim-core tile::tests::tile_kind_orders_base_kinds_before_red_kinds`を実行し、各色の9直後に赤牌がある現在順との不一致で失敗するredを確認した。
+- 2026-08-09: enum宣言と`TileKind::ALL`を通常34種類、`M0`、`P0`、`S0`の順へ変更してgreenにした。refactor変更なし。
+- 2026-08-09: workspace全6 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
 
 ## Completion review
 
