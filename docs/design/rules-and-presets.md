@@ -1,0 +1,287 @@
+# ルールとプリセット
+
+## 1. 方針
+
+「雀魂ルール」のような名前を engine の条件分岐にしない。公式ルールを構造化した完全設定を検証し、engine はその値だけを見る。プリセットは便利な名前付き入力であると同時に、出典と版を固定した監査対象である。
+
+ルールは次の四層に分ける。
+
+```mermaid
+flowchart LR
+    T["TableRules<br/>牌・行為・和了・支払"] --> M["MatchRules<br/>場・連荘・終了・精算"]
+    M --> C["CompetitionPolicy<br/>日程・集計・進出"]
+    C --> R["RankingPolicy<br/>参加資格・段位・Rating"]
+```
+
+各層は独立に版管理し、`ResolvedExperimentSpec` が使う版を束ねる。卓内ルールの改定と段位ポイントの改定を同じ版番号で扱わない。
+
+## 2. 設定の lifecycle
+
+```text
+Source evidence
+  -> RawRuleSpec
+  -> schema validation
+  -> semantic validation
+  -> capability validation
+  -> ValidatedRuleSet<P>
+  -> canonical serialization + content hash
+  -> immutable preset version
+```
+
+- **schema validation**: 必須項目、enum、数値範囲、未知 field を検査する。
+- **semantic validation**: 人数、牌、支払、終了条件の相互矛盾を検査する。
+- **capability validation**: 現 engine と `hule`/`xiangting` adapter が全条項を実行できるか検査する。
+- 未知 field を無視して前方互換に見せない。意味が変わる設定の取りこぼしを防ぐため拒否する。
+
+## 3. TableRules の設定領域
+
+### 3.1 プレイヤーと牌
+
+| 領域 | 主な option |
+|---|---|
+| 人数 | yonma / sanma |
+| 使用牌 | 34 種の copy 数、三麻の除外牌、総牌数 |
+| 赤牌 | 萬子・筒子・索子ごとの赤 5 copy 数、赤牌のドラ扱い |
+| 北 | 通常牌/役牌/客風、抜き可否、抜きドラ、手牌扱い、抜いた直後の補充元、槍北可否 |
+| 王牌 | 王牌枚数、嶺上枚数、ドラ表示位置、最大槓数 |
+| 配牌 | 親子枚数、第一ツモの扱い、自動配牌差の正規化 |
+
+### 3.2 行為
+
+| 領域 | 主な option |
+|---|---|
+| チー | 可否、対象 seat、食い替え制限 |
+| ポン/明槓 | 可否、優先順位、発声競合 |
+| 暗槓/加槓 | 可否、リーチ後条件、待ち/面子構成/役変化条件、槍槓窓 |
+| リーチ | 必要点数、残りツモ条件、供託、フリテンリーチ、オープンリーチ等の local rule |
+| 和了選択 | 見逃し後の同巡/以後フリテン、リーチ後の見逃し |
+| 応答窓 | 同時ロン、head bump、複数ロン、三家和流局、seat priority |
+| timeout | 卓内ルールではなく実験方針として pass/tsumogiri/forfeit を選ぶ |
+
+### 3.3 流局
+
+個別 enum/flag とし、一つの `abortive_draws: true` へまとめない。
+
+- 九種九牌
+- 四風連打
+- 四家立直（または三家立直）
+- 四槓散了と一人四槓時の扱い
+- 三家和
+- exhaustive draw
+- 流し満貫を和了/流局精算/不採用のどれとして扱うか
+- 聴牌の定義、形式聴牌、自己の牌を使い切った待ち
+- 聴牌公開、ノーテン罰符
+
+### 3.4 役と和了制限
+
+| 領域 | 主な option |
+|---|---|
+| 一翻縛り | 常時、場による変更 |
+| 喰いタン/後付け | 可否 |
+| 一発・裏・槓ドラ・槓裏 | 個別可否 |
+| 役一覧 | 門前限定、食い下がり、local yaku |
+| 役満 | 一覧、複合、double variant、責任払い対象 |
+| 数え役満 | 不採用/役満/三倍満上限など |
+| 人和 | 不採用、通常役、満貫、倍満、役満など明示型 |
+| 国士無双 | 暗槓への槍槓、十三面の扱い |
+| 緑一色等 | 構成牌条件の variation |
+
+役名の文字列と翻数だけでは判定意味論を表せない。engine が対応する `YakuRuleId` の閉じた集合と parameter を使い、未知の custom expression を実行しない。
+
+### 3.5 符・翻・上限
+
+- 連風牌の雀頭符
+- 嶺上開花のツモ符
+- 平和ツモの符
+- 七対子の固定符・翻
+- 切り上げ満貫の条件
+- 満貫、跳満、倍満、三倍満、役満の境界
+- 役満複合と数え上限
+- 点数丸め単位
+
+「一般的な計算」を default として暗黙採用せず、validated preset は全項目を解決する。
+
+### 3.6 支払
+
+- 親/子のロン・ツモ支払
+- 本場の一人あたりまたは総加点
+- 三麻のツモ損、折半、北家分補正などの方式
+- 複数ロン時の本場と供託配分
+- 責任払いの対象役とロン/ツモ時の分担
+- 点棒単位と端数丸め
+
+支払結果は `Transfer { from, to, amount, reason }` の集合とし、各 transfer の理由を監査可能にする。
+
+## 4. MatchRules の設定領域
+
+| 領域 | 主な option |
+|---|---|
+| 初期値 | 開始点、返し点、起家/座順 |
+| 規定場 | 東風、東南、任意の round sequence |
+| 連荘 | 親和了、親聴牌、流局種別ごとの継続 |
+| 本場 | 増減条件、上限 |
+| 延長 | 南入/西入等、必要トップ点、最大場、サドンデス |
+| 終了 | 飛び条件（負/0以下）、目標点、時間管理 event |
+| all-last | アガリ止め、聴牌止め、順位条件、続行選択の有無 |
+| 同点 | 起家順、同順位、順位点分配、追加局 |
+| 精算 | oka、uma/順位点、残供託、1000点単位変換 |
+
+終了判定は `HandSettlement` 適用後の一か所で行い、和了処理と流局処理に重複させない。
+
+## 5. CompetitionPolicy と RankingPolicy
+
+卓内設定に次を入れない。
+
+- 何半荘の合計か、連続 N 戦の最大値か
+- レギュラー/セミファイナル/ファイナルの持越し率
+- team lineup と最低出場数
+- 予選足切り、同点 tie-break、最終戦の条件
+- 段位 room の参加資格と場代
+- 順位ごとの段位ポイント、降段保護、rating 更新
+- matchmaker が誰を同卓させるか
+
+詳細は [大会・段位戦・リーグ戦](competitions.md) に記載する。
+
+## 6. プリセットの identity
+
+### 6.1 Family と不変版
+
+Family ID は人間が検索する安定名、不変版 ID は実験に保存する名前である。
+
+```text
+family:     jp.m-league.table
+version:    jp.m-league.table@<effective-date-or-document-version>+<revision>
+alias:      jp.m-league.table@current
+hash:       sha256:<canonical validated content>
+```
+
+`current` alias は設定解決時だけ許し、run 開始前に不変版 ID と hash へ置き換える。公式文書に版がない場合は、取得日だけで意味版を偽装せず、snapshot date と独自 revision を metadata に分ける。
+
+### 6.2 Metadata
+
+各版は少なくとも次を持つ。
+
+- family ID / immutable version ID
+- config schema version / content hash
+- `draft`, `review`, `verified`, `deprecated`, `blocked` の状態
+- 対象人数・mode・地域・language
+- effective from/to（判明する場合）
+- source URL、文書 title/version、取得・確認日時
+- game 内資料なら app version、server/region、画面 ID、証跡 hash
+- 確認者と review 記録
+- unsupported clause と engine capability
+- 旧版/後継版、変更理由
+
+`verified` は「すべてのシミュレーション対象条項が一次資料と照合され、golden test がある」ことを意味する。単に起動できる意味ではない。
+
+## 7. 必須プリセット catalog
+
+以下は実装対象 family である。現 Phase 0 では設定データ自体を作らず、監査状態を台帳に記録する。東風/東南、room、season で値が変わる場合は family 内の別版または `MatchRules`/`RankingPolicy` の別 family とする。
+
+### 7.1 オンライン段位戦
+
+| Family ID（予定） | 対象 | Table/Match | Ranking | Phase 0 の監査状態 |
+|---|---|---|---|---|
+| `jp.mahjongsoul.ranked.yonma` | 雀魂 四人段位戦 | 必須 | 必須 | 公式 guide は確認、完全値は game 内証跡が必要 |
+| `jp.mahjongsoul.ranked.sanma` | 雀魂 三人段位戦 | 必須 | 必須 | 同上 |
+| `jp.tenhou.ranked.yonma` | 天鳳 四人段位戦 | 必須 | 必須 | 公式 manual を基点に mode 差分監査が必要 |
+| `jp.tenhou.ranked.sanma` | 天鳳 三人段位戦 | 必須 | 必須 | 同上 |
+| `jp.riichicity.ranked.yonma` | 麻雀一番街 四人段位戦 | 必須 | 必須 | 公式 Web に完全仕様なし、game 内証跡待ち |
+| `jp.riichicity.ranked.sanma` | 麻雀一番街 三人段位戦 | 必須 | 必須 | 同上 |
+| `jp.ron2.ranked.yonma` | 龍龍 四人段位戦 | 必須 | 必須 | 公式ルールページ確認、段位制度を追加監査 |
+| `jp.ron2.ranked.sanma` | 龍龍 三人段位戦 | 必須 | 必須 | 同上 |
+
+サービス内の room/卓別に卓内ルールが同じで段位ポイントだけ違う場合、`TableRules` を複製せず複数の `RankingPolicy` を組み合わせる。
+
+### 7.2 競技ルール
+
+| Family ID（予定） | 対象 | 主な variation | Phase 0 の監査状態 |
+|---|---|---|---|
+| `org.m-league.table` | M リーグ | 公式戦ルールと season competition | 公式ルールページ確認、season 規定は別版 |
+| `org.worldriichi.wrc` | WRC | 2025 rules、clarification、optional rules | 2025 公式資料確認、optional を別設定にする |
+| `jp.saikouisen.main` | 最高位戦日本プロ麻雀協会 | 本戦/Classic/対局種別特例 | 本ルールを必須、variation は別 family/版 |
+| `jp.jpml.a` | 日本プロ麻雀連盟 | 公式/A、WRC、WRC-R を混同しない | 公式ルールを基準、WRC は別 family |
+| `jp.npm.main` | 日本プロ麻雀協会 | 競技規定、title 別特例 | 公式競技規定確認、対象大会を明示 |
+| `jp.mu.official` | 麻将連合 | μカップ、将王/リーグ等の罰符差 | 公式 PDF と競技規定確認、variation 必須 |
+| `jp.rmu.a` | RMU A | 一発・裏あり | 公式ページ確認 |
+| `jp.rmu.b` | RMU B | A から一発・裏/槓ドラ差 | 公式ページ確認 |
+| `jp.rmu.m` | RMU M | 赤・開始点・順位点・パオ等 | 公式ページ確認 |
+
+日本プロ麻雀連盟の `WRC` と World Riichi Championship の WRC 公式資料は関係するが、出典・改定時期・採用大会を同一 preset と仮定しない。利用者が指定した「WRC」は `org.worldriichi.wrc` を指し、JPML が採用する大会版は別の解決済み版として差分を確認する。
+
+## 8. 設定構造の概念例
+
+これは schema の確定形式ではない。
+
+```yaml
+preset:
+  id: immutable-version-id
+  schema: rule-schema-v1
+  status: verified
+  sources: [source-snapshot-id]
+
+table_rules:
+  player_set: yonma
+  tiles: { ...fully resolved... }
+  actions: { ...fully resolved... }
+  draws: { ...fully resolved... }
+  wins: { ...fully resolved... }
+  scoring: { ...fully resolved... }
+  payments: { ...fully resolved... }
+
+match_rules:
+  initial: { ... }
+  progression: { ... }
+  termination: { ... }
+  settlement: { ... }
+```
+
+継承用の `extends: other-preset` を canonical 保存形式にしない。authoring tool が差分入力を受け付けても、解決・検証後は完全値と source mapping を保存する。これにより親 preset 更新による過去 run の意味変化を防ぐ。
+
+## 9. Semantic validation の例
+
+- `player_set = sanma` なら seat 数、順位点数、支払 vector が 3。
+- 除外した tile に赤 copy や yaku requirement を設定できない。
+- 北抜き可なら北牌と replacement draw policy が存在する。
+- `multiple_ron = head_bump` と `triple_ron_abort = true` のような競合を拒否する。
+- リーチ必要点が 0 未満でない。供託と終了時残供託処理がある。
+- max kan と dead wall の補充牌数が整合する。
+- 数え役満を不採用にした場合も上限点が定義される。
+- 連荘または延長に循環上限がなくても、麻雀上の正当な長期継続として scheduler が扱える。
+- placement bonus の要素数が人数と一致し、oka/source/sink を含む精算 conservation が説明できる。
+- rule が要求する yaku/scoring capability を `hule` adapter が宣言している。
+
+## 10. 公式資料の監査手順
+
+1. [公式ルール出典台帳](../references/rule-sources.md) に一次資料を登録する。
+2. URL、title、版、effective date、取得日時を記録し、可能なら内容 hash を保存する。
+3. game 内のみの仕様は app version、region、画面遷移、画像 hash を記録する。認証情報や個人情報は保存しない。
+4. 条項を設定項目へ一対一または一対多で mapping する。
+5. シミュレーション対象外の物理条項も別表へ mapping し、欠落扱いにしない。
+6. 別の確認者が値と出典を review する。
+7. 各差分を表す最小 golden scenario を red にする。
+8. implementation と test が green 後、preset を `verified` へ上げる。
+
+二次資料は一次資料の所在発見と曖昧点の検出に使えるが、値確定の唯一の根拠にはしない。一次資料同士が矛盾する場合は、対象期間と優先条項を確認できるまで `blocked` とする。
+
+## 11. 改定の扱い
+
+公式側の更新を検知しても既存版を編集しない。
+
+1. source snapshot を追加する。
+2. 旧版との差分 report を作る。
+3. 新しい immutable version を `draft` で作る。
+4. 変更した条項の test list を作る。
+5. red/green/refactor と review を終える。
+6. `verified` にし、`current` alias を原子的に新版へ向ける。
+7. 旧版は `deprecated` にできるが、再生のため削除しない。
+
+## 12. 既知のリスク
+
+- オンラインサービスは告知なしに server-side ルールや段位ポイントを変える可能性がある。
+- 一次資料が Web、PDF、game 内 help に分散している。
+- 同じ団体でも大会、league、年度でルールが異なる。
+- 物理競技の裁定条項を計算規則と誤って実装すると、AI simulator に不要な状態が増える。
+- 未公開 `hule` の対応範囲次第で preset capability が制限される。
+
+これらは preset の版、source mapping、unsupported clause、contract test で管理する。
