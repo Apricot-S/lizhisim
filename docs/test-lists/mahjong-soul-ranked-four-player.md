@@ -67,11 +67,14 @@
 
 - Selected: 四人用の全`Seat`を構築でき、範囲外seatを構築できない。
 - Selected at: 2026-08-09
+- Phase: Red
 - Why: walking skeletonの最小の型安全性であり、observation/action/event schemaや`StateHash`方式へ依存しないため。ユーザーがこの一項目の選択を明示した。
 
 ## Cycle log
 
 - 2026-08-09: `Seat`の構築範囲testを選択。redは未着手。
+- 2026-08-09: 局所的不変条件を検証するunit testとして`lizhisim-core/src/seat.rs`へ移動。`tests/`はfacade互換性や複数module間のintegration testに使う。
+- 2026-08-09: `cargo test -p lizhisim-core seat::tests::four_player_seat_accepts_exactly_four_indices`を実行し、未実装の`FourPlayer`と`Seat`を参照できないため失敗するredを確認する。
 
 ## Completion review
 

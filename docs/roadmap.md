@@ -29,7 +29,7 @@ Exit gate:
 実装開始前に決定する。
 
 - [x] MSRV 1.97 / Edition 2024、開発 toolchain 1.97.1 / default profile
-- [x] 最小 workspace/crate boundary（root workspace + `lizhisim` library scaffolding）
+- [x] 最小workspace/crate boundary（re-export facadeの`lizhisim` + 実装所有crateの`lizhisim-core`）
 - [x] format、lint、build、test、docs-rs の CI command
 - [x] `cargo-deny`によるdependency auditと独立CI workflow
 - [x] Markdown lintとrepository内リンク検査の独立CI workflow

@@ -182,11 +182,11 @@ event は少なくとも experiment、competition、table match、round の stre
 
 ## 9. 将来の workspace 境界
 
-実装時の候補であり、Phase 0 では directory や Cargo manifest を作らない。
+最初の実装境界として、利用者向け`lizhisim`をre-export専用facade、domain実装を所有する`lizhisim-core`を内部crateとする。[ADR-0014](../adr/0014-facade-and-core-crates.md)で確定した。以下はwalking skeleton後に必要性を再評価する追加候補であり、先回りして作らない。
 
 | 候補 crate | 責務 |
 |---|---|
-| `lizhisim-domain` | 値型、typestate、純粋遷移、port |
+| `lizhisim-core` | 値型、typestate、純粋遷移、domain port。現在作成済み |
 | `lizhisim-rules` | 設定 schema、検証、preset registry |
 | `lizhisim-protocol` | 観測、action、request/response、event schema |
 | `lizhisim-engine` | 論理卓 scheduler と continuation runtime |
@@ -198,7 +198,7 @@ event は少なくとも experiment、competition、table match、round の stre
 | `lizhisim-app` | 実験設定の composition root |
 | conformance app crate（crate名未決） | userがlocalに置いた`majsoul-record`のdecode、projection、匿名化、LizhiSimとの1パスfull-record比較、diff report。取得機能は持たず、`game_log`出力は任意の診断機能とする |
 
-crate 分割は循環依存を避ける手段であり、最初から細分化する目的ではない。walking skeleton で変更頻度と compile cost を計測し、ADR で確定する。
+`lizhisim-core`より先のcrate分割は、循環依存を避ける必要とwalking skeletonの変更頻度・compile costを確認してからADRで確定する。
 
 ## 10. 拡張境界
 
@@ -215,3 +215,4 @@ crate 分割は循環依存を避ける手段であり、最初から細分化�
 - [ADR-0003: 大会ドメインを卓内エンジンから分離する](../adr/0003-separate-competition-domain.md)
 - [ADR-0004: 麻雀用語はピンインを基本とし、Roundを局専用にする](../adr/0004-pinyin-terminology-and-round.md)
 - [ADR-0006: Rust toolchain、初期 workspace、CI baselineを固定する](../adr/0006-rust-toolchain-workspace-and-ci.md)
+- [ADR-0014: facadeとcore crateを分離する](../adr/0014-facade-and-core-crates.md)
