@@ -1,8 +1,8 @@
 # ロードマップ
 
-ロードマップは期限ではなく、依存関係と品質 gate を示す。各 milestone は小さい vertical slice の test list に分解し、t-wada TDD で進める。Phase 0 中は実装しない。
+ロードマップは期限ではなく、依存関係と品質 gate を示す。各 milestone は小さい vertical slice の test list に分解し、t-wada TDD で進める。
 
-## Phase 0 — 構想と設計（現在）
+## Phase 0 — 構想と設計（完了）
 
 成果物:
 
@@ -45,7 +45,7 @@ Decision output:
 - initial schema draft
 - first test list
 
-## Phase 1 — 決定的な一局 walking skeleton
+## Phase 1 — 決定的な一局 walking skeleton（現在）
 
 Goal: GPU、network、実 scoring crate なしで、固定牌山の小さな一局断片を要求・応答・event・replay まで通す。
 

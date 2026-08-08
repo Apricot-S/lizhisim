@@ -29,7 +29,7 @@
 
 ### Values and configuration
 
-- [ ] `FourPlayer`は4つの`Seat`を定義する。
+- [x] `FourPlayer`は4つの`Seat`を定義する。
 - [ ] 四人用index 0〜3を対応する`Seat`へ変換できる。
 - [ ] 四人用index 4を`Seat`へ変換できない。
 - [ ] 赤`5m`、赤`5p`、赤`5s`を含む37種類の`TileKind`を構築でき、それ以外の赤牌を構築できない。
@@ -67,10 +67,9 @@
 
 ## Current
 
-- Selected: `FourPlayer`は4つの`Seat`を定義する。
-- Selected at: 2026-08-09
-- Phase: Red
-- Why: 選択済み項目を一観点まで分割した最小例であり、observation/action/event schemaや`StateHash`方式へ依存しないため。
+- Selected: None
+- Phase: Awaiting next selection
+- Why: 選択していた「`FourPlayer`は4つの`Seat`を定義する」がgreenとなり、refactor要否の確認まで完了したため。次項目はまだ選択しない。
 
 ## Cycle log
 
@@ -79,6 +78,8 @@
 - 2026-08-09: 「4席ある」「index 0〜3を変換できる」「範囲外を拒否する」の複数観点と複数assertionが一testに混在していたため、test listを三項目へ分割した。
 - 2026-08-09: `FourPlayer`が4つの`Seat`を定義する一観点だけを選び、`seat::tests::four_player_defines_four_seats`を一assertionで記述した。
 - 2026-08-09: `cargo test -p lizhisim-core seat::tests::four_player_defines_four_seats`を実行し、未実装の`FourPlayer`と`Seat`を参照できないため失敗するredを再確認した。
+- 2026-08-09: `FourPlayer`、型付き`Seat<P>`、四席の`Seat::<FourPlayer>::ALL`だけを`lizhisim-core`へ実装し、選択testのgreenを確認した。index変換と範囲外errorは実装していない。
+- 2026-08-09: refactorを確認し、追加変更なし。`cargo test --workspace --verbose`、`cargo clippy --workspace --all-targets -- -D warnings`、`cargo fmt -- --check`が成功した。
 
 ## Completion review
 

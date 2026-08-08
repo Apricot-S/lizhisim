@@ -3,3 +3,5 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 mod seat;
+
+pub use seat::{FourPlayer, Seat};

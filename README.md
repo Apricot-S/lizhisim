@@ -2,7 +2,7 @@
 
 深層学習向けの AI 対戦用リーチ麻雀シミュレーターを、Rust で新規設計するプロジェクトです。
 
-現在は **Phase 0: 設計** です。以前のドメイン実装は撤去済みで、Cargo workspace には空の crate scaffolding だけがあります。実行可能な機能と公開 API はまだありません。設計レビューが完了するまで振る舞いの実装を開始しません。
+現在は **Phase 1: 決定的な一局walking skeleton** です。t-wada TDDに従い、test listから一項目ずつ`red -> green -> refactor`で実装します。公開APIはwalking skeletonに必要な最小範囲だけです。
 
 ## 目標
 

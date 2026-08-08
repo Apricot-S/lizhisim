@@ -2,7 +2,7 @@
 
 ## 1. 現在の作業範囲
 
-現在は Phase 0 であり、許可される成果物は要求、設計、ADR、調査台帳、test list の雛形である。Cargo workspace と空の library crate scaffolding は存在するが、ユーザーが実装開始を明示するまで振る舞いを持つ Rust コード、crate、dependency を追加しない。
+現在はPhase 1であり、決定的な一局walking skeletonをtest listから一項目ずつ実装する。選択中でない振る舞いを先回りして実装せず、crateやdependencyの追加は選択項目に必要な場合だけ行う。
 
 文書だけを変更する場合も、変更理由、要求 ID、文書間リンク、未決事項を確認する。設計が変わる場合は ADR を追加または supersede する。
 
