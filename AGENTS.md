@@ -81,6 +81,10 @@
 
 複数の振る舞いを一度に red にしない。バグ修正では、再現テストの red を先に確認する。テストを実装へ合わせて弱めない。
 
+- 一つのtestは一つの観点だけを検証する。`正常系と異常系`、`個数と変換`のような独立して失敗し得る観点を同じtestへ混在させない。
+- One assertion per testを原則とし、一つのtest functionではassertion macroを一回だけ使う。複数入力を同じ性質として検証する場合は結果を一つの値へ集約し、一回のassertionで比較する。
+- 複数assertionが不可分だと判断した例外は、分割できない理由をtest listのcycle logへ記録してreviewする。fixture/setup確認をassertion数の例外にしない。
+
 ## 8. 検証方針
 
 - pure transition の例示テストを最優先する。

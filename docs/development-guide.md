@@ -54,6 +54,8 @@ test list はテストコードの一覧ではなく、振る舞いの仮説と�
 
 最小で、設計上の学びが大きく、短く green にできる項目を一つ `Current` にする。関連する複数例を一度に選ばない。新しい疑問が出たら test list へ追加し、現在の red を広げない。
 
+選択した項目に独立して失敗し得る複数の観点が含まれていたら、testを書く前に項目を分割する。正常系と異常系、個数と変換、受理と拒否を一つの項目またはtestへまとめない。
+
 ### 3.3 Red
 
 失敗する最小テストを書く。
@@ -63,6 +65,14 @@ test list はテストコードの一覧ではなく、振る舞いの仮説と�
 - fixture/setup の失敗や typo を red と数えない。
 - 既存テストが別理由で壊れている場合は先に切り分ける。
 - red の command と要点を cycle log に記録する。
+
+一つのtest functionは一つの観点だけを検証し、One assertion per testを原則とする。
+
+- assertion macroは原則としてtest functionごとに一回だけ使う。
+- 同じ性質に対する複数入力は、結果を配列や値へ集約して一回のassertionで比較できる。
+- loop内で繰り返しassertionせず、入力ごとに別観点ならtestを分ける。
+- 複数assertionが不可分な例外は、分割できない理由をcycle logへ記録しreviewする。
+- fixtureやsetupの妥当性確認を追加assertionで混在させない。必要ならfixture自身のtestへ分ける。
 
 型で禁止すべき不正状態は compile-fail test を検討する。ただし compile-fail snapshot の保守コストと価値を比べる。
 

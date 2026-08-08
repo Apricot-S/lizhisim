@@ -28,6 +28,8 @@
 - Selected: None
 - Why this is the smallest useful next test:
 
+選択時に、一項目が一つの観点まで分割され、原則一つのassertionで検証できることを確認する。
+
 ## Cycle log
 
 ### Cycle 1 — {selected behavior}

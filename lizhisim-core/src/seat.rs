@@ -7,17 +7,7 @@ mod tests {
     use super::{FourPlayer, Seat};
 
     #[test]
-    fn four_player_seat_accepts_exactly_four_indices() {
+    fn four_player_defines_four_seats() {
         assert_eq!(Seat::<FourPlayer>::ALL.len(), 4);
-
-        for (index, expected) in Seat::<FourPlayer>::ALL.iter().enumerate() {
-            assert_eq!(
-                Seat::<FourPlayer>::try_from_index(index).as_ref(),
-                Ok(expected)
-            );
-        }
-
-        assert!(Seat::<FourPlayer>::try_from_index(4).is_err());
-        assert!(Seat::<FourPlayer>::try_from_index(usize::MAX).is_err());
     }
 }

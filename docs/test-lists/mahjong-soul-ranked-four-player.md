@@ -29,7 +29,9 @@
 
 ### Values and configuration
 
-- [ ] 四人用の全`Seat`を構築でき、範囲外seatを構築できない。
+- [ ] `FourPlayer`は4つの`Seat`を定義する。
+- [ ] 四人用index 0〜3を対応する`Seat`へ変換できる。
+- [ ] 四人用index 4を`Seat`へ変換できない。
 - [ ] 赤`5m`、赤`5p`、赤`5s`を含む37種類の`TileKind`を構築でき、それ以外の赤牌を構築できない。
 - [ ] 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる。
 - [ ] `TileKind`ごとの枚数不足、枚数超過、除外牌混入を拒否し、部分的な状態を返さない。
@@ -65,16 +67,18 @@
 
 ## Current
 
-- Selected: 四人用の全`Seat`を構築でき、範囲外seatを構築できない。
+- Selected: `FourPlayer`は4つの`Seat`を定義する。
 - Selected at: 2026-08-09
 - Phase: Red
-- Why: walking skeletonの最小の型安全性であり、observation/action/event schemaや`StateHash`方式へ依存しないため。ユーザーがこの一項目の選択を明示した。
+- Why: 選択済み項目を一観点まで分割した最小例であり、observation/action/event schemaや`StateHash`方式へ依存しないため。
 
 ## Cycle log
 
 - 2026-08-09: `Seat`の構築範囲testを選択。redは未着手。
 - 2026-08-09: 局所的不変条件を検証するunit testとして`lizhisim-core/src/seat.rs`へ移動。`tests/`はfacade互換性や複数module間のintegration testに使う。
-- 2026-08-09: `cargo test -p lizhisim-core seat::tests::four_player_seat_accepts_exactly_four_indices`を実行し、未実装の`FourPlayer`と`Seat`を参照できないため失敗するredを確認する。
+- 2026-08-09: 「4席ある」「index 0〜3を変換できる」「範囲外を拒否する」の複数観点と複数assertionが一testに混在していたため、test listを三項目へ分割した。
+- 2026-08-09: `FourPlayer`が4つの`Seat`を定義する一観点だけを選び、`seat::tests::four_player_defines_four_seats`を一assertionで記述した。
+- 2026-08-09: `cargo test -p lizhisim-core seat::tests::four_player_defines_four_seats`を実行し、未実装の`FourPlayer`と`Seat`を参照できないため失敗するredを再確認した。
 
 ## Completion review
 
