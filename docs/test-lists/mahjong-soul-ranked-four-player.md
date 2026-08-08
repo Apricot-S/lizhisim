@@ -30,7 +30,7 @@
 ### Values and configuration
 
 - [x] `FourPlayer`は4つの`Seat`を定義する。
-- [ ] 四人用index 0〜3を対応する`Seat`へ変換できる。
+- [x] 四人用index 0〜3を対応する`Seat`へ変換できる。
 - [ ] 四人用index 4を`Seat`へ変換できない。
 - [ ] 赤`5m`、赤`5p`、赤`5s`を含む37種類の`TileKind`を構築でき、それ以外の赤牌を構築できない。
 - [ ] 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる。
@@ -69,7 +69,7 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 選択していた「`FourPlayer`は4つの`Seat`を定義する」がgreenとなり、refactor要否の確認まで完了したため。次項目はまだ選択しない。
+- Why: 選択していた四人用index 0〜3の変換がgreenとなり、refactor要否の確認まで完了したため。次項目はまだ選択しない。
 
 ## Cycle log
 
@@ -80,6 +80,11 @@
 - 2026-08-09: `cargo test -p lizhisim-core seat::tests::four_player_defines_four_seats`を実行し、未実装の`FourPlayer`と`Seat`を参照できないため失敗するredを再確認した。
 - 2026-08-09: `FourPlayer`、型付き`Seat<P>`、四席の`Seat::<FourPlayer>::ALL`だけを`lizhisim-core`へ実装し、選択testのgreenを確認した。index変換と範囲外errorは実装していない。
 - 2026-08-09: refactorを確認し、追加変更なし。`cargo test --workspace --verbose`、`cargo clippy --workspace --all-targets -- -D warnings`、`cargo fmt -- --check`が成功した。
+- 2026-08-09: 次項目として「四人用index 0〜3を対応する`Seat`へ変換できる」を選択。一つの配列結果を比較する一assertionのtestを追加した。
+- 2026-08-09: `cargo test -p lizhisim-core seat::tests::four_player_seat_converts_every_valid_index`を実行し、`try_from_index`が未実装のため失敗するredを確認した。
+- 2026-08-09: `try_from_index`を`Seat::<FourPlayer>::ALL`から安全に検索する最小実装でgreenにした。無効indexから不正な`Seat`を構築しないため、未検証のunchecked castは採用しなかった。
+- 2026-08-09: Rust 1.97ではsliceの`get`を`const fn`内で呼べないため、意味上不要な`const`を`try_from_index`から除去した。ほかにrefactor変更なし。
+- 2026-08-09: `cargo test --workspace --verbose`、`cargo clippy --workspace --all-targets -- -D warnings`、`cargo fmt -- --check`、`git diff --check`が成功した。
 
 ## Completion review
 

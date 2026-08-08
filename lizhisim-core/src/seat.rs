@@ -16,6 +16,10 @@ pub struct Seat<P> {
 impl Seat<FourPlayer> {
     pub const ALL: [Self; 4] = [Self::new(0), Self::new(1), Self::new(2), Self::new(3)];
 
+    pub fn try_from_index(index: usize) -> Option<Self> {
+        Self::ALL.get(index).copied()
+    }
+
     const fn new(index: u8) -> Self {
         Self {
             index,
@@ -31,5 +35,13 @@ mod tests {
     #[test]
     fn four_player_defines_four_seats() {
         assert_eq!(Seat::<FourPlayer>::ALL.len(), 4);
+    }
+
+    #[test]
+    fn four_player_seat_converts_every_valid_index() {
+        assert_eq!(
+            [0, 1, 2, 3].map(Seat::<FourPlayer>::try_from_index),
+            Seat::<FourPlayer>::ALL.map(Some)
+        );
     }
 }
