@@ -77,27 +77,34 @@
 
 次の概念は設計で必要になるが、LizhiSim の正規識別子はまだ決めない。参考欄は既存実装に見られる表記であり、自動採用を意味しない。ユーザーが「採用識別子」欄を決めた後、この表から確定済み表へ移す。
 
-| 日本語での説明 | 既存参照・候補 | 採用識別子（ユーザー記入） |
+| 日本語での説明 | 既存参照・候補 | 採用識別子（ユーザー記入） | コメント（ユーザー記入） |
 |---|---|---|
-| 牌、牌種、物理的な牌 | Kanachan: `pai` 系 | |
-| 牌山 | Kanachan: `paishan` | |
-| 摸牌・ツモ動作 | Kanachan: `zimo` | |
-| 打牌 | Kanachan: `dapai` | |
-| チー | Kanachan: `chi` | |
-| ポン | Kanachan: `peng` | |
-| 暗槓 | Kanachan: `angang` | |
-| 大明槓 | Kanachan: `daminggang` | |
-| 加槓 | Kanachan: `jiagang` | |
-| 荒牌平局 | Kanachan: `huangpai_pingju` | |
-| 北抜き | — | |
-| 王牌 | — | |
-| 宝牌・ドラ | — | |
-| 本場 | — | |
-| 立直棒・供託 | — | |
-| 親・荘家 | — | |
-| 場風・自風 | — | |
-| 河・捨て牌列 | — | |
-| 責任払い | — | |
+| 牌、牌種、物理的な牌 | Kanachan: `pai` 系 | `tile` | 例外的にピンインではなく英語を採用する(kanachanやxiangtingなども同様の方針) |
+| 牌山 | Kanachan: `paishan` | `bipai` | 壁牌(bìpái) |
+| 摸牌・ツモ動作 | Kanachan: `zimo` | `zimo` | - |
+| 打牌 | Kanachan: `dapai` | `dapai` | - |
+| チー | Kanachan: `chi` | `chi` | 吃(chī) |
+| ポン | Kanachan: `peng` | `peng` | 碰(pèng) |
+| 暗槓 | Kanachan: `angang` | `angang` | - |
+| 大明槓 | Kanachan: `daminggang` | `daminggang` | - |
+| 加槓 | Kanachan: `jiagang` | `jiagang` | - |
+| ロン | Kanachan: `rong` | `rong` | 栄 |
+| 荒牌平局 | Kanachan: `huangpai_pingju` | `huangpai_pingju` | - |
+| 北抜き | — | `babei` | 抜北(bá běi); 雀魂中国語版より |
+| 王牌 | — | `wangpai` | - |
+| 宝牌・ドラ | — | `baopai` | - |
+| 里宝牌・裏ドラ | — | `li_baopai` | - |
+| 紅宝牌・赤ドラ | — | `hong_baopai` | - |
+| 抜北宝牌・抜きドラ | — | `babei_baopai` | - |
+| 場 | - | `chang` | 東場・南場 |
+| 本場 | — | `ben` | 本 |
+| 立直棒・供託 | — | `lizhibang` | - |
+| 親・荘家 | — | `zhuangjia` | - |
+| 子・散家 | — | `sanjia` | - |
+| 場風 | — | `quanfengpai` | 圏風牌 |
+| 自風 | — | `menfengpai` | 門風牌 |
+| 河・捨て牌列 | — | `he` | - |
+| 責任払い | — | `bao` | 包 |
 
 参考: [Cryolite/kanachan `src/simulation`](https://github.com/Cryolite/kanachan/tree/main/src/simulation)
 
