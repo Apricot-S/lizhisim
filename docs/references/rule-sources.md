@@ -46,21 +46,22 @@ game 内表示しかない場合、最低限次を記録する。
 | 資料 | 位置付け | 使用方法 |
 |---|---|---|
 | [Cryolite/kanachan `src/simulation`](https://github.com/Cryolite/kanachan/tree/main/src/simulation) | 雀魂牌譜との照合実績がある先行実装 | corner case の候補、状態分割、必要な test 観点を発見する。コードを一次資料扱いせず、license を確認せずコピーしない |
-| [Cryolite の雀魂シミュレーション検証記録](https://gist.github.com/Cryolite/a026f41713f6a7ca88713737f5c2cfb6) | 牌譜 ID 付きの検証記録 | 記載された牌譜 ID から元牌譜を改めて取得し、該当 `Round` を最小 regression/golden test にする |
+| [Cryolite の雀魂シミュレーション検証記録](https://gist.github.com/Cryolite/a026f41713f6a7ca88713737f5c2cfb6) | 牌譜 ID 付きの検証記録 | corner case候補とsource牌譜IDを得る。[ADR-0010](../adr/0010-mahjong-soul-record-conformance.md)に従って最小CI fixtureとCI外full-record testへ利用する |
 
 推奨する evidence chain:
 
 ```text
 雀魂公式詳細ルール
   -> 記載外の corner case を Kanachan/検証記録から発見
-  -> 記載された牌譜 ID の元牌譜を取得
-  -> raw 牌譜を保存・hash 化
-  -> 最小 test list を作成
+  -> userがproject外でraw牌譜を取得
+  -> 変換用app crateがlocal rawをdecode・匿名化
+  -> corner caseを編集した最小fixtureをGitへ保存してCI test
+  -> raw corpusをGit外に保持しfull-record conformance testを定期実行
   -> red -> green -> refactor
   -> LizhiSim の event と元牌譜を照合
 ```
 
-Kanachan の挙動だけを期待値にしない。最終的な根拠を取得済み牌譜と公式ルールに戻し、取得不能な牌譜に依存する項目は `verified` にしない。
+Kanachanの挙動だけを期待値にしない。最小fixtureはsource牌譜IDと編集内容を記録し、full-record testはrawから毎回decodeしてsource event単位でLizhiSimと比較する。
 
 ## 4. 競技団体・リーグ
 

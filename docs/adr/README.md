@@ -22,6 +22,8 @@
 | [0006](0006-rust-toolchain-workspace-and-ci.md) | Accepted | Rust toolchain、初期 workspace、CI baselineを固定する |
 | [0007](0007-content-addressed-source-evidence.md) | Superseded | 公式資料をcontent-addressed private evidenceとして保存する |
 | [0008](0008-source-review-without-copying.md) | Accepted | 公式資料を複製せずURL・取得日時・確認記録で追跡する |
+| [0009](0009-minimized-game-record-evidence.md) | Superseded | 牌譜を保存せず承認済み最小fixtureへ変換する |
+| [0010](0010-mahjong-soul-record-conformance.md) | Accepted | 雀魂raw牌譜を外部入力として二段階検証する |
 
 ## Template
 

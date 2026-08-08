@@ -28,7 +28,7 @@ production dependency追加時は`deny.toml`のlicense、ban、source方針をre
 - [x] 雀魂段位戦・四人が最初の基準presetに決定している。
 - [x] 公式ルール、Kanachan、検証記録、元牌譜のevidence chainが定義されている。
 - [x] 雀魂公式ページを複製せず、URL・取得日時・確認記録で追跡する方式を決める（[ADR-0008](adr/0008-source-review-without-copying.md)）。
-- [ ] 雀魂牌譜の取得、匿名化、保存、hash方針を決める。
+- [x] 雀魂牌譜の取得、変換、匿名化、二段階test、保存・hash方針を決める（[ADR-0010](adr/0010-mahjong-soul-record-conformance.md)）。
 - [ ] walking skeletonが必要とする最小`RuleClaim` mappingを作る。
 
 source未確定の値を推測してfixtureへ埋めない。pure engineの構造だけを試すfixtureは、公式presetと明確に区別する。

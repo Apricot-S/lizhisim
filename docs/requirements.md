@@ -103,6 +103,8 @@
 | DATA-005 | Must | 不完全な run、失敗、キャンセルを成功 run と区別して保存する。 |
 | DATA-006 | Should | policy 学習用 trajectory、評価集計、デバッグ用完全イベントを別 view として生成する。 |
 | DATA-007 | Should | 古い schema を読み込む migration を core から分離できる。 |
+| DATA-008 | Must | userがproject外で取得した雀魂raw牌譜をlocal inputとして読み、player名を匿名化してproject牌譜形式へ変換するapp crateを提供する。牌譜取得機能は含めない。 |
+| DATA-009 | Must | 編集済み最小corner-case testをCIで実行し、Git外のraw/変換済み完全牌譜corpusをCI外で逐次conformance testできる。 |
 
 ## 10. 非機能要求
 
