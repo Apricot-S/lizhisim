@@ -5,7 +5,7 @@
 - Owner: project owner / implementer
 - Created: 2026-08-09
 - Updated: 2026-08-09
-- Status: Planned（実装開始の明示指示まで選択しない）
+- Status: Active
 - Requirements: `CORE-001`, `CORE-006`, `CORE-007`, `AI-001`, `AI-002`, `AI-003`, `DATA-002`, `DATA-003`, `NFR-001`, `RULE-010`
 - ADR / design: [ADR-0001](../adr/0001-event-driven-typed-continuations.md), [ADR-0005](../adr/0005-mahjong-soul-first.md), [domain model](../design/domain-model.md)
 - Rule sources / clauses: [雀魂段位戦詳細ルールと補助資料](../references/rule-sources.md#雀魂の補助検証資料)、[最小RuleClaim mapping](../references/mahjong-soul-walking-skeleton-rule-claims.md)
@@ -65,12 +65,13 @@
 
 ## Current
 
-- Selected: None
-- Why: Phase 0中であり、ユーザーから振る舞いの実装開始を指示されていないため。実装開始時は「四人用の全`Seat`を構築でき、範囲外seatを構築できない」を最初の候補とし、さらに小さくできるか確認する。
+- Selected: 四人用の全`Seat`を構築でき、範囲外seatを構築できない。
+- Selected at: 2026-08-09
+- Why: walking skeletonの最小の型安全性であり、observation/action/event schemaや`StateHash`方式へ依存しないため。ユーザーがこの一項目の選択を明示した。
 
 ## Cycle log
 
-実装開始後、選択した一項目についてのみ`red -> green -> refactor`を記録する。
+- 2026-08-09: `Seat`の構築範囲testを選択。redは未着手。
 
 ## Completion review
 

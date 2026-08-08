@@ -37,7 +37,7 @@ source未確定の値を推測してfixtureへ埋めない。pure engineの構�
 
 - [x] test list templateがある。
 - [x] [最初のplanned test list](test-lists/mahjong-soul-ranked-four-player.md)がある。
-- [x] Phase 0中の`Selected`が`None`である。
+- [x] ユーザーの明示指示により、最初のtest itemとして四人用`Seat`の構築範囲testを一つだけ選択した。
 - [ ] canonical serialization / `StateHash`方式を、最初に必要となる時点までに決める。
 - [ ] observation/action/eventのinitial schema draftを、対応testを選ぶ前に作る。
 

@@ -31,7 +31,7 @@
 
 | Claim ID | `config_path` | Normalized value | Source / locator | Walking skeletonでの用途 | Status |
 |---|---|---|---|---|---|
-| `MS4-WS-001` | `table_rules.player_set` | `four_player` | `mahjongsoul-ranked-rules` / `四人麻雀` | `Seat`の個数と範囲を決める | `review` |
+| `MS4-WS-001` | `table_rules.player_set` | `four_player` | `mahjongsoul-ranked-rules` / `四人麻雀` | `Seat`の個数と範囲を決める | `reviewed` |
 | `MS4-WS-002` | `match_rules.initial.starting_points_per_seat` | `25000` | `mahjongsoul-ranked-rules` / `四人麻雀 > 基本ルール > 配原` | 初期状態と観測に点数を含める場合の値を決める | `review` |
 | `MS4-WS-003` | `table_rules.tiles.red_tile_copy_count.total` | `3` | `mahjongsoul-ranked-rules` / `四人麻雀 > 基本ルール > 赤ドラ` | 雀魂基準の全`Bipai`でtile conservationを検査する | `reviewed` |
 | `MS4-WS-004` | `table_rules.tiles.red_count_by_kind` | `5m = 1, 5p = 1, 5s = 1` | `mahjongsoul-game-behavior-2026-08-09` / project owner review | 赤牌を含む完全な`TileKind` multisetを作る | `reviewed` |
