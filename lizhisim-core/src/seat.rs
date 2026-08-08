@@ -3,6 +3,7 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 use core::marker::PhantomData;
+use thiserror::Error;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct FourPlayer;
@@ -13,12 +14,15 @@ pub struct Seat<P> {
     player_set: PhantomData<fn() -> P>,
 }
 
+#[derive(Clone, Copy, Debug, Eq, Error, Hash, PartialEq)]
+#[error("seat index {index} is out of range for {seat_count} seats")]
+pub struct SeatIndexOutOfRange {
+    pub index: usize,
+    pub seat_count: usize,
+}
+
 impl Seat<FourPlayer> {
     pub const ALL: [Self; 4] = [Self::new(0), Self::new(1), Self::new(2), Self::new(3)];
-
-    pub fn try_from_index(index: usize) -> Option<Self> {
-        Self::ALL.get(index).copied()
-    }
 
     const fn new(index: u8) -> Self {
         Self {
@@ -28,9 +32,20 @@ impl Seat<FourPlayer> {
     }
 }
 
+impl TryFrom<usize> for Seat<FourPlayer> {
+    type Error = SeatIndexOutOfRange;
+
+    fn try_from(index: usize) -> Result<Self, Self::Error> {
+        Self::ALL.get(index).copied().ok_or(SeatIndexOutOfRange {
+            index,
+            seat_count: Self::ALL.len(),
+        })
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{FourPlayer, Seat};
+    use super::{FourPlayer, Seat, SeatIndexOutOfRange};
 
     #[test]
     fn four_player_defines_four_seats() {
@@ -40,13 +55,24 @@ mod tests {
     #[test]
     fn four_player_seat_converts_every_valid_index() {
         assert_eq!(
-            [0, 1, 2, 3].map(Seat::<FourPlayer>::try_from_index),
-            Seat::<FourPlayer>::ALL.map(Some)
+            [0, 1, 2, 3].map(|index| Seat::<FourPlayer>::try_from(index).ok()),
+            Seat::<FourPlayer>::ALL.map(Some),
         );
     }
 
     #[test]
     fn four_player_seat_rejects_first_out_of_range_index() {
-        assert_eq!(Seat::<FourPlayer>::try_from_index(4), None);
+        assert!(Seat::<FourPlayer>::try_from(4).is_err());
+    }
+
+    #[test]
+    fn out_of_range_error_reports_index_and_seat_count() {
+        assert_eq!(
+            Seat::<FourPlayer>::try_from(4),
+            Err(SeatIndexOutOfRange {
+                index: 4,
+                seat_count: 4,
+            })
+        );
     }
 }

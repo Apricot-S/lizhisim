@@ -32,6 +32,7 @@
 - [x] `FourPlayer`は4つの`Seat`を定義する。
 - [x] 四人用index 0〜3を対応する`Seat`へ変換できる。
 - [x] 四人用index 4を`Seat`へ変換できない。
+- [x] 範囲外errorは失敗したindexと四人用seat数を保持する。
 - [ ] 赤`5m`、赤`5p`、赤`5s`を含む37種類の`TileKind`を構築でき、それ以外の赤牌を構築できない。
 - [ ] 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる。
 - [ ] `TileKind`ごとの枚数不足、枚数超過、除外牌混入を拒否し、部分的な状態を返さない。
@@ -69,7 +70,7 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 選択していた四人用index 4の拒否testがmutantによるred検証を経てgreenとなり、refactor要否の確認まで完了したため。
+- Why: 選択していた範囲外errorの診断情報testがgreenとなり、refactor要否とdependency metadataの確認まで完了したため。
 
 ## Cycle log
 
@@ -88,6 +89,11 @@
 - 2026-08-09: 次項目として「四人用index 4を`Seat`へ変換できない」を選択し、一assertionの境界testを追加した。前cycleの安全な検索が既にこの境界を満たすため、mutantでredを確認する。
 - 2026-08-09: test追加時点ではgreenだった。`try_from_index`が常に`Some`を返すmutantを一時適用し、index 4が`Some(Seat)`となってtestが失敗するredを確認した後、`ALL.get(index).copied()`へ復元した。
 - 2026-08-09: 復元後に選択testと全3 testがgreen。refactor変更なし。workspace test、Clippy `-D warnings`、format、`git diff --check`が成功した。
+- 2026-08-09: Rustの変換規約に合わせ、`try_from_index -> Option`を`TryFrom<usize, Error = SeatIndexOutOfRange>`へrefactorした。既存testは一観点・一assertionを維持してgreen。
+- 2026-08-09: 次項目として「範囲外errorは失敗したindexと四人用seat数を保持する」を選択し、期待する`Result`全体を比較する一assertionのtestを追加した。
+- 2026-08-09: `cargo test -p lizhisim-core seat::tests::out_of_range_error_reports_index_and_seat_count`を実行し、`SeatIndexOutOfRange`に期待fieldがないため失敗するredを確認した。
+- 2026-08-09: `thiserror`で`SeatIndexOutOfRange { index, seat_count }`を実装し、選択testをgreenにした。`thiserror 2.0.20`のMIT licenseは`deny.toml`のallow listと既存`THIRD-PARTY-NOTICES.md`に整合する。
+- 2026-08-09: refactor変更なし。workspace全4 testとClippy `-D warnings`が成功。ローカルに`cargo-deny` subcommandがないため`cargo deny check`は未実行で、既存のdependency audit CIで検査する。
 
 ## Completion review
 

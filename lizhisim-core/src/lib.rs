@@ -4,4 +4,4 @@
 
 mod seat;
 
-pub use seat::{FourPlayer, Seat};
+pub use seat::{FourPlayer, Seat, SeatIndexOutOfRange};
