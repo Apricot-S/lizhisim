@@ -35,7 +35,7 @@
 - [x] 範囲外errorは失敗したindexと四人用seat数を保持する。
 - [x] `TileKind`は赤牌を含む37種類を定義する。
 - [x] `TileKind`の内部indexは通常34種類の後に`M0`、`P0`、`S0`を置く。
-- [ ] 赤牌として赤`5m`、赤`5p`、赤`5s`を構築できる。
+- [x] `M0`、`P0`、`S0`を`hong_baopai`と判定する。
 - [ ] `5m`、`5p`、`5s`以外を赤牌として構築できない。
 - [ ] 雀魂四人基準fixtureの牌構成を検証済み値へ変換できる。
 - [ ] `TileKind`ごとの枚数不足、枚数超過、除外牌混入を拒否し、部分的な状態を返さない。
@@ -73,7 +73,7 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 選択していた`TileKind`内部index順序testがgreenとなり、refactor要否の確認まで完了したため。
+- Why: 選択していた`hong_baopai`判定testがgreenとなり、refactor要否の確認まで完了したため。
 
 ## Cycle log
 
@@ -109,6 +109,10 @@
 - 2026-08-09: `cargo test -p lizhisim-core tile::tests::tile_kind_orders_base_kinds_before_red_kinds`を実行し、各色の9直後に赤牌がある現在順との不一致で失敗するredを確認した。
 - 2026-08-09: enum宣言と`TileKind::ALL`を通常34種類、`M0`、`P0`、`S0`の順へ変更してgreenにした。refactor変更なし。
 - 2026-08-09: workspace全6 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
+- 2026-08-09: 次項目を「`M0`、`P0`、`S0`を`hong_baopai`と判定する」へ具体化し、3種の判定結果を一つの配列として比較する一assertionのtestを追加した。
+- 2026-08-09: `cargo test -p lizhisim-core tile::tests::zero_numbered_suit_kinds_are_hong_baopai`を実行し、`is_hong_baopai`未実装のため失敗するredを確認した。
+- 2026-08-09: `M0`、`P0`、`S0`だけに一致する`const fn is_hong_baopai`を実装してgreenにした。refactor変更なし。
+- 2026-08-09: workspace全7 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
 
 ## Completion review
 

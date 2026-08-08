@@ -46,6 +46,10 @@ impl TileKind {
         // hong_baopai
         Self::M0, Self::P0, Self::S0,
     ];
+
+    pub const fn is_hong_baopai(self) -> bool {
+        matches!(self, Self::M0 | Self::P0 | Self::S0)
+    }
 }
 
 #[cfg(test)]
@@ -71,5 +75,13 @@ mod tests {
             TileKind::Z5, TileKind::Z6, TileKind::Z7,
             TileKind::M0, TileKind::P0, TileKind::S0,
         ]);
+    }
+
+    #[test]
+    fn zero_numbered_suit_kinds_are_hong_baopai() {
+        assert_eq!(
+            [TileKind::M0, TileKind::P0, TileKind::S0].map(TileKind::is_hong_baopai),
+            [true; 3],
+        );
     }
 }
