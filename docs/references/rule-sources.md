@@ -53,10 +53,10 @@ game 内表示しかない場合、最低限次を記録する。
 ```text
 雀魂公式詳細ルール
   -> 記載外の corner case を Kanachan/検証記録から発見
-  -> userがproject外でraw牌譜を取得
-  -> 変換用app crateがlocal rawをdecode・匿名化
-  -> corner caseを編集した最小fixtureをGitへ保存してCI test
-  -> raw corpusをGit外に保持しfull-record conformance testを定期実行
+  -> userがproject外で`majsoul-record`を取得
+  -> 変換用app crateがlocal `majsoul-record`をdecodeし、匿名化した`game_log`へ変換
+  -> corner caseを編集した最小`game_log` fixtureをGitへ保存してCI test
+  -> 完全な`majsoul-record` corpusをGit外に保持しfull-record conformance testを定期実行
   -> red -> green -> refactor
   -> LizhiSim の event と元牌譜を照合
 ```

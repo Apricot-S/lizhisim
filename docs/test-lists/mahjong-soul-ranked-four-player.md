@@ -21,7 +21,7 @@
 - [ ] 雀魂公式ページの取得日時、対象mode、locale、内容hashを記録する。
 - [ ] walking skeletonが依存する設定値を`RuleClaim`へmappingする。
 - [ ] 牌譜を使う項目はplayer名を匿名化し、source牌譜ID、対象`Round`、source event範囲、編集内容、最小fixture hashを記録する。
-- [ ] 同じsource牌譜をCI外full-record corpusへ登録し、rawから逐次decodeしてLizhiSimと比較できる。
+- [ ] 同じsource`majsoul-record`をCI外full-record corpusへ登録し、毎回逐次decodeしてLizhiSimと比較できる。
 - [ ] Kanachanの挙動だけを期待値にしていないことをreviewする。
 
 ## Examples and tests

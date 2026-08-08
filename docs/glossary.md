@@ -10,6 +10,7 @@
 4. 新しい麻雀用語が必要な場合、先に「ユーザー決定待ち」表へ行を追加する。識別子欄はユーザーが決めるまで空欄とし、実装を先行しない。
 5. Rust の型・variant は PascalCase、field・function・module は snake_case に機械変換する。規範形自体は小文字のピンインで記録する。
 6. `Round` は麻雀の「局」専用とする。「節」は `Matchday` とする。
+7. 外部formatやcrateのkebab-case IDは指定表記を保ち、RustのtypeはPascalCase、moduleはsnake_caseへ変換する。
 
 `round-robin`、`round trip`、scheduler の `weighted round-robin` は一般的な英語・アルゴリズム名であり、麻雀の `Round` とは別である。
 
@@ -56,6 +57,13 @@
 | 自風 | 門風牌 | `menfengpai` | `Menfengpai` |
 | 河・捨て牌列 | 河 | `he` | `He` |
 | 責任払い | 包 | `bao` | `Bao` |
+
+### 2.2 牌譜
+
+| 日本語での説明 | 規範形 | Rust 型・module例 | 運用 |
+|---|---|---|---|
+| 雀魂の生牌譜 | `majsoul-record` | `MajsoulRecord`, `majsoul_record` | 牌譜URLのresponse bytesを保存した`.bin`。service固有のprotobuf event列 |
+| LizhiSimの牌譜形式 | `game_log` | `GameLog`, `game_log` | `majsoul-record`から作る場合はagent名を匿名化。通常生成時はagent名を匿名化しない |
 
 ## 3. 確定済みの英語用語
 
@@ -108,10 +116,7 @@
 
 ## 5. ユーザー決定待ち
 
-| 日本語での説明 | 既存参照・候補 | 採用識別子（ユーザー記入） | コメント（ユーザー記入） |
-|---|---|---|---|
-| 雀魂の生牌譜 | — |  | service固有のraw protobuf event列 |
-| LizhiSimの牌譜形式 | — |  | 匿名化・変換後のproject形式 |
+現在、決定待ちの用語はない。新しい麻雀固有概念が必要になった時点で、識別子欄を空欄にした表をこの節へ追加し、ユーザーの決定を待つ。
 
 ## 6. 曖昧語を避ける
 

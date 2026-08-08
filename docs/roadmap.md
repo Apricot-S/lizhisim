@@ -92,7 +92,7 @@ Goal: 東風/東南など一つの対局を終え、雀魂段位戦・四人 pre
 
 Slices:
 
-- 雀魂raw牌譜のlocal converter appとsource event trace
+- `majsoul-record`から`game_log`へのlocal converter appとsource event trace
 - CI用constructed corner-case fixtureとCI外full-record conformance harness
 - 連荘、本場、供託、対局進行
 - all-last、延長、飛び、同点

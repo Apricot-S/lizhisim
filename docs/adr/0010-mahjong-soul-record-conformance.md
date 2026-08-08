@@ -1,4 +1,4 @@
-# ADR-0010: 雀魂raw牌譜を外部入力として二段階検証する
+# ADR-0010: `majsoul-record`を外部入力として二段階検証する
 
 - Status: Accepted
 - Date: 2026-08-09
@@ -8,9 +8,9 @@
 
 ## Context
 
-雀魂牌譜はprotobufで表現されたevent列であり、LizhiSimの検証資料として利用できる。raw牌譜の取得はproject ownerが別途行い、取得toolはLizhiSimの対象外とする。牌譜IDとIDを付加したreplay URLにはaccess tokenが含まれず、game内の共有機能等で得られる半ば公開のlocatorとしてprojectで利用できる。
+`majsoul-record`はprotobufで表現されたevent列であり、LizhiSimの検証資料として利用できる。`majsoul-record`の取得はproject ownerが別途行い、取得toolはLizhiSimの対象外とする。牌譜IDとIDを付加したreplay URLにはaccess tokenが含まれず、game内の共有機能等で得られる半ば公開のlocatorとしてprojectで利用できる。
 
-raw牌譜全体は容量が増えるためGit管理しない。変換用app crateでLizhiSimの牌譜形式へ変換し、匿名化・抜粋したtest dataだけをGit管理する。変換済みの完全牌譜もGit管理せず、一定量が集まった時点でproject ownerがlocal corpusとして検証する。
+完全な`majsoul-record`は容量が増えるためGit管理しない。変換用app crateで`game_log`へ変換し、匿名化・抜粋したtest dataだけをGit管理する。変換済みの完全な`game_log`もGit管理せず、一定量が集まった時点でproject ownerがlocal corpusとして検証する。
 
 ただし、変換済みdataだけを正解としてsimulatorと比較すると、変換toolのbugが期待値を誤らせる危険がある。protobufから何らかのdomain表現への解釈は不可避だが、変換結果を無検証のoracleにしてはならない。
 
@@ -18,9 +18,9 @@ raw牌譜全体は容量が増えるためGit管理しない。変換用app crat
 
 ### Scope and acquisition
 
-- raw牌譜の取得はuserの責任とし、LizhiSim repositoryにdownloader、scraper、network client、認証処理を実装しない。
-- 変換用app crateは明示的に指定されたlocal raw fileだけを入力にし、networkから取得しない。
-- raw牌譜と変換済み完全牌譜はGit管理しない。保存場所、backup、retentionはuser管理とし、repositoryのCIやrelease artifactへ含めない。
+- `majsoul-record`の取得はuserの責任とし、LizhiSim repositoryにdownloader、scraper、network client、認証処理を実装しない。
+- 変換用app crateは明示的に指定されたlocal `majsoul-record` fileだけを入力にし、networkから取得しない。
+- 完全な`majsoul-record`と変換済みの完全な`game_log`はGit管理しない。保存場所、backup、retentionはuser管理とし、repositoryのCIやrelease artifactへ含めない。
 - 牌譜IDとreplay URLはsource locatorとしてGitへ記録できる。access tokenとして扱う必要はない。ただしplayer名等の不要な情報をURL周辺のmetadataとして併記しない。
 - player名とservice内player identifierは変換時に除去する。fixture内participantは、そのfixture内だけで有効な連番等へ変換する。
 
@@ -29,7 +29,7 @@ raw牌譜全体は容量が増えるためGit管理しない。変換用app crat
 変換用app crateの内部を次の三層に分ける。
 
 ```text
-raw protobuf bytes
+majsoul-record bytes
   -> wire decoder
   -> Mahjong Soul event projector
   -> LizhiSim record writer / conformance verifier
@@ -37,9 +37,9 @@ raw protobuf bytes
 
 1. **Wire decoder**はprotobuf messageをsource順序付きのservice eventへdecodeする。未知message、未知field、decode不能dataを黙って捨てず、source event indexとともにerrorまたは明示的unknownとして返す。
 2. **Mahjong Soul event projector**はservice eventを、比較に必要な観測事実へ変換する。tile/action、actor、points、`Round`境界等を解釈するが、LizhiSimの遷移結果を期待値として生成しない。
-3. **Record writer / conformance verifier**は、匿名化・最小化したproject形式の出力、またはLizhiSim eventとの逐次比較を行う。decodeとrule解釈を同じ巨大functionへまとめない。
+3. **Record writer / conformance verifier**は、匿名化・最小化した`game_log`の出力、またはLizhiSim eventとの逐次比較を行う。decodeとrule解釈を同じ巨大functionへまとめない。
 
-変換結果を一度生成して固定oracleにするだけの構成は禁止する。full-record検証では原則としてlocal raw fileを毎回decodeし、source event indexごとにLizhiSimへ観測actionを与え、双方の公開状態・points・局面結果をcheck pointで比較する。
+変換結果を一度生成して固定oracleにするだけの構成は禁止する。full-record検証では原則としてlocal `majsoul-record`を毎回decodeし、source event indexごとにLizhiSimへ観測actionを与え、双方の公開状態・points・局面結果をcheck pointで比較する。
 
 ### Converter verification
 
@@ -66,8 +66,8 @@ synthetic testはconverterのmechanicsを検証するが、service意味論の�
 
 ### Tier 2: full-record conformance tests
 
-- user管理のlocal raw牌譜corpusを入力にし、変換用app crateとLizhiSimで対局全体を逐次検証する。
-- raw牌譜、変換済み完全牌譜、player名mappingはGit管理しない。
+- user管理のlocal `majsoul-record` corpusを入力にし、変換用app crateとLizhiSimで対局全体を逐次検証する。
+- 完全な`majsoul-record`、変換済みの完全な`game_log`、player名mappingはGit管理しない。
 - corner caseの元牌譜を含め、corpusが一定量増えるごと、converter変更時、rule engine変更時、release前にuserが実行する。
 - 通常CIの対象外とする。CI環境はcorpusを取得せず、secret storageも要求しない。
 - 実行reportにはcorpus件数、牌譜ID、converter/schema version、成功・失敗event index、未対応event、集計値を残せる。reportをGitへ入れる場合はplayer名等を含まないことを確認する。
@@ -75,13 +75,13 @@ synthetic testはconverterのmechanicsを検証するが、service意味論の�
 ### Hash and provenance
 
 - Git管理するTier 1 fixtureはfile bytesのSHA-256を持てる。
-- local Tier 2ではraw file hashと変換結果hashをrun reportへ記録できるが、raw file自体はGitへ入れない。
+- local Tier 2では`majsoul-record` file hashと`game_log` hashをrun reportへ記録できるが、完全なfile自体はGitへ入れない。
 - 牌譜IDはsource locatorとして記録し、hashの代替ではなく併記する。
 - converter/schema versionを必ず記録し、同じraw inputでもconverter変更による差分を追跡する。
 
 ## Why raw input still needs a converter
 
-raw protobuf eventとLizhiSim eventはschemaも抽象度も異なるため、直接比較にもdecodeとsemantic mappingは必要である。重要なのは変換をなくすことではなく、変換済みfileを唯一の真実にしないことである。
+`majsoul-record` eventとLizhiSim eventはschemaも抽象度も異なるため、直接比較にもdecodeとsemantic mappingは必要である。重要なのは変換をなくすことではなく、変換済み`game_log`を唯一の真実にしないことである。
 
 full-record testでrawを毎回読み、decoder/projectorを独立testし、source event indexまでtraceすることで、converter bugを局所化できる。さらにprojectorが期待するLizhiSim結果を作るのではなく、観測actionと観測後状態だけを抽出することで、simulatorとoracleの実装共有を避ける。
 
@@ -89,7 +89,7 @@ full-record testでrawを毎回読み、decoder/projectorを独立testし、sour
 
 ### Positive
 
-- raw牌譜をGitへ置かず、大規模corpusをlocalに増やせる。
+- 完全な`majsoul-record`をGitへ置かず、大規模corpusをlocalに増やせる。
 - 小さいcorner-case testは高速でCI実行できる。
 - full-record testは変換済みsnapshotではなくrawから毎回検証できる。
 - decoder、projector、simulatorのbugをsource event indexで切り分けやすい。
@@ -108,11 +108,11 @@ full-record testでrawを毎回読み、decoder/projectorを独立testし、sour
 
 Rejected. converter bugを固定化し、simulatorが正しくても誤判定し得る。
 
-### Raw protobufをdomain coreで直接読む
+### `majsoul-record`をdomain coreで直接読む
 
 Rejected. service固有schemaとdecode errorをpure domainへ漏らし、取得元変更やschema evolutionをcoreへ結合する。
 
-### Raw牌譜をGitへcommitしてCIで全件実行する
+### 完全な`majsoul-record`をGitへcommitしてCIで全件実行する
 
 Rejected. repository size、実行時間、player情報、service dataの管理負担が大きい。
 
@@ -122,7 +122,6 @@ Rejected. 編集時に落としたcontextや長い対局進行の差異を検出
 
 ## Follow-up / verification
 
-- 牌譜およびproject牌譜形式の正規識別子をglossaryでuserが決定する。
 - 実装開始時に変換用app crateの責務と依存方向をworkspace ADRへ追加する。
 - converter、Tier 1、Tier 2をそれぞれ別test listに分ける。
 - Tier 2の実行command、corpus discovery、匿名化reportを実装時に文書化する。
