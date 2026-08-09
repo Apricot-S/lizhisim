@@ -128,4 +128,12 @@ mod tests {
             }),
         );
     }
+
+    #[test]
+    fn removing_absent_tile_kind_does_not_change_bingpai() {
+        let bingpai = Bingpai::default();
+        let _ = bingpai.clone().with_removed(TileKind::M1);
+
+        assert_eq!(bingpai.counts(), &[0; 37]);
+    }
 }

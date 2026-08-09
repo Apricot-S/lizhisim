@@ -53,7 +53,7 @@
 - [x] `M5`を加えても、`M0`の所持枚数は増えない。
 - [x] 所持している`TileKind`を1枚除くと、その所持枚数が1減る。
 - [x] 所持していない`TileKind`を除こうとすると、対象`TileKind`を含むerrorで失敗する。
-- [ ] 所持していない`TileKind`を除く操作が失敗した後も、`bingpai`は変化しない。
+- [x] 所持していない`TileKind`を除く操作が失敗した後も、`bingpai`は変化しない。
 - [ ] `M5`だけを所持するとき、`M0`を除こうとしても`M5`で代替しない。
 - [ ] `M0`だけを所持するとき、`M5`を除こうとしても`M0`で代替しない。
 - [ ] 追加元が`M5`だけを持つとき、`M0`の追加要求を`M5`で代替しない。
@@ -124,10 +124,13 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 未所持`TileKind`の除去失敗を対象kind付き`Result` errorで表現し、全体検証まで完了したため。
+- Why: 未所持牌の除去失敗後も元の`bingpai`が変化しないことをgreenにし、全体検証まで完了したため。
 
 ## Cycle log
 
+- 2026-08-09: 「所持していない`TileKind`を除く操作が失敗した後も、`bingpai`は変化しない」を選択した。元のcount配列を一assertionで比較し、失敗理由の検証とは分離する。
+- 2026-08-09: 未所持`M1`除去後に元の空`bingpai`を比較するtestを追加した。`with_removed`は状態をconsumeするためcloneした値へ適用し、元値の不変性を検証した。
+- 2026-08-09: 選択testとworkspace全19 testがgreen。Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: `SeatIndexOutOfRange`を`BingpaiError`と比較し、error値の利用箇所に必要な`Debug`、`Error`、`PartialEq`だけを残した。`Clone`、`Copy`、`Eq`、`Hash`は使用されていないため削除した。
 - 2026-08-09: `BingpaiError`も同じ方針で`Eq`をderiveせず、`Debug`、`Error`、`PartialEq`だけに統一した。
 - 2026-08-09: 次項目として未所持`TileKind`の除去失敗を選択した。失敗理由を保持できる`Result<Bingpai, BingpaiError>`へ`with_removed`の戻り値を変更する。
