@@ -50,7 +50,7 @@
 - [x] `M0`のraw枚数5をschema validationで拒否する。
 - [x] `P0`のraw枚数5をschema validationで拒否する。
 - [x] `S0`のraw枚数5をschema validationで拒否する。
-- [ ] 赤牌0枚を通常5が4枚、赤牌が0枚の`TileSet`へ解決する。
+- [x] 赤牌0枚を通常5が4枚、赤牌が0枚の`TileSet`へ解決する。
 - [ ] 赤牌1枚を通常5が3枚、赤牌が1枚の`TileSet`へ解決する。
 - [ ] 赤牌4枚を通常5が0枚、赤牌が4枚の`TileSet`へ解決する。
 - [ ] 雀魂四人基準の各色赤1枚を合計136枚の`TileSet`へ解決する。
@@ -103,10 +103,12 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: `RuleSpec`が3色の赤牌raw枚数5を拒否することを確認できたため。
+- Why: 赤牌0枚の`RuleSpec`を通常5 4枚・赤牌0枚の`TileSet`へ解決できたため。
 
 ## Cycle log
 
+- 2026-08-10: 「赤牌0枚を通常5が4枚、赤牌が0枚の`TileSet`へ解決する」を選択し、M/P/S各0枚の解決結果を一assertionで検証する。既存の`RuleSpec::resolve_tile_set`がすでに契約を満たしていたため、redなしでgreenを確認した。
+- 2026-08-10: M/P/Sの赤牌と通常5のcountをまとめて比較する回帰testを追加した。
 - 2026-08-10: `P0`と`S0`のraw枚数5拒否をM0と同じサイクルで選択し、対象牌、実枚数、上限を各一assertionで検証した。既存の共通validationが契約を満たしていたため、redなしでgreenを確認した。
 - 2026-08-10: `RuleSpecError::HongBaopaiCountOutOfRange`のP0/S0 payload回帰testを追加した。
 - 2026-08-10: 「`M0`のraw枚数5をschema validationで拒否する」を選択し、対象牌、実枚数、上限を一assertionで検証する。既存の`HongBaopaiConfig::validate`がすでに契約を満たしていたため、redなしでgreenを確認した。

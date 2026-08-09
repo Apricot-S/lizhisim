@@ -173,4 +173,22 @@ mod tests {
             }),
         );
     }
+
+    #[test]
+    fn rule_spec_resolves_zero_hong_baopai_to_four_base_fives() {
+        let rule_spec = RuleSpec::try_from(raw(0, 0, 0)).unwrap();
+        let tile_set = rule_spec.resolve_tile_set().unwrap();
+
+        assert_eq!(
+            [
+                tile_set.max_count(TileKind::M0),
+                tile_set.max_count(TileKind::M5),
+                tile_set.max_count(TileKind::P0),
+                tile_set.max_count(TileKind::P5),
+                tile_set.max_count(TileKind::S0),
+                tile_set.max_count(TileKind::S5),
+            ],
+            [0, 4, 0, 4, 0, 4],
+        );
+    }
 }
