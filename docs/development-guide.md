@@ -6,7 +6,7 @@
 
 文書だけを変更する場合も、変更理由、要求 ID、文書間リンク、未決事項を確認する。設計が変わる場合は ADR を追加または supersede する。
 
-workspace のcrateは `{root}/crates/` 配下に置く。各crateは独立した `README.md` を持ち、責務、依存方向、公開範囲を簡潔に記載する。workspace rootのREADMEはプロジェクト全体の説明に限定する。workspaceと全crateの初期versionは `0.0.1` とし、crate固有のversion変更が必要になるまでworkspace versionを基準にする。
+workspace のcrateは `{root}/crates/` 配下に置く。通常のcrateは独立した `README.md` を持ち、責務、依存方向、公開範囲を簡潔に記載する。プロジェクトのfacade crateだけは `readme.workspace = true` でworkspace rootのREADMEを使ってよい。workspace rootのREADMEはプロジェクト全体の説明に限定する。workspaceと全crateの初期versionは `0.0.1` とし、crate固有のversion変更が必要になるまでworkspace versionを基準にする。
 
 識別子を追加する前に [用語集](glossary.md) を確認する。対応する行がなければ「ユーザー決定待ち」表へ空欄で追加し、ユーザーがピンインまたは英語識別子を決めるまで production 名を作らない。日本語ローマ字やその場限りの英訳で仮置きしない。
 
