@@ -112,6 +112,7 @@
 - 2026-08-09: rulesの実装を`rule_spec.rs`へ分割し、`lib.rs`を公開APIのre-exportだけにした。`RawRuleSpec`直下の赤牌枚数を`HongBaopaiConfig`へまとめ、`RawRuleSpec -> RuleSpec`の検証境界へ既存3色testを移行した。
 - 2026-08-09: refactor後もworkspace全37 test、Clippy、format、`git diff --check`が成功した。
 - 2026-08-09: `RawRuleSpec`を外部入力・serde decode用、`RuleSpec`をsemantic validation済み設定とする境界を採用した。serdeのschema validationとrulesのsemantic validationを分離し、TOML入力は後続adapterで扱う。
+- 2026-08-09: `validate_hong_baopai_count`を`HongBaopaiConfig::validate`から利用する構造へrefactorし、`RuleSpec`の変換処理を設定検証と構築に限定した。workspace全37 test、Clippy、format、`git diff --check`が成功した。
 - 2026-08-09: rulesのmodule分割と`HongBaopaiConfig`導入は、既存behaviorを変えないrefactorとして別cycleで扱う方針を確認した。
 - 2026-08-09: TOML/serdeは入力adapterのtest list項目を選択した時点で導入する。domain型へ直接serde deriveを付けず、TOML schemaから`RawRuleSpec`へ変換する境界を置く。環境変数overrideは再現性のため導入しない。
 - 2026-08-09: 「`S0`のraw枚数を独立に0〜4で受け付ける」を選択し、`M0 = 0`、`P0 = 0`を固定して0〜4の全入力を一assertionで検証する。

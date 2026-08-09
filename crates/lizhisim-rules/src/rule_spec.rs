@@ -35,22 +35,33 @@ pub enum RuleSpecError {
     TileSet(#[from] TileSetError),
 }
 
+impl HongBaopaiConfig {
+    const fn validate(self) -> Result<(), RuleSpecError> {
+        match validate_hong_baopai_count(TileKind::M0, self.m0_count) {
+            Ok(()) => {}
+            Err(error) => return Err(error),
+        }
+        match validate_hong_baopai_count(TileKind::P0, self.p0_count) {
+            Ok(()) => {}
+            Err(error) => return Err(error),
+        }
+        match validate_hong_baopai_count(TileKind::S0, self.s0_count) {
+            Ok(()) => {}
+            Err(error) => return Err(error),
+        }
+        Ok(())
+    }
+}
+
 impl TryFrom<RawRuleSpec> for RuleSpec {
     type Error = RuleSpecError;
 
     fn try_from(raw: RawRuleSpec) -> Result<Self, Self::Error> {
-        match validate_hong_baopai_count(TileKind::M0, raw.hong_baopai.m0_count) {
+        match raw.hong_baopai.validate() {
             Ok(()) => {}
             Err(error) => return Err(error),
         }
-        match validate_hong_baopai_count(TileKind::P0, raw.hong_baopai.p0_count) {
-            Ok(()) => {}
-            Err(error) => return Err(error),
-        }
-        match validate_hong_baopai_count(TileKind::S0, raw.hong_baopai.s0_count) {
-            Ok(()) => {}
-            Err(error) => return Err(error),
-        }
+
         Ok(Self {
             hong_baopai: raw.hong_baopai,
         })
