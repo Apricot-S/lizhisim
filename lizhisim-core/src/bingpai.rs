@@ -136,4 +136,58 @@ mod tests {
 
         assert_eq!(bingpai.counts(), &[0; 37]);
     }
+
+    #[test]
+    fn removing_m0_from_bingpai_holding_only_m5_does_not_substitute_m5() {
+        assert_eq!(
+            Bingpai::default()
+                .with_added(TileKind::M5)
+                .with_removed(TileKind::M0),
+            Err(BingpaiError::TileNotPresent {
+                tile_kind: TileKind::M0,
+            }),
+        );
+    }
+
+    #[test]
+    fn removing_m5_from_bingpai_holding_only_m0_does_not_substitute_m0() {
+        assert_eq!(
+            Bingpai::default()
+                .with_added(TileKind::M0)
+                .with_removed(TileKind::M5),
+            Err(BingpaiError::TileNotPresent {
+                tile_kind: TileKind::M5,
+            }),
+        );
+    }
+
+    #[test]
+    fn adding_m0_to_bingpai_holding_m5_does_not_substitute_m5() {
+        let bingpai = Bingpai::default()
+            .with_added(TileKind::M5)
+            .with_added(TileKind::M0);
+
+        assert_eq!(
+            [
+                bingpai.counts()[TileKind::M0.index()],
+                bingpai.counts()[TileKind::M5.index()],
+            ],
+            [1, 1],
+        );
+    }
+
+    #[test]
+    fn adding_m5_to_bingpai_holding_m0_does_not_substitute_m0() {
+        let bingpai = Bingpai::default()
+            .with_added(TileKind::M0)
+            .with_added(TileKind::M5);
+
+        assert_eq!(
+            [
+                bingpai.counts()[TileKind::M0.index()],
+                bingpai.counts()[TileKind::M5.index()],
+            ],
+            [1, 1],
+        );
+    }
 }
