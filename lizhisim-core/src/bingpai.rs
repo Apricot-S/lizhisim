@@ -9,6 +9,8 @@ use thiserror::Error;
 pub enum BingpaiError {
     #[error("tile kind is not present in bingpai: {tile_kind:?}")]
     TileNotPresent { tile_kind: TileKind },
+    #[error("tile kind exceeds its maximum count of {max_count}: {tile_kind:?}")]
+    TileCountExceeded { tile_kind: TileKind, max_count: u8 },
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -23,6 +25,18 @@ impl Default for Bingpai {
 }
 
 impl Bingpai {
+    pub fn try_with_added(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
+        let count = &mut self.counts[tile_kind.index()];
+        if *count >= 4 {
+            return Err(BingpaiError::TileCountExceeded {
+                tile_kind,
+                max_count: 4,
+            });
+        }
+        *count += 1;
+        Ok(self)
+    }
+
     pub fn with_added(mut self, tile_kind: TileKind) -> Self {
         self.counts[tile_kind.index()] += 1;
         self
@@ -204,6 +218,27 @@ mod tests {
         assert_eq!(
             Bingpai::default().with_added(TileKind::S0).counts()[TileKind::S5.index()],
             0,
+        );
+    }
+
+    #[test]
+    fn adding_fifth_copy_of_tile_kind_reports_count_exceeded() {
+        let bingpai = Bingpai::default()
+            .try_with_added(TileKind::M1)
+            .unwrap()
+            .try_with_added(TileKind::M1)
+            .unwrap()
+            .try_with_added(TileKind::M1)
+            .unwrap()
+            .try_with_added(TileKind::M1)
+            .unwrap();
+
+        assert_eq!(
+            bingpai.try_with_added(TileKind::M1),
+            Err(BingpaiError::TileCountExceeded {
+                tile_kind: TileKind::M1,
+                max_count: 4,
+            }),
         );
     }
 }

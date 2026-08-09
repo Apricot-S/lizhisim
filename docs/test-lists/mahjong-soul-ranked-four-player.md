@@ -47,7 +47,7 @@
 - [x] 空の`bingpai`へ`M1`を1枚加えると、`M1`の所持枚数が1になる。
 - [x] 空の`bingpai`へ`M1`を1枚加えても、ほかの36種類の所持枚数は変化しない。
 - [x] 同じ`TileKind`を複数枚加えると、その所持枚数が加えた枚数になる。
-- [ ] 各`TileKind`の最大枚数以上に追加しようとすると、上限超過errorで失敗する。
+- [x] 各`TileKind`の最大枚数以上に追加しようとすると、上限超過errorで失敗する。
 - [x] `M0`を加えると、`M0`の所持枚数が1になる。
 - [x] `M0`を加えても、`M5`の所持枚数は増えない。
 - [x] `M5`を加えると、`M5`の所持枚数が1になる。
@@ -123,12 +123,15 @@
 
 ## Current
 
-- Selected: None
-- Phase: Awaiting next selection
-- Why: 赤牌と通常5の除去・追加で相互代替しない4項目をgreenにし、全体検証まで完了したため。
+- Selected: 各`TileKind`の最大枚数以上に追加しようとすると、上限超過errorで失敗する。
+- Phase: Red
+- Why: 同一`TileKind`の物理上限4枚を`Result`で検証するため。
 
 ## Cycle log
 
+- 2026-08-09: 「各`TileKind`の最大枚数以上に追加しようとすると、上限超過errorで失敗する」を選択した。既存の`with_added`を維持し、上限を検証する`try_with_added`を追加する。
+- 2026-08-09: `BingpaiError::TileCountExceeded { tile_kind, max_count }`と`try_with_added`を実装し、5枚目の`M1`を拒否するtestをgreenにした。既存のunchecked追加APIは互換性のため維持し、ルール検証経路ではchecked APIを使う。
+- 2026-08-09: workspace全26 test、Clippy `-D warnings`、format、`git diff --check`が成功した。並列実行時のWindows linker競合は単独再実行で解消した。
 - 2026-08-09: `P0/P5`と`S0/S5`の非代替性testを追加した。`rstest`は導入せず、各色を独立したtest functionで検証する。
 - 2026-08-09: 赤牌と通常5の相互代替を禁止する4項目を実装した。既存の`with_added`と`with_removed`がkind indexを厳密に使うため、各項目をソース内testとして追加し、結果を一assertionで比較した。
 - 2026-08-09: reviewで漏れていた「各`TileKind`の最大枚数以上の追加拒否」を`bingpai` count stateへ追加した。上限値とerror設計はこのtestを選択するcycleで確定する。
