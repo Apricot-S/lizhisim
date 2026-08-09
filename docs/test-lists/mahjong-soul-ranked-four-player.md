@@ -47,6 +47,7 @@
 - [x] 空の`bingpai`へ`M1`を1枚加えると、`M1`の所持枚数が1になる。
 - [x] 空の`bingpai`へ`M1`を1枚加えても、ほかの36種類の所持枚数は変化しない。
 - [x] 同じ`TileKind`を複数枚加えると、その所持枚数が加えた枚数になる。
+- [ ] 各`TileKind`の最大枚数以上に追加しようとすると、上限超過errorで失敗する。
 - [x] `M0`を加えると、`M0`の所持枚数が1になる。
 - [x] `M0`を加えても、`M5`の所持枚数は増えない。
 - [x] `M5`を加えると、`M5`の所持枚数が1になる。
@@ -128,6 +129,7 @@
 
 ## Cycle log
 
+- 2026-08-09: reviewで漏れていた「各`TileKind`の最大枚数以上の追加拒否」を`bingpai` count stateへ追加した。上限値とerror設計はこのtestを選択するcycleで確定する。
 - 2026-08-09: 「所持していない`TileKind`を除く操作が失敗した後も、`bingpai`は変化しない」を選択した。元のcount配列を一assertionで比較し、失敗理由の検証とは分離する。
 - 2026-08-09: 未所持`M1`除去後に元の空`bingpai`を比較するtestを追加した。`with_removed`は状態をconsumeするためcloneした値へ適用し、元値の不変性を検証した。
 - 2026-08-09: 選択testとworkspace全19 testがgreen。Clippy `-D warnings`、format、`git diff --check`が成功した。
