@@ -3,6 +3,7 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 use core::marker::PhantomData;
+
 use thiserror::Error;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]

@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use crate::TileKind;
 use thiserror::Error;
+
+use crate::TileKind;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum TileSetError {

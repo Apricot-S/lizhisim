@@ -8,6 +8,8 @@
 
 識別子を追加する前に [用語集](glossary.md) を確認する。対応する行がなければ「ユーザー決定待ち」表へ空欄で追加し、ユーザーがピンインまたは英語識別子を決めるまで production 名を作らない。日本語ローマ字やその場限りの英訳で仮置きしない。
 
+Rust の `use` 宣言は、rustfmt nightly の `group_imports = "StdExternalCrate"` に倣って並べる。標準ライブラリ（`std`、`core`、`alloc`）、外部crate、crate内（`self`、`super`、`crate`）の順に3グループへ分け、グループ間には1行の空行を置く。該当しないグループは省略する。
+
 ## 2. 実装開始 gate
 
 次を満たしてから最初の Rust 変更へ進む。
