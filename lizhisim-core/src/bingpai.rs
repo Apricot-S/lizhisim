@@ -60,4 +60,12 @@ mod tests {
             4,
         );
     }
+
+    #[test]
+    fn adding_m0_to_empty_bingpai_has_one_m0() {
+        assert_eq!(
+            Bingpai::default().with_added(TileKind::M0).counts()[TileKind::M0.index()],
+            1,
+        );
+    }
 }
