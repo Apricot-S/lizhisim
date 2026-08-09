@@ -213,6 +213,32 @@ mod tests {
     }
 
     #[test]
+    fn rule_spec_resolves_mahjong_soul_four_player_red_three_to_136_tiles() {
+        let tile_set = RuleSpec::try_from(raw(1, 1, 1))
+            .unwrap()
+            .resolve_tile_set()
+            .unwrap();
+
+        assert_eq!(tile_set.total_count(), 136);
+    }
+
+    #[test]
+    fn rule_spec_resolves_mahjong_soul_four_player_non_five_tiles_to_four() {
+        let tile_set = RuleSpec::try_from(raw(1, 1, 1))
+            .unwrap()
+            .resolve_tile_set()
+            .unwrap();
+        let non_five_counts = TileKind::ALL[..34]
+            .iter()
+            .copied()
+            .filter(|tile_kind| !matches!(tile_kind, TileKind::M5 | TileKind::P5 | TileKind::S5))
+            .map(|tile_kind| tile_set.max_count(tile_kind))
+            .collect::<Vec<_>>();
+
+        assert_eq!(non_five_counts, vec![4; 31]);
+    }
+
+    #[test]
     fn rule_spec_resolves_four_hong_baopai_to_zero_base_fives() {
         let tile_set = RuleSpec::try_from(raw(4, 4, 4))
             .unwrap()
