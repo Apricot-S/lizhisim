@@ -57,10 +57,7 @@ impl TryFrom<RawRuleSpec> for RuleSpec {
     type Error = RuleSpecError;
 
     fn try_from(raw: RawRuleSpec) -> Result<Self, Self::Error> {
-        match raw.hong_baopai.validate() {
-            Ok(()) => {}
-            Err(error) => return Err(error),
-        }
+        raw.hong_baopai.validate()?;
 
         Ok(Self {
             hong_baopai: raw.hong_baopai,
