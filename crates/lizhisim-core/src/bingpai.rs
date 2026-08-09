@@ -22,7 +22,7 @@ pub struct Bingpai {
 
 impl Bingpai {
     #[cfg(test)]
-    pub(crate) const fn default() -> Self {
+    pub(crate) const fn red_three_four_player() -> Self {
         Self {
             counts: [0; 37],
             tile_set: TileSet::red_three_four_player(),
@@ -67,13 +67,13 @@ mod tests {
 
     #[test]
     fn empty_bingpai_has_zero_of_every_tile_kind() {
-        assert_eq!(Bingpai::default().counts(), &[0; 37]);
+        assert_eq!(Bingpai::red_three_four_player().counts(), &[0; 37]);
     }
 
     #[test]
     fn adding_m1_to_empty_bingpai_has_one_m1() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::M1)
                 .unwrap()
                 .counts()[0],
@@ -84,7 +84,7 @@ mod tests {
     #[test]
     fn adding_m1_to_empty_bingpai_does_not_change_other_counts() {
         assert_eq!(
-            &Bingpai::default()
+            &Bingpai::red_three_four_player()
                 .with_added(TileKind::M1)
                 .unwrap()
                 .counts()[1..],
@@ -95,7 +95,7 @@ mod tests {
     #[test]
     fn adding_same_tile_kind_four_times_has_count_four() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::M1)
                 .unwrap()
                 .with_added(TileKind::M1)
@@ -112,7 +112,7 @@ mod tests {
     #[test]
     fn adding_m0_to_empty_bingpai_has_one_m0() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::M0)
                 .unwrap()
                 .counts()[TileKind::M0.index()],
@@ -123,7 +123,7 @@ mod tests {
     #[test]
     fn adding_m0_to_empty_bingpai_does_not_change_m5_count() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::M0)
                 .unwrap()
                 .counts()[TileKind::M5.index()],
@@ -134,7 +134,7 @@ mod tests {
     #[test]
     fn adding_m5_to_empty_bingpai_has_one_m5() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::M5)
                 .unwrap()
                 .counts()[TileKind::M5.index()],
@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn adding_m5_to_empty_bingpai_does_not_change_m0_count() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::M5)
                 .unwrap()
                 .counts()[TileKind::M0.index()],
@@ -156,7 +156,7 @@ mod tests {
     #[test]
     fn removing_present_tile_kind_decreases_its_count() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::M1)
                 .unwrap()
                 .with_removed(TileKind::M1)
@@ -169,7 +169,7 @@ mod tests {
     #[test]
     fn removing_absent_tile_kind_reports_the_tile_kind() {
         assert_eq!(
-            Bingpai::default().with_removed(TileKind::M1),
+            Bingpai::red_three_four_player().with_removed(TileKind::M1),
             Err(BingpaiError::TileNotPresent {
                 tile_kind: TileKind::M1,
             }),
@@ -178,7 +178,7 @@ mod tests {
 
     #[test]
     fn removing_absent_tile_kind_does_not_change_bingpai() {
-        let bingpai = Bingpai::default();
+        let bingpai = Bingpai::red_three_four_player();
         let _ = bingpai.clone().with_removed(TileKind::M1);
 
         assert_eq!(bingpai.counts(), &[0; 37]);
@@ -187,7 +187,7 @@ mod tests {
     #[test]
     fn removing_m0_from_bingpai_holding_only_m5_does_not_substitute_m5() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::M5)
                 .unwrap()
                 .with_removed(TileKind::M0),
@@ -200,7 +200,7 @@ mod tests {
     #[test]
     fn removing_m5_from_bingpai_holding_only_m0_does_not_substitute_m0() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::M0)
                 .unwrap()
                 .with_removed(TileKind::M5),
@@ -212,7 +212,7 @@ mod tests {
 
     #[test]
     fn adding_m0_to_bingpai_holding_m5_does_not_substitute_m5() {
-        let bingpai = Bingpai::default()
+        let bingpai = Bingpai::red_three_four_player()
             .with_added(TileKind::M5)
             .unwrap()
             .with_added(TileKind::M0)
@@ -229,7 +229,7 @@ mod tests {
 
     #[test]
     fn adding_m5_to_bingpai_holding_m0_does_not_substitute_m0() {
-        let bingpai = Bingpai::default()
+        let bingpai = Bingpai::red_three_four_player()
             .with_added(TileKind::M0)
             .unwrap()
             .with_added(TileKind::M5)
@@ -247,7 +247,7 @@ mod tests {
     #[test]
     fn adding_p0_to_empty_bingpai_does_not_change_p5_count() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::P0)
                 .unwrap()
                 .counts()[TileKind::P5.index()],
@@ -258,7 +258,7 @@ mod tests {
     #[test]
     fn adding_s0_to_empty_bingpai_does_not_change_s5_count() {
         assert_eq!(
-            Bingpai::default()
+            Bingpai::red_three_four_player()
                 .with_added(TileKind::S0)
                 .unwrap()
                 .counts()[TileKind::S5.index()],
@@ -268,7 +268,7 @@ mod tests {
 
     #[test]
     fn adding_fifth_copy_of_tile_kind_reports_count_exceeded() {
-        let bingpai = Bingpai::default()
+        let bingpai = Bingpai::red_three_four_player()
             .with_added(TileKind::M1)
             .unwrap()
             .with_added(TileKind::M1)
