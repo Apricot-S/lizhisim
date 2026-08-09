@@ -76,4 +76,20 @@ mod tests {
             0,
         );
     }
+
+    #[test]
+    fn adding_m5_to_empty_bingpai_has_one_m5() {
+        assert_eq!(
+            Bingpai::default().with_added(TileKind::M5).counts()[TileKind::M5.index()],
+            1,
+        );
+    }
+
+    #[test]
+    fn adding_m5_to_empty_bingpai_does_not_change_m0_count() {
+        assert_eq!(
+            Bingpai::default().with_added(TileKind::M5).counts()[TileKind::M0.index()],
+            0,
+        );
+    }
 }
