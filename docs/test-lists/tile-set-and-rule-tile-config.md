@@ -109,6 +109,8 @@
 
 - 2026-08-09: refactorとして`M0CountOutOfRange`、`P0CountOutOfRange`、`S0CountOutOfRange`を`HongBaopaiCountOutOfRange`へ統合し、対象`TileKind`をpayloadへ保持する共通helperを追加した。`const fn`の制約により明示的な`match`でerrorを伝播した。
 - 2026-08-09: refactor後もworkspace全37 test、Clippy、format、`git diff --check`が成功した。
+- 2026-08-09: rulesの実装を`raw_rule_spec.rs`へ分割し、`lib.rs`を公開APIのre-exportだけにした。`RawRuleSpec`直下の赤牌枚数を`HongBaopaiConfig`へまとめ、既存3色testを新構造へ移行した。
+- 2026-08-09: refactor後もworkspace全37 test、Clippy、format、`git diff --check`が成功した。
 - 2026-08-09: rulesのmodule分割と`HongBaopaiConfig`導入は、既存behaviorを変えないrefactorとして別cycleで扱う方針を確認した。
 - 2026-08-09: TOML/serdeは入力adapterのtest list項目を選択した時点で導入する。domain型へ直接serde deriveを付けず、TOML schemaから`RawRuleSpec`へ変換する境界を置く。環境変数overrideは再現性のため導入しない。
 - 2026-08-09: 「`S0`のraw枚数を独立に0〜4で受け付ける」を選択し、`M0 = 0`、`P0 = 0`を固定して0〜4の全入力を一assertionで検証する。
