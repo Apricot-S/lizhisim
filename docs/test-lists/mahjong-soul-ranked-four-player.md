@@ -45,7 +45,7 @@
 
 - [x] 空の`bingpai`では37種類すべての所持枚数が0である。
 - [x] 空の`bingpai`へ`M1`を1枚加えると、`M1`の所持枚数が1になる。
-- [ ] 空の`bingpai`へ`M1`を1枚加えても、ほかの36種類の所持枚数は変化しない。
+- [x] 空の`bingpai`へ`M1`を1枚加えても、ほかの36種類の所持枚数は変化しない。
 - [ ] 同じ`TileKind`を複数枚加えると、その所持枚数が加えた枚数になる。
 - [ ] `M0`を加えると、`M0`の所持枚数が1になる。
 - [ ] `M0`を加えても、`M5`の所持枚数は増えない。
@@ -124,10 +124,13 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 空の`bingpai`への`M1`追加とcount 1をgreenにし、全体検証まで完了したため。
+- Why: `with_added`が`M1`以外のcountを変更しないことをgreenにし、全体検証まで完了したため。
 
 ## Cycle log
 
+- 2026-08-09: 「空の`bingpai`へ`M1`を1枚加えても、ほかの36種類の所持枚数は変化しない」を選択した。対象範囲を`counts()[1..]`へ限定し、一assertionで検証する。
+- 2026-08-09: 選択testは既存実装でgreenだったため、`with_added`がindex + 1へ誤更新するmutantでredを確認し、正しいindex更新へ復元した。
+- 2026-08-09: 復元後に選択testとworkspace全11 testがgreen。Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: 「空の`bingpai`へ`M1`を1枚加えると、`M1`の所持枚数が1になる」を選択した。追加は既存値を消費して新しい`Bingpai`を返すAPIとして検証する。
 - 2026-08-09: 選択testを実行し、`with_added`未実装によるmethod not foundで失敗するredを確認した。
 - 2026-08-09: `TileKind`へ`#[repr(u8)]`と内部indexを追加し、`Bingpai::with_added`で指定kindのcountだけを増やしてgreenにした。

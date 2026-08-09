@@ -39,4 +39,12 @@ mod tests {
     fn adding_m1_to_empty_bingpai_has_one_m1() {
         assert_eq!(Bingpai::default().with_added(TileKind::M1).counts()[0], 1);
     }
+
+    #[test]
+    fn adding_m1_to_empty_bingpai_does_not_change_other_counts() {
+        assert_eq!(
+            &Bingpai::default().with_added(TileKind::M1).counts()[1..],
+            &[0; 36],
+        );
+    }
 }
