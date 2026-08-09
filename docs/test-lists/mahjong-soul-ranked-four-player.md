@@ -48,7 +48,7 @@
 - [x] 空の`bingpai`へ`M1`を1枚加えても、ほかの36種類の所持枚数は変化しない。
 - [x] 同じ`TileKind`を複数枚加えると、その所持枚数が加えた枚数になる。
 - [x] `M0`を加えると、`M0`の所持枚数が1になる。
-- [ ] `M0`を加えても、`M5`の所持枚数は増えない。
+- [x] `M0`を加えても、`M5`の所持枚数は増えない。
 - [ ] `M5`を加えると、`M5`の所持枚数が1になる。
 - [ ] `M5`を加えても、`M0`の所持枚数は増えない。
 - [ ] 所持している`TileKind`を1枚除くと、その所持枚数が1減る。
@@ -124,10 +124,13 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: `M0`を`M5`とは独立したcountへ追加できることをgreenにし、全体検証まで完了したため。
+- Why: `M0`追加が`M5`countへ影響しないことをgreenにし、全体検証まで完了したため。
 
 ## Cycle log
 
+- 2026-08-09: 「`M0`を加えても`M5`の所持枚数は増えない」を選択した。`M5`のcountだけを一assertionで比較する。
+- 2026-08-09: 選択testは既存実装でgreenだったため、`M0`追加時に`M5`も増やすmutantでredを確認し、指定kindだけを加算する実装へ復元した。
+- 2026-08-09: 復元後に選択testとworkspace全14 testがgreen。Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: 「`M0`を加えると、`M0`の所持枚数が1になる」を選択した。`TileKind::M0.index()`のcountを一assertionで比較する。
 - 2026-08-09: 選択testは既存実装でgreenだったため、`M0`を`M5`のindexへ加算するmutantでredを確認し、kind自身のindexへ加算する実装へ復元した。
 - 2026-08-09: 復元後に選択testとworkspace全13 testがgreen。`cargo fmt`で整形し、Clippy `-D warnings`、format、`git diff --check`が成功した。

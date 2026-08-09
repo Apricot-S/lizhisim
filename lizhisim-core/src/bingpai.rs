@@ -68,4 +68,12 @@ mod tests {
             1,
         );
     }
+
+    #[test]
+    fn adding_m0_to_empty_bingpai_does_not_change_m5_count() {
+        assert_eq!(
+            Bingpai::default().with_added(TileKind::M0).counts()[TileKind::M5.index()],
+            0,
+        );
+    }
 }
