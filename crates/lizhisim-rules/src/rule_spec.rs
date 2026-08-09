@@ -149,4 +149,28 @@ mod tests {
             }),
         );
     }
+
+    #[test]
+    fn rule_spec_rejects_p0_count_above_four() {
+        assert_eq!(
+            RuleSpec::try_from(raw(0, 5, 0)),
+            Err(RuleSpecError::HongBaopaiCountOutOfRange {
+                hong_baopai: TileKind::P0,
+                actual_count: 5,
+                max_count: 4,
+            }),
+        );
+    }
+
+    #[test]
+    fn rule_spec_rejects_s0_count_above_four() {
+        assert_eq!(
+            RuleSpec::try_from(raw(0, 0, 5)),
+            Err(RuleSpecError::HongBaopaiCountOutOfRange {
+                hong_baopai: TileKind::S0,
+                actual_count: 5,
+                max_count: 4,
+            }),
+        );
+    }
 }
