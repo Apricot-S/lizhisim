@@ -200,10 +200,10 @@ event は少なくとも experiment、competition、table match、round の stre
 
 `lizhisim-core`より先のcrate分割は、循環依存を避ける必要とwalking skeletonの変更頻度・compile costを確認してからADRで確定する。
 
-牌構成については[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)で、raw設定と
-`ValidatedRuleSet<P>`を`lizhisim-rules`、実行時の`TileSet`を`lizhisim-core`が所有する案を
-提案している。採用時の依存方向は`lizhisim-rules -> lizhisim-core`とし、coreからrulesへの
-逆依存を禁止する。
+牌構成については[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)に従い、raw設定と
+`ValidatedRuleSet<P>`を`lizhisim-rules`、実行時の`TileSet`を`lizhisim-core`が所有する。
+依存方向は`lizhisim-rules -> lizhisim-core`とし、coreからrulesへの逆依存を禁止する。
+`TileSet`は`Bingpai`と`Bipai`から独立した`tile_set` moduleに置く。
 
 ## 10. 拡張境界
 

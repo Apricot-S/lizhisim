@@ -59,6 +59,10 @@ primitive obsession を避け、少なくとも次を区別する。
 設定をsemantic validationした後、coreの検証済みconstructorを通して`TileSet`を生成する。
 詳細は[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)を参照する。
 
+実装は`lizhisim-core/src/tile_set.rs`に置き、`bingpai.rs`や将来の`bipai.rs`の内部型にしない。
+`TileSet`は牌種ごとの上限参照に加え、`Bipai`の完全なmultiset、配牌後の各領域、replay時の
+tile conservationを照合する共通基準である。
+
 `bingpai`は`TileKind`の内部indexに対応する`[u8; 37]`の所持枚数配列として保持し、
 個々の牌を並べた可変長列としては保持しない。`zimopai`、`he`、canonical eventは
 牌の実個体を区別せず`TileKind`を保持する。

@@ -28,7 +28,7 @@
 | [0012](0012-normalize-dealer-first-draw.md) | Accepted | 親の14枚配牌を最初の`Zimo`へ正規化する |
 | [0013](0013-tile-kind-without-copy-identity.md) | Accepted | 赤牌を含む37種類の`TileKind`を使い牌の個別identityを持たない |
 | [0014](0014-facade-and-core-crates.md) | Accepted | `lizhisim`をre-export facade、`lizhisim-core`を実装所有crateとする |
-| [0015](0015-rule-and-domain-tile-ownership.md) | Proposed | 牌構成設定をrules、実行時牌上限をcoreが所有する |
+| [0015](0015-rule-and-domain-tile-ownership.md) | Accepted | 牌構成設定をrules、実行時牌上限をcoreが所有する |
 
 ## Template
 

@@ -1,6 +1,6 @@
 # ADR-0015: 牌構成設定と実行時牌上限の所有crateを分離する
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-09
 - Deciders: Project owner
 - Relates to: [ADR-0014](0014-facade-and-core-crates.md)
@@ -49,6 +49,11 @@ serialization、source metadataを知らない。
 `Bingpai`の追加検証は`TileSet`の対象kind上限を使う。`Bingpai`が`TileSet`を所有するか、
 追加時に参照を受け取るかはperformance測定前に固定しない。どちらの場合も、公開APIから
 ルール未検証の追加経路を提供しない。
+
+`TileSet`は`Bingpai`と`Bipai`の双方が使うため、`bingpai` moduleの内部型にしない。
+`lizhisim-core/src/tile_set.rs`が実装と局所unit testを所有し、crate rootから公開する。
+`Bingpai`はkindごとの所持上限、`Bipai`は生成・読込時の完全なmultiset一致、配牌と
+replay検証はtile conservationの基準として同じ`TileSet`を使う。
 
 ## Consequences
 

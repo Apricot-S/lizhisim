@@ -4,7 +4,8 @@
 
 ## Planned
 
-- [雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md) — 最初の基準presetに向けた計画。未選択・未実装。
+- [雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md) — 最初の基準presetに向けたactive list。
+- [TileSetと牌構成rule](tile-set-and-rule-tile-config.md) — core実行値、rules解決、`Bingpai`/`Bipai`連携。
 
 新規作成時は [template](../templates/test-list.md) を複製し、[開発手順書](../development-guide.md) の `test list -> one -> red -> green -> refactor` に従う。
 
