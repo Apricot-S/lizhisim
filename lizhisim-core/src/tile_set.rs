@@ -30,6 +30,23 @@ pub struct TileSet {
     total_count: u16,
 }
 
+const fn validate_combined_five_count(
+    counts: &[u8; 37],
+    hong_baopai: TileKind,
+    base_tile: TileKind,
+) -> Result<(), TileSetError> {
+    let actual_count = counts[hong_baopai.index()] + counts[base_tile.index()];
+    if actual_count > 4 {
+        return Err(TileSetError::CombinedFiveCountExceeded {
+            hong_baopai,
+            base_tile,
+            actual_count,
+            max_count: 4,
+        });
+    }
+    Ok(())
+}
+
 impl TileSet {
     pub const fn try_from_counts(counts: [u8; 37]) -> Result<Self, TileSetError> {
         let mut index = 0;
@@ -46,34 +63,17 @@ impl TileSet {
             index += 1;
         }
 
-        let combined_m5_count = counts[TileKind::M0.index()] + counts[TileKind::M5.index()];
-        if combined_m5_count > 4 {
-            return Err(TileSetError::CombinedFiveCountExceeded {
-                hong_baopai: TileKind::M0,
-                base_tile: TileKind::M5,
-                actual_count: combined_m5_count,
-                max_count: 4,
-            });
+        match validate_combined_five_count(&counts, TileKind::M0, TileKind::M5) {
+            Ok(()) => {}
+            Err(error) => return Err(error),
         }
-
-        let combined_p5_count = counts[TileKind::P0.index()] + counts[TileKind::P5.index()];
-        if combined_p5_count > 4 {
-            return Err(TileSetError::CombinedFiveCountExceeded {
-                hong_baopai: TileKind::P0,
-                base_tile: TileKind::P5,
-                actual_count: combined_p5_count,
-                max_count: 4,
-            });
+        match validate_combined_five_count(&counts, TileKind::P0, TileKind::P5) {
+            Ok(()) => {}
+            Err(error) => return Err(error),
         }
-
-        let combined_s5_count = counts[TileKind::S0.index()] + counts[TileKind::S5.index()];
-        if combined_s5_count > 4 {
-            return Err(TileSetError::CombinedFiveCountExceeded {
-                hong_baopai: TileKind::S0,
-                base_tile: TileKind::S5,
-                actual_count: combined_s5_count,
-                max_count: 4,
-            });
+        match validate_combined_five_count(&counts, TileKind::S0, TileKind::S5) {
+            Ok(()) => {}
+            Err(error) => return Err(error),
         }
 
         Ok(Self {

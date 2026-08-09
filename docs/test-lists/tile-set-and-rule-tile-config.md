@@ -98,7 +98,7 @@
 - 2026-08-09: 「`S0`と`S5`の合計が4枚を超えるcountを拒否する」を選択し、`S0 = 2`、`S5 = 3`の合計5を一assertionで検証する。
 - 2026-08-09: `S0/S5`の合計検証が未実装のため、`Ok(TileSet)`になるredを確認した。
 - 2026-08-09: `S0`と`S5`の合計が4を超えた場合に既存のcombined-count errorを返す最小実装をgreenにした。
-- 2026-08-09: refactor変更なし。選択testがgreenになった。
+- 2026-08-09: M/P/Sの重複していた赤牌・通常5の合計検証を`validate_combined_five_count`へまとめた。`const fn`の制約により明示的な`match`でerrorを伝播し、workspace全33 test、Clippy、format、`git diff --check`が成功した。
 - 2026-08-09: 「`P0`と`P5`の合計が4枚を超えるcountを拒否する」を選択し、`P0 = 2`、`P5 = 3`の合計5を一assertionで検証する。
 - 2026-08-09: `P0/P5`の合計検証が未実装のため、`Ok(TileSet)`になるredを確認した。
 - 2026-08-09: `P0`と`P5`の合計が4を超えた場合に既存のcombined-count errorを返す最小実装をgreenにした。
