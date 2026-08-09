@@ -137,4 +137,16 @@ mod tests {
                 .all(|accepted| accepted)
         );
     }
+
+    #[test]
+    fn rule_spec_rejects_m0_count_above_four() {
+        assert_eq!(
+            RuleSpec::try_from(raw(5, 0, 0)),
+            Err(RuleSpecError::HongBaopaiCountOutOfRange {
+                hong_baopai: TileKind::M0,
+                actual_count: 5,
+                max_count: 4,
+            }),
+        );
+    }
 }

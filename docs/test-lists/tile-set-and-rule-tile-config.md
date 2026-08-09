@@ -47,7 +47,7 @@
 - [x] `M0`のraw枚数を独立に0〜4で受け付ける。
 - [x] `P0`のraw枚数を独立に0〜4で受け付ける。
 - [x] `S0`のraw枚数を独立に0〜4で受け付ける。
-- [ ] `M0`のraw枚数5をschema validationで拒否する。
+- [x] `M0`のraw枚数5をschema validationで拒否する。
 - [ ] `P0`のraw枚数5をschema validationで拒否する。
 - [ ] `S0`のraw枚数5をschema validationで拒否する。
 - [ ] 赤牌0枚を通常5が4枚、赤牌が0枚の`TileSet`へ解決する。
@@ -103,10 +103,12 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: `RawRuleSpec`が3色の赤牌raw枚数0〜4を独立に受け付けることを確認できたため。
+- Why: `RuleSpec`が`M0`のraw枚数5を拒否することを確認できたため。
 
 ## Cycle log
 
+- 2026-08-10: 「`M0`のraw枚数5をschema validationで拒否する」を選択し、対象牌、実枚数、上限を一assertionで検証する。既存の`HongBaopaiConfig::validate`がすでに契約を満たしていたため、redなしでgreenを確認した。
+- 2026-08-10: `RuleSpecError::HongBaopaiCountOutOfRange`のpayloadを検証する回帰testを追加した。
 - 2026-08-09: refactorとして`M0CountOutOfRange`、`P0CountOutOfRange`、`S0CountOutOfRange`を`HongBaopaiCountOutOfRange`へ統合し、対象`TileKind`をpayloadへ保持する共通helperを追加した。`const fn`の制約により明示的な`match`でerrorを伝播した。
 - 2026-08-09: refactor後もworkspace全37 test、Clippy、format、`git diff --check`が成功した。
 - 2026-08-09: rulesの実装を`rule_spec.rs`へ分割し、`lib.rs`を公開APIのre-exportだけにした。`RawRuleSpec`直下の赤牌枚数を`HongBaopaiConfig`へまとめ、`RawRuleSpec -> RuleSpec`の検証境界へ既存3色testを移行した。
