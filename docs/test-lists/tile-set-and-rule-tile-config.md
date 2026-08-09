@@ -38,7 +38,7 @@
 - [x] `P0`と`P5`の合計が4枚を超えるcountを拒否する。
 - [x] `S0`と`S5`の合計が4枚を超えるcountを拒否する。
 - [x] 不正なcountのerrorは対象`TileKind`と上限を保持する。
-- [ ] 構築失敗時に部分的な`TileSet`を返さない。
+- [x] 構築失敗時に部分的な`TileSet`を返さない。
 
 ### Minimal `lizhisim-rules` boundary
 
@@ -91,10 +91,12 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 不正なcount errorのpayloadを検証するcycleがgreenになったため。
+- Why: 構築失敗時に部分的な`TileSet`を返さない契約を検証するcycleがgreenになったため。
 
 ## Cycle log
 
+- 2026-08-09: 「構築失敗時に部分的な`TileSet`を返さない」を選択し、`M1 = 4`を含むcountで`Z7 = 5`を拒否し、戻り値が`Err`であることを一assertionで検証する。既存の`Result` APIがすでにこの契約を満たしていたため、redなしでgreenを確認した。
+- 2026-08-09: 部分的な`TileSet`を返さない回帰testを追加した。workspace全体の検証は次のrefactor後に実行する。
 - 2026-08-09: 「不正なcountのerrorは対象`TileKind`と上限を保持する」を選択し、`Z7 = 5`のerror payloadを一assertionで検証する。既存実装がすでにこの契約を満たしていたため、redなしでgreenを確認した。
 - 2026-08-09: `TileCountExceeded`の対象`TileKind`、実枚数、上限を保持する回帰testを追加した。workspace全体の検証は次のrefactor後に実行する。
 - 2026-08-09: 「`S0`と`S5`の合計が4枚を超えるcountを拒否する」を選択し、`S0 = 2`、`S5 = 3`の合計5を一assertionで検証する。

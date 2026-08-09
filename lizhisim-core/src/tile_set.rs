@@ -152,6 +152,15 @@ mod tests {
     }
 
     #[test]
+    fn tile_set_construction_failure_does_not_return_partial_tile_set() {
+        let mut counts = [0; 37];
+        counts[TileKind::M1.index()] = 4;
+        counts[TileKind::Z7.index()] = 5;
+
+        assert!(TileSet::try_from_counts(counts).is_err());
+    }
+
+    #[test]
     fn tile_set_rejects_combined_m0_and_m5_count_above_four() {
         let mut counts = [0; 37];
         counts[TileKind::M0.index()] = 2;
