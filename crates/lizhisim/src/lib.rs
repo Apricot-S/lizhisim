@@ -4,7 +4,6 @@
 
 pub use lizhisim_core::*;
 
-#[allow(unused_imports)]
 pub mod rules {
     pub use lizhisim_rules::*;
 }
