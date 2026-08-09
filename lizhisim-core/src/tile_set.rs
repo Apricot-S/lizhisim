@@ -6,7 +6,14 @@ use crate::TileKind;
 use thiserror::Error;
 
 #[derive(Debug, Error, PartialEq)]
-pub enum TileSetError {}
+pub enum TileSetError {
+    #[error("tile kind {tile_kind:?} has {actual_count} copies, exceeding maximum {max_count}")]
+    TileCountExceeded {
+        tile_kind: TileKind,
+        actual_count: u8,
+        max_count: u8,
+    },
+}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct TileSet {
@@ -19,6 +26,13 @@ impl TileSet {
         let mut index = 0;
         let mut total_count = 0;
         while index < counts.len() {
+            if counts[index] > 4 {
+                return Err(TileSetError::TileCountExceeded {
+                    tile_kind: TileKind::ALL[index],
+                    actual_count: counts[index],
+                    max_count: 4,
+                });
+            }
             total_count += counts[index] as u16;
             index += 1;
         }
@@ -64,5 +78,20 @@ mod tests {
         let tile_set = TileSet::try_from_counts(counts).unwrap();
 
         assert_eq!(tile_set.total_count(), 7);
+    }
+
+    #[test]
+    fn tile_set_rejects_kind_count_above_four() {
+        let mut counts = [0; 37];
+        counts[TileKind::M1.index()] = 5;
+
+        assert_eq!(
+            TileSet::try_from_counts(counts),
+            Err(TileSetError::TileCountExceeded {
+                tile_kind: TileKind::M1,
+                actual_count: 5,
+                max_count: 4,
+            }),
+        );
     }
 }

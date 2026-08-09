@@ -33,7 +33,7 @@
 - [x] 37種類のcountから物理的に可能な`TileSet`を構築できる。
 - [x] `TileSet`は指定した`TileKind`の最大枚数を返す。
 - [x] `TileSet`の総牌数は37 countの合計から一意に求まる。
-- [ ] 一つの`TileKind`が4枚を超えるcountを拒否する。
+- [x] 一つの`TileKind`が4枚を超えるcountを拒否する。
 - [ ] `M0`と`M5`の合計が4枚を超えるcountを拒否する。
 - [ ] `P0`と`P5`の合計が4枚を超えるcountを拒否する。
 - [ ] `S0`と`S5`の合計が4枚を超えるcountを拒否する。
@@ -91,10 +91,14 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: constructorが37 countの合計を`total_count`として保持することをgreenにし、全体検証まで完了したため。
+- Why: 一つの`TileKind`が4枚を超えるcountをconstructorで拒否することをgreenにし、全体検証まで完了したため。
 
 ## Cycle log
 
+- 2026-08-09: 「一つの`TileKind`が4枚を超えるcountを拒否する」を選択し、`M1 = 5`が対象kind、実枚数5、上限4を持つerrorになることを一assertionで検証する。
+- 2026-08-09: `TileSetError::TileCountExceeded`未定義によるvariant not foundで失敗するredを確認した。
+- 2026-08-09: constructorの既存loopで最初に4を超えたcountを検出し、対象`TileKind`、実枚数、上限を持つerrorを返す最小実装をgreenにした。
+- 2026-08-09: refactor変更なし。workspace全30 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: 「`TileSet`の総牌数は37 countの合計から一意に求まる」を選択し、`M1 = 4`、`M2 = 3`の合計7を一assertionで検証する。
 - 2026-08-09: `total_count`未実装によるmethod not foundで失敗するredを確認した。
 - 2026-08-09: constructor内で37 countを合計して非公開`u16`へ保持し、`TileSet::total_count`で返す最小実装をgreenにした。count配列と総数を別々に入力できないため、不整合な状態は構築できない。
