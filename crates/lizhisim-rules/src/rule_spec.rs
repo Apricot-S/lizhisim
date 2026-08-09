@@ -53,6 +53,20 @@ impl HongBaopaiConfig {
     }
 }
 
+const fn validate_hong_baopai_count(
+    hong_baopai: TileKind,
+    actual_count: u8,
+) -> Result<(), RuleSpecError> {
+    if actual_count > 4 {
+        return Err(RuleSpecError::HongBaopaiCountOutOfRange {
+            hong_baopai,
+            actual_count,
+            max_count: 4,
+        });
+    }
+    Ok(())
+}
+
 impl TryFrom<RawRuleSpec> for RuleSpec {
     type Error = RuleSpecError;
 
@@ -78,20 +92,6 @@ impl RuleSpec {
 
         TileSet::try_from_counts(counts).map_err(RuleSpecError::TileSet)
     }
-}
-
-const fn validate_hong_baopai_count(
-    hong_baopai: TileKind,
-    actual_count: u8,
-) -> Result<(), RuleSpecError> {
-    if actual_count > 4 {
-        return Err(RuleSpecError::HongBaopaiCountOutOfRange {
-            hong_baopai,
-            actual_count,
-            max_count: 4,
-        });
-    }
-    Ok(())
 }
 
 #[cfg(test)]
