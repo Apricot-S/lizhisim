@@ -24,7 +24,7 @@ impl Default for Bingpai {
     fn default() -> Self {
         Self {
             counts: [0; 37],
-            tile_set: TileSet::standard_four_player(),
+            tile_set: TileSet::red_three_four_player(),
         }
     }
 }

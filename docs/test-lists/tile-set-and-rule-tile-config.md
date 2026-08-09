@@ -177,7 +177,7 @@
 
 - 2026-08-10: 雀魂四人基準の5以外31種類が各4枚となる解決testを追加した。既存の`RuleSpec::resolve_tile_set`が契約を満たしていたためredなしでgreenを確認した。
 
-- 2026-08-10: `Bingpai::new(TileSet)`を追加し、`Bingpai`が常に確定した`TileSet`を値で保持するようにした。`Default`も有効な雀魂四人用赤3の`TileSet`を保持し、設定上限1枚の`M1`超過testを追加した。workspace全46 test、Clippy、format、`git diff --check`が成功した。
+- 2026-08-10: `Bingpai::new(TileSet)`を追加し、`Bingpai`が常に確定した`TileSet`を値で保持するようにした。`Default`は`TileSet::red_three_four_player()`を保持し、設定上限1枚の`M1`超過testを追加した。workspace全46 test、Clippy、format、`git diff --check`が成功した。
 
 ## Completion review
 

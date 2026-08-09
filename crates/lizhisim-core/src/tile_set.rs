@@ -49,7 +49,7 @@ const fn validate_combined_five_count(
 }
 
 impl TileSet {
-    pub const fn standard_four_player() -> Self {
+    pub const fn red_three_four_player() -> Self {
         let mut counts = [4; 37];
         counts[TileKind::M0.index()] = 1;
         counts[TileKind::M5.index()] = 3;
