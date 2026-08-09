@@ -28,8 +28,7 @@ impl Bingpai {
 
 #[cfg(test)]
 mod tests {
-    use super::Bingpai;
-    use crate::TileKind;
+    use super::*;
 
     #[test]
     fn empty_bingpai_has_zero_of_every_tile_kind() {

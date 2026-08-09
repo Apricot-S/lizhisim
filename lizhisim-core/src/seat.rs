@@ -45,7 +45,7 @@ impl TryFrom<usize> for Seat<FourPlayer> {
 
 #[cfg(test)]
 mod tests {
-    use super::{FourPlayer, Seat, SeatIndexOutOfRange};
+    use super::*;
 
     #[test]
     fn four_player_defines_four_seats() {

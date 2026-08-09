@@ -59,7 +59,7 @@ impl TileKind {
 
 #[cfg(test)]
 mod tests {
-    use super::TileKind;
+    use super::*;
 
     #[test]
     fn tile_kind_defines_thirty_seven_kinds() {
