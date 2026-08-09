@@ -43,7 +43,7 @@
 ### Minimal `lizhisim-rules` boundary
 
 - [x] `lizhisim-rules` crateは`lizhisim-core`へだけ依存して最小scaffoldを構築できる。
-- [ ] facade `lizhisim`はrulesとcoreの公開APIをre-exportする。
+- [x] facade `lizhisim`はrulesとcoreの公開APIをre-exportする。
 - [ ] `M0`、`P0`、`S0`のraw枚数を独立に0〜4で受け付ける。
 - [ ] `M0`のraw枚数5をschema validationで拒否する。
 - [ ] `P0`のraw枚数5をschema validationで拒否する。
@@ -91,13 +91,14 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: `lizhisim-rules` の最小scaffoldと `lizhisim-core` への依存方向を確認できたため。
+- Why: facadeからcoreを直re-exportし、rulesを`rules` module内でre-exportできたため。
 
 ## Cycle log
 
 - 2026-08-09: 「`lizhisim-rules` crateは`lizhisim-core`へだけ依存して最小scaffoldを構築できる」を選択した。crate未作成のため、workspaceへ追加してbuildできる状態が未達であることをredの前提として確認する。
 - 2026-08-09: workspaceへ`lizhisim-rules`を追加し、`lizhisim-core`だけを依存に持つ空のlibrary scaffoldを作成してgreenにした。
 - 2026-08-09: workspace build、全34 test、Clippy、format、`git diff --check`が成功した。
+- 2026-08-09: facadeのcore直re-exportを維持し、`lizhisim-rules`を`rules` module内でre-exportする構造にした。workspace全34 test、Clippy、format、`git diff --check`が成功した。
 - 2026-08-09: 「構築失敗時に部分的な`TileSet`を返さない」を選択し、`M1 = 4`を含むcountで`Z7 = 5`を拒否し、戻り値が`Err`であることを一assertionで検証する。既存の`Result` APIがすでにこの契約を満たしていたため、redなしでgreenを確認した。
 - 2026-08-09: 部分的な`TileSet`を返さない回帰testを追加した。workspace全体の検証は次のrefactor後に実行する。
 - 2026-08-09: 「不正なcountのerrorは対象`TileKind`と上限を保持する」を選択し、`Z7 = 5`のerror payloadを一assertionで検証する。既存実装がすでにこの契約を満たしていたため、redなしでgreenを確認した。

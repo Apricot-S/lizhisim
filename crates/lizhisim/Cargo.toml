@@ -13,3 +13,4 @@ categories.workspace = true
 
 [dependencies]
 lizhisim-core.workspace = true
+lizhisim-rules.workspace = true
