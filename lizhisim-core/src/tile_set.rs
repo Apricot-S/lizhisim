@@ -13,6 +13,15 @@ pub enum TileSetError {
         actual_count: u8,
         max_count: u8,
     },
+    #[error(
+        "combined count of {hong_baopai:?} and {base_tile:?} is {actual_count}, exceeding maximum {max_count}"
+    )]
+    CombinedFiveCountExceeded {
+        hong_baopai: TileKind,
+        base_tile: TileKind,
+        actual_count: u8,
+        max_count: u8,
+    },
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -35,6 +44,16 @@ impl TileSet {
             }
             total_count += counts[index] as u16;
             index += 1;
+        }
+
+        let combined_m5_count = counts[TileKind::M0.index()] + counts[TileKind::M5.index()];
+        if combined_m5_count > 4 {
+            return Err(TileSetError::CombinedFiveCountExceeded {
+                hong_baopai: TileKind::M0,
+                base_tile: TileKind::M5,
+                actual_count: combined_m5_count,
+                max_count: 4,
+            });
         }
 
         Ok(Self {
@@ -89,6 +108,23 @@ mod tests {
             TileSet::try_from_counts(counts),
             Err(TileSetError::TileCountExceeded {
                 tile_kind: TileKind::M1,
+                actual_count: 5,
+                max_count: 4,
+            }),
+        );
+    }
+
+    #[test]
+    fn tile_set_rejects_combined_m0_and_m5_count_above_four() {
+        let mut counts = [0; 37];
+        counts[TileKind::M0.index()] = 2;
+        counts[TileKind::M5.index()] = 3;
+
+        assert_eq!(
+            TileSet::try_from_counts(counts),
+            Err(TileSetError::CombinedFiveCountExceeded {
+                hong_baopai: TileKind::M0,
+                base_tile: TileKind::M5,
                 actual_count: 5,
                 max_count: 4,
             }),

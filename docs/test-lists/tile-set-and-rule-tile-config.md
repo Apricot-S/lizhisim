@@ -34,7 +34,7 @@
 - [x] `TileSet`は指定した`TileKind`の最大枚数を返す。
 - [x] `TileSet`の総牌数は37 countの合計から一意に求まる。
 - [x] 一つの`TileKind`が4枚を超えるcountを拒否する。
-- [ ] `M0`と`M5`の合計が4枚を超えるcountを拒否する。
+- [x] `M0`と`M5`の合計が4枚を超えるcountを拒否する。
 - [ ] `P0`と`P5`の合計が4枚を超えるcountを拒否する。
 - [ ] `S0`と`S5`の合計が4枚を超えるcountを拒否する。
 - [ ] 不正なcountのerrorは対象`TileKind`と上限を保持する。
@@ -91,10 +91,14 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 一つの`TileKind`が4枚を超えるcountをconstructorで拒否することをgreenにし、全体検証まで完了したため。
+- Why: `M0`と`M5`の合計上限を検証するcycleがgreenになったため。
 
 ## Cycle log
 
+- 2026-08-09: 「`M0`と`M5`の合計が4枚を超えるcountを拒否する」を選択し、`M0 = 2`、`M5 = 3`の合計5を一assertionで検証する。
+- 2026-08-09: `TileSetError::CombinedFiveCountExceeded`未定義によるvariant not foundで失敗するredを確認した。
+- 2026-08-09: `M0`と`M5`の合計が4を超えた場合に、赤牌、通常5、実枚数、上限を持つerrorを返す最小実装をgreenにした。`P0/P5`と`S0/S5`は後続testへ残した。
+- 2026-08-09: refactor変更なし。workspace全31 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: 「一つの`TileKind`が4枚を超えるcountを拒否する」を選択し、`M1 = 5`が対象kind、実枚数5、上限4を持つerrorになることを一assertionで検証する。
 - 2026-08-09: `TileSetError::TileCountExceeded`未定義によるvariant not foundで失敗するredを確認した。
 - 2026-08-09: constructorの既存loopで最初に4を超えたcountを検出し、対象`TileKind`、実枚数、上限を持つerrorを返す最小実装をgreenにした。
