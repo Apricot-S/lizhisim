@@ -20,16 +20,15 @@ pub struct Bingpai {
     tile_set: TileSet,
 }
 
-impl Default for Bingpai {
-    fn default() -> Self {
+impl Bingpai {
+    #[cfg(test)]
+    pub(crate) const fn default() -> Self {
         Self {
             counts: [0; 37],
             tile_set: TileSet::red_three_four_player(),
         }
     }
-}
 
-impl Bingpai {
     pub const fn new(tile_set: TileSet) -> Self {
         Self {
             counts: [0; 37],
