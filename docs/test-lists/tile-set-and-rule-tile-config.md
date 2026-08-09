@@ -5,7 +5,7 @@
 - Owner: project owner / implementer
 - Created: 2026-08-09
 - Updated: 2026-08-09
-- Status: Planned
+- Status: Active
 - Requirements: `CORE-001`, `CORE-006`, `RULE-001`, `RULE-002`, `NFR-001`, `NFR-003`
 - ADR / design: [ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md), [domain model](../design/domain-model.md), [rules and presets](../design/rules-and-presets.md)
 
@@ -30,8 +30,7 @@
 
 ### Core `TileSet`
 
-- [ ] `TileSet`は`tile_set` moduleから公開される。
-- [ ] 37種類のcountから物理的に可能な`TileSet`を構築できる。
+- [x] 37種類のcountから物理的に可能な`TileSet`を構築できる。
 - [ ] `TileSet`は指定した`TileKind`の最大枚数を返す。
 - [ ] `TileSet`の総牌数は37 countの合計から一意に求まる。
 - [ ] 一つの`TileKind`が4枚を超えるcountを拒否する。
@@ -91,12 +90,16 @@
 ## Current
 
 - Selected: None
-- Phase: Awaiting first selection
-- Why: ADR-0015の受入れ後にtest listを作成した段階であり、実装開始項目はまだ選択していないため。
+- Phase: Awaiting next selection
+- Why: 37種類の物理的に可能なcountから`TileSet`を構築するtestをgreenにし、全体検証まで完了したため。
 
 ## Cycle log
 
 - 2026-08-09: ADR-0015をAcceptedとし、`TileSet`を独立した`tile_set.rs`へ置く方針でtest listを作成した。
+- 2026-08-09: module公開は単独の振る舞いtestにせずdesign constraintとして確認する。最初の項目に「37種類のcountから物理的に可能な`TileSet`を構築できる」を選択した。
+- 2026-08-09: `TileSet`と`TileSetError`が未定義のため失敗するredを確認した。
+- 2026-08-09: `lizhisim-core/src/tile_set.rs`へ37 countを保持する`TileSet`、将来のvalidation errorを追加する`TileSetError`、最小の`try_from_counts`を実装してgreenにした。上限検証は後続testへ残した。
+- 2026-08-09: refactor変更なし。workspace全27 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
 
 ## Completion review
 

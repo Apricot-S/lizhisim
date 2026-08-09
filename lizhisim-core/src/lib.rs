@@ -5,7 +5,9 @@
 mod bingpai;
 mod seat;
 mod tile;
+mod tile_set;
 
 pub use bingpai::Bingpai;
 pub use seat::{FourPlayer, Seat, SeatIndexOutOfRange};
 pub use tile::TileKind;
+pub use tile_set::{TileSet, TileSetError};
