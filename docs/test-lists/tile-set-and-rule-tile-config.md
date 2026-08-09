@@ -46,7 +46,7 @@
 - [x] facade `lizhisim`はrulesとcoreの公開APIをre-exportする。
 - [x] `M0`のraw枚数を独立に0〜4で受け付ける。
 - [x] `P0`のraw枚数を独立に0〜4で受け付ける。
-- [ ] `S0`のraw枚数を独立に0〜4で受け付ける。
+- [x] `S0`のraw枚数を独立に0〜4で受け付ける。
 - [ ] `M0`のraw枚数5をschema validationで拒否する。
 - [ ] `P0`のraw枚数5をschema validationで拒否する。
 - [ ] `S0`のraw枚数5をschema validationで拒否する。
@@ -93,10 +93,14 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: `RawRuleSpec`が`P0`のraw枚数0〜4を受け付けることを確認できたため。
+- Why: `RawRuleSpec`が3色の赤牌raw枚数0〜4を独立に受け付けることを確認できたため。
 
 ## Cycle log
 
+- 2026-08-09: 「`S0`のraw枚数を独立に0〜4で受け付ける」を選択し、`M0 = 0`、`P0 = 0`を固定して0〜4の全入力を一assertionで検証する。
+- 2026-08-09: `RawRuleSpec`に`S0`設定が未実装のため、3引数constructorとS0 testをコンパイルできないredを確認した。
+- 2026-08-09: `RawRuleSpec`へ`s0_count`と範囲検証を追加し、牌数解決で`S0/S5`へ反映する最小実装をgreenにした。
+- 2026-08-09: refactor変更なし。選択testがgreenになった。
 - 2026-08-09: 「`P0`のraw枚数を独立に0〜4で受け付ける」を選択し、`M0 = 0`を固定して0〜4の全入力を一assertionで検証する。
 - 2026-08-09: `RawRuleSpec`に`P0`設定が未実装のため、2引数constructorとP0 testをコンパイルできないredを確認した。
 - 2026-08-09: `RawRuleSpec`へ`p0_count`と範囲検証を追加し、牌数解決で`P0/P5`へ反映する最小実装をgreenにした。
