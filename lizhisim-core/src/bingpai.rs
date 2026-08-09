@@ -21,6 +21,11 @@ impl Bingpai {
         self
     }
 
+    pub fn with_removed(mut self, tile_kind: TileKind) -> Option<Self> {
+        self.counts[tile_kind.index()] = self.counts[tile_kind.index()].checked_sub(1)?;
+        Some(self)
+    }
+
     pub const fn counts(&self) -> &[u8; 37] {
         &self.counts
     }
@@ -89,6 +94,18 @@ mod tests {
     fn adding_m5_to_empty_bingpai_does_not_change_m0_count() {
         assert_eq!(
             Bingpai::default().with_added(TileKind::M5).counts()[TileKind::M0.index()],
+            0,
+        );
+    }
+
+    #[test]
+    fn removing_present_tile_kind_decreases_its_count() {
+        assert_eq!(
+            Bingpai::default()
+                .with_added(TileKind::M1)
+                .with_removed(TileKind::M1)
+                .unwrap()
+                .counts()[TileKind::M1.index()],
             0,
         );
     }

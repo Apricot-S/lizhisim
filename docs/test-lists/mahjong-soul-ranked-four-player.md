@@ -51,7 +51,7 @@
 - [x] `M0`を加えても、`M5`の所持枚数は増えない。
 - [x] `M5`を加えると、`M5`の所持枚数が1になる。
 - [x] `M5`を加えても、`M0`の所持枚数は増えない。
-- [ ] 所持している`TileKind`を1枚除くと、その所持枚数が1減る。
+- [x] 所持している`TileKind`を1枚除くと、その所持枚数が1減る。
 - [ ] 所持していない`TileKind`を除こうとすると失敗する。
 - [ ] 所持していない`TileKind`を除く操作が失敗した後も、`bingpai`は変化しない。
 - [ ] `M5`だけを所持するとき、`M0`を除こうとしても`M5`で代替しない。
@@ -124,10 +124,13 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: `M5`の追加と`M0`への非干渉をgreenにし、全体検証まで完了したため。
+- Why: 所持している牌の除去で対象countが1減ることをgreenにし、全体検証まで完了したため。
 
 ## Cycle log
 
+- 2026-08-09: 「所持している`TileKind`を1枚除くと、その所持枚数が1減る」を選択した。`M1`を追加してから除去し、対象countを一assertionで比較する。除去APIは`Option<Bingpai>`を返す。
+- 2026-08-09: `with_removed`を`checked_sub`で実装し、所持中の`M1`を除去する選択testをgreenにした。未所持時の失敗挙動は後続testへ残した。
+- 2026-08-09: refactor変更なし。workspace全17 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: `M0`と対称な「`M5`を加えると`M5`が1になる」「`M5`を加えても`M0`は増えない」の2項目を選択し、両方を同一cycleでgreenまで進める。
 - 2026-08-09: 2項目は既存実装でgreenだったため、`M5`を`M0`へ誤加算するmutantで両方のredを確認し、指定kind自身のindexへ加算する実装へ復元した。
 - 2026-08-09: 復元後に2項目とworkspace全16 testがgreen。Clippy `-D warnings`、format、`git diff --check`が成功した。
