@@ -1,0 +1,15 @@
+[package]
+name = "lizhisim-rules"
+description.workspace = true
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+lizhisim-core.workspace = true

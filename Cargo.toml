@@ -3,6 +3,7 @@ resolver = "3"
 members = [
     "lizhisim",
     "lizhisim-core",
+    "lizhisim-rules",
 ]
 
 [workspace.package]
@@ -22,5 +23,6 @@ tag-prefix = ""
 
 [workspace.dependencies]
 lizhisim-core = { path = "lizhisim-core", version = "0.1.0" }
+lizhisim-rules = { path = "lizhisim-rules", version = "0.1.0" }
 
 thiserror = "2.0.20"
