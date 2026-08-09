@@ -46,7 +46,7 @@
 - [x] 空の`bingpai`では37種類すべての所持枚数が0である。
 - [x] 空の`bingpai`へ`M1`を1枚加えると、`M1`の所持枚数が1になる。
 - [x] 空の`bingpai`へ`M1`を1枚加えても、ほかの36種類の所持枚数は変化しない。
-- [ ] 同じ`TileKind`を複数枚加えると、その所持枚数が加えた枚数になる。
+- [x] 同じ`TileKind`を複数枚加えると、その所持枚数が加えた枚数になる。
 - [ ] `M0`を加えると、`M0`の所持枚数が1になる。
 - [ ] `M0`を加えても、`M5`の所持枚数は増えない。
 - [ ] `M5`を加えると、`M5`の所持枚数が1になる。
@@ -124,10 +124,13 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: `with_added`が`M1`以外のcountを変更しないことをgreenにし、全体検証まで完了したため。
+- Why: 同じ`TileKind`を4回追加したcountが4になることをgreenにし、全体検証まで完了したため。
 
 ## Cycle log
 
+- 2026-08-09: 「同じ`TileKind`を複数枚加えると、その所持枚数が加えた枚数になる」を選択した。`M1`を4回追加し、対象countだけを一assertionで比較する。
+- 2026-08-09: 選択testは既存実装でgreenだったため、代入でcountを1へ戻すmutantでredを確認し、加算実装へ復元した。
+- 2026-08-09: 復元後に選択testとworkspace全12 testがgreen。Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: 「空の`bingpai`へ`M1`を1枚加えても、ほかの36種類の所持枚数は変化しない」を選択した。対象範囲を`counts()[1..]`へ限定し、一assertionで検証する。
 - 2026-08-09: 選択testは既存実装でgreenだったため、`with_added`がindex + 1へ誤更新するmutantでredを確認し、正しいindex更新へ復元した。
 - 2026-08-09: 復元後に選択testとworkspace全11 testがgreen。Clippy `-D warnings`、format、`git diff --check`が成功した。

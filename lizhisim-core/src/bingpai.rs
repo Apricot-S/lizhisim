@@ -47,4 +47,17 @@ mod tests {
             &[0; 36],
         );
     }
+
+    #[test]
+    fn adding_same_tile_kind_four_times_has_count_four() {
+        assert_eq!(
+            Bingpai::default()
+                .with_added(TileKind::M1)
+                .with_added(TileKind::M1)
+                .with_added(TileKind::M1)
+                .with_added(TileKind::M1)
+                .counts()[0],
+            4,
+        );
+    }
 }
