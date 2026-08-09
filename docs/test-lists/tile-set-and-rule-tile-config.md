@@ -98,7 +98,7 @@
 - 2026-08-09: 「構築失敗時に部分的な`TileSet`を返さない」を選択し、`M1 = 4`を含むcountで`Z7 = 5`を拒否し、戻り値が`Err`であることを一assertionで検証する。既存の`Result` APIがすでにこの契約を満たしていたため、redなしでgreenを確認した。
 - 2026-08-09: 部分的な`TileSet`を返さない回帰testを追加した。workspace全体の検証は次のrefactor後に実行する。
 - 2026-08-09: 「不正なcountのerrorは対象`TileKind`と上限を保持する」を選択し、`Z7 = 5`のerror payloadを一assertionで検証する。既存実装がすでにこの契約を満たしていたため、redなしでgreenを確認した。
-- 2026-08-09: `TileCountExceeded`の対象`TileKind`、実枚数、上限を保持する回帰testを追加した。workspace全体の検証は次のrefactor後に実行する。
+- 2026-08-09: `tile_set_count_error_retains_tile_kind_and_max_count`は`tile_set_rejects_kind_count_above_four`と観点が重複するため削除し、後者で対象`TileKind`、実枚数、上限を継続して検証する方針とした。
 - 2026-08-09: 「`S0`と`S5`の合計が4枚を超えるcountを拒否する」を選択し、`S0 = 2`、`S5 = 3`の合計5を一assertionで検証する。
 - 2026-08-09: `S0/S5`の合計検証が未実装のため、`Ok(TileSet)`になるredを確認した。
 - 2026-08-09: `S0`と`S5`の合計が4を超えた場合に既存のcombined-count errorを返す最小実装をgreenにした。

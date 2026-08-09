@@ -135,23 +135,6 @@ mod tests {
     }
 
     #[test]
-    fn tile_set_count_error_retains_tile_kind_and_max_count() {
-        let mut counts = [0; 37];
-        counts[TileKind::Z7.index()] = 5;
-
-        let error = TileSet::try_from_counts(counts).expect_err("count must be rejected");
-
-        assert_eq!(
-            error,
-            TileSetError::TileCountExceeded {
-                tile_kind: TileKind::Z7,
-                actual_count: 5,
-                max_count: 4,
-            },
-        );
-    }
-
-    #[test]
     fn tile_set_construction_failure_does_not_return_partial_tile_set() {
         let mut counts = [0; 37];
         counts[TileKind::M1.index()] = 4;
