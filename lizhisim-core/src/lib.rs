@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
+mod bingpai;
 mod seat;
 mod tile;
 
+pub use bingpai::Bingpai;
 pub use seat::{FourPlayer, Seat, SeatIndexOutOfRange};
 pub use tile::TileKind;

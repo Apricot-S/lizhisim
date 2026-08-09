@@ -43,7 +43,7 @@
 `bingpai`の実装は`TileKind`の内部indexに対応する`[u8; 37]`を用いる。
 テストではmemory layoutそのものではなく、外部から観測できる枚数状態を検証する。
 
-- [ ] 空の`bingpai`では37種類すべての所持枚数が0である。
+- [x] 空の`bingpai`では37種類すべての所持枚数が0である。
 - [ ] 空の`bingpai`へ`M1`を1枚加えると、`M1`の所持枚数が1になる。
 - [ ] 空の`bingpai`へ`M1`を1枚加えても、ほかの36種類の所持枚数は変化しない。
 - [ ] 同じ`TileKind`を複数枚加えると、その所持枚数が加えた枚数になる。
@@ -124,10 +124,15 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 選択していた通常牌の`hong_baopai`否定testがmutantによるred検証を経てgreenとなり、refactor要否の確認まで完了したため。
+- Why: 空の`bingpai`の37 countがすべて0であることをgreenにし、refactor確認と全体検証まで完了したため。
 
 ## Cycle log
 
+- 2026-08-09: 「空の`bingpai`では37種類すべての所持枚数が0である」を選択した。`Bingpai`の内部表現は`[u8; 37]`とし、testは全countを一つの配列として比較する一assertionで記述する。
+- 2026-08-09: 選択testを実行し、`Bingpai`未実装によるunresolved importで失敗するredを確認した。
+- 2026-08-09: 非公開の`[u8; 37]`と読取専用のcount参照だけを持つ`Bingpai`を実装した。追加・除去は未実装のままgreen検証へ進む。
+- 2026-08-09: `[u8; 37]`は`Default`をderiveできなかったため、zero-filled arrayを返す`Default`を明示実装して選択testをgreenにした。
+- 2026-08-09: refactor変更なし。workspace全9 test、Clippy `-D warnings`、format、build、`git diff --check`が成功した。Cargoのglobal cache使用記録はsandbox外のread-only databaseへ保存できないwarningが出たが、buildとtest結果には影響していない。
 - 2026-08-09: `Seat`の構築範囲testを選択。redは未着手。
 - 2026-08-09: 局所的不変条件を検証するunit testとして`lizhisim-core/src/seat.rs`へ移動。`tests/`はfacade互換性や複数module間のintegration testに使う。
 - 2026-08-09: 「4席ある」「index 0〜3を変換できる」「範囲外を拒否する」の複数観点と複数assertionが一testに混在していたため、test listを三項目へ分割した。
