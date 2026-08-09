@@ -128,6 +128,8 @@
 
 ## Cycle log
 
+- 2026-08-09: `SeatIndexOutOfRange`を`BingpaiError`と比較し、error値の利用箇所に必要な`Debug`、`Error`、`PartialEq`だけを残した。`Clone`、`Copy`、`Eq`、`Hash`は使用されていないため削除した。
+- 2026-08-09: `BingpaiError`も同じ方針で`Eq`をderiveせず、`Debug`、`Error`、`PartialEq`だけに統一した。
 - 2026-08-09: 次項目として未所持`TileKind`の除去失敗を選択した。失敗理由を保持できる`Result<Bingpai, BingpaiError>`へ`with_removed`の戻り値を変更する。
 - 2026-08-09: `BingpaiError::TileNotPresent { tile_kind }`を`thiserror`で追加し、未所持`M1`の除去が対象kind付き`Err`になるtestをgreenにした。既存の所持牌除去testも`Result`へ移行してgreenを維持した。
 - 2026-08-09: refactor変更なし。workspace全18 test、Clippy `-D warnings`、format、`git diff --check`が成功した。

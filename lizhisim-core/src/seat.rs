@@ -14,7 +14,7 @@ pub struct Seat<P> {
     player_set: PhantomData<fn() -> P>,
 }
 
-#[derive(Clone, Copy, Debug, Eq, Error, Hash, PartialEq)]
+#[derive(Debug, Error, PartialEq)]
 #[error("seat index {index} is out of range for {seat_count} seats")]
 pub struct SeatIndexOutOfRange {
     pub index: usize,

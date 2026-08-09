@@ -5,7 +5,7 @@
 use crate::TileKind;
 use thiserror::Error;
 
-#[derive(Debug, Eq, Error, PartialEq)]
+#[derive(Debug, Error, PartialEq)]
 pub enum BingpaiError {
     #[error("tile kind is not present in bingpai: {tile_kind:?}")]
     TileNotPresent { tile_kind: TileKind },
