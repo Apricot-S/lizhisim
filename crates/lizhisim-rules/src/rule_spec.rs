@@ -6,19 +6,19 @@ use thiserror::Error;
 
 use lizhisim_core::{TileKind, TileSet, TileSetError};
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct HongBaopaiConfig {
     pub m0_count: u8,
     pub p0_count: u8,
     pub s0_count: u8,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RawRuleSpec {
     pub hong_baopai: HongBaopaiConfig,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RuleSpec {
     hong_baopai: HongBaopaiConfig,
 }
@@ -36,7 +36,7 @@ pub enum RuleSpecError {
 }
 
 impl HongBaopaiConfig {
-    const fn validate(self) -> Result<(), RuleSpecError> {
+    const fn validate(&self) -> Result<(), RuleSpecError> {
         match validate_hong_baopai_count(TileKind::M0, self.m0_count) {
             Ok(()) => {}
             Err(error) => return Err(error),
@@ -80,7 +80,7 @@ impl TryFrom<RawRuleSpec> for RuleSpec {
 }
 
 impl RuleSpec {
-    pub fn resolve_tile_set(self) -> Result<TileSet, RuleSpecError> {
+    pub fn resolve_tile_set(&self) -> Result<TileSet, RuleSpecError> {
         let mut counts = [4; 37];
 
         counts[TileKind::M0.index()] = self.hong_baopai.m0_count;
