@@ -72,7 +72,7 @@
 - [ ] 赤牌1枚の`TileSet`では対応する赤牌を1枚だけ追加できる。
 - [ ] 赤牌1枚の`TileSet`では対応する通常5を3枚だけ追加できる。
 - [ ] 赤牌4枚の`TileSet`では対応する通常5を追加できない。
-- [ ] 上限超過errorは対象`TileKind`、現在枚数、設定上限を保持する。
+- [x] 上限超過errorは対象`TileKind`、現在枚数、設定上限を保持する。
 - [ ] 追加失敗後も元の`Bingpai`は変化しない。
 - [ ] 現在の固定4枚上限testを`TileSet`由来の上限testへ置き換える。
 
@@ -176,6 +176,8 @@
 - 2026-08-10: 雀魂四人基準（赤3、各色赤1枚）の`TileSet::total_count() == 136`を検証する回帰testを追加した。既存の解決実装が契約を満たしていたためredなしでgreenを確認した。
 
 - 2026-08-10: 雀魂四人基準の5以外31種類が各4枚となる解決testを追加した。既存の`RuleSpec::resolve_tile_set`が契約を満たしていたためredなしでgreenを確認した。
+
+- 2026-08-10: `Bingpai::new(TileSet)`を追加し、設定上限1枚の`M1`を2枚追加しようとした場合に設定上限を持つerrorになるtestを追加した。`TileSet`値保持方式を採用し、workspace全46 test、Clippy、format、`git diff --check`が成功した。
 
 ## Completion review
 

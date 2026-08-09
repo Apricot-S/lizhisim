@@ -4,7 +4,7 @@
 
 use thiserror::Error;
 
-use crate::TileKind;
+use crate::{TileKind, TileSet};
 
 #[derive(Debug, Error, PartialEq)]
 pub enum BingpaiError {
@@ -17,21 +17,36 @@ pub enum BingpaiError {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Bingpai {
     counts: [u8; 37],
+    tile_set: Option<TileSet>,
 }
 
 impl Default for Bingpai {
     fn default() -> Self {
-        Self { counts: [0; 37] }
+        Self {
+            counts: [0; 37],
+            tile_set: None,
+        }
     }
 }
 
 impl Bingpai {
+    pub const fn new(tile_set: TileSet) -> Self {
+        Self {
+            counts: [0; 37],
+            tile_set: Some(tile_set),
+        }
+    }
+
     pub fn with_added(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
         let count = &mut self.counts[tile_kind.index()];
-        if *count >= 4 {
+        let max_count = self
+            .tile_set
+            .as_ref()
+            .map_or(4, |tile_set| tile_set.max_count(tile_kind));
+        if *count >= max_count {
             return Err(BingpaiError::TileCountExceeded {
                 tile_kind,
-                max_count: 4,
+                max_count,
             });
         }
         *count += 1;
@@ -272,6 +287,23 @@ mod tests {
             Err(BingpaiError::TileCountExceeded {
                 tile_kind: TileKind::M1,
                 max_count: 4,
+            }),
+        );
+    }
+
+    #[test]
+    fn adding_beyond_tile_set_limit_reports_configured_max_count() {
+        let mut counts = [0; 37];
+        counts[TileKind::M1.index()] = 1;
+        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap())
+            .with_added(TileKind::M1)
+            .unwrap();
+
+        assert_eq!(
+            bingpai.with_added(TileKind::M1),
+            Err(BingpaiError::TileCountExceeded {
+                tile_kind: TileKind::M1,
+                max_count: 1,
             }),
         );
     }
