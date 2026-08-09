@@ -190,4 +190,20 @@ mod tests {
             [1, 1],
         );
     }
+
+    #[test]
+    fn adding_p0_to_empty_bingpai_does_not_change_p5_count() {
+        assert_eq!(
+            Bingpai::default().with_added(TileKind::P0).counts()[TileKind::P5.index()],
+            0,
+        );
+    }
+
+    #[test]
+    fn adding_s0_to_empty_bingpai_does_not_change_s5_count() {
+        assert_eq!(
+            Bingpai::default().with_added(TileKind::S0).counts()[TileKind::S5.index()],
+            0,
+        );
+    }
 }
