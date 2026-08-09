@@ -25,7 +25,7 @@ impl Default for Bingpai {
 }
 
 impl Bingpai {
-    pub fn try_with_added(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
+    pub fn with_added(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
         let count = &mut self.counts[tile_kind.index()];
         if *count >= 4 {
             return Err(BingpaiError::TileCountExceeded {
@@ -35,11 +35,6 @@ impl Bingpai {
         }
         *count += 1;
         Ok(self)
-    }
-
-    pub fn with_added(mut self, tile_kind: TileKind) -> Self {
-        self.counts[tile_kind.index()] += 1;
-        self
     }
 
     pub fn with_removed(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
@@ -65,13 +60,22 @@ mod tests {
 
     #[test]
     fn adding_m1_to_empty_bingpai_has_one_m1() {
-        assert_eq!(Bingpai::default().with_added(TileKind::M1).counts()[0], 1);
+        assert_eq!(
+            Bingpai::default()
+                .with_added(TileKind::M1)
+                .unwrap()
+                .counts()[0],
+            1
+        );
     }
 
     #[test]
     fn adding_m1_to_empty_bingpai_does_not_change_other_counts() {
         assert_eq!(
-            &Bingpai::default().with_added(TileKind::M1).counts()[1..],
+            &Bingpai::default()
+                .with_added(TileKind::M1)
+                .unwrap()
+                .counts()[1..],
             &[0; 36],
         );
     }
@@ -81,9 +85,13 @@ mod tests {
         assert_eq!(
             Bingpai::default()
                 .with_added(TileKind::M1)
+                .unwrap()
                 .with_added(TileKind::M1)
+                .unwrap()
                 .with_added(TileKind::M1)
+                .unwrap()
                 .with_added(TileKind::M1)
+                .unwrap()
                 .counts()[0],
             4,
         );
@@ -92,7 +100,10 @@ mod tests {
     #[test]
     fn adding_m0_to_empty_bingpai_has_one_m0() {
         assert_eq!(
-            Bingpai::default().with_added(TileKind::M0).counts()[TileKind::M0.index()],
+            Bingpai::default()
+                .with_added(TileKind::M0)
+                .unwrap()
+                .counts()[TileKind::M0.index()],
             1,
         );
     }
@@ -100,7 +111,10 @@ mod tests {
     #[test]
     fn adding_m0_to_empty_bingpai_does_not_change_m5_count() {
         assert_eq!(
-            Bingpai::default().with_added(TileKind::M0).counts()[TileKind::M5.index()],
+            Bingpai::default()
+                .with_added(TileKind::M0)
+                .unwrap()
+                .counts()[TileKind::M5.index()],
             0,
         );
     }
@@ -108,7 +122,10 @@ mod tests {
     #[test]
     fn adding_m5_to_empty_bingpai_has_one_m5() {
         assert_eq!(
-            Bingpai::default().with_added(TileKind::M5).counts()[TileKind::M5.index()],
+            Bingpai::default()
+                .with_added(TileKind::M5)
+                .unwrap()
+                .counts()[TileKind::M5.index()],
             1,
         );
     }
@@ -116,7 +133,10 @@ mod tests {
     #[test]
     fn adding_m5_to_empty_bingpai_does_not_change_m0_count() {
         assert_eq!(
-            Bingpai::default().with_added(TileKind::M5).counts()[TileKind::M0.index()],
+            Bingpai::default()
+                .with_added(TileKind::M5)
+                .unwrap()
+                .counts()[TileKind::M0.index()],
             0,
         );
     }
@@ -126,6 +146,7 @@ mod tests {
         assert_eq!(
             Bingpai::default()
                 .with_added(TileKind::M1)
+                .unwrap()
                 .with_removed(TileKind::M1)
                 .unwrap()
                 .counts()[TileKind::M1.index()],
@@ -156,6 +177,7 @@ mod tests {
         assert_eq!(
             Bingpai::default()
                 .with_added(TileKind::M5)
+                .unwrap()
                 .with_removed(TileKind::M0),
             Err(BingpaiError::TileNotPresent {
                 tile_kind: TileKind::M0,
@@ -168,6 +190,7 @@ mod tests {
         assert_eq!(
             Bingpai::default()
                 .with_added(TileKind::M0)
+                .unwrap()
                 .with_removed(TileKind::M5),
             Err(BingpaiError::TileNotPresent {
                 tile_kind: TileKind::M5,
@@ -179,7 +202,9 @@ mod tests {
     fn adding_m0_to_bingpai_holding_m5_does_not_substitute_m5() {
         let bingpai = Bingpai::default()
             .with_added(TileKind::M5)
-            .with_added(TileKind::M0);
+            .unwrap()
+            .with_added(TileKind::M0)
+            .unwrap();
 
         assert_eq!(
             [
@@ -194,7 +219,9 @@ mod tests {
     fn adding_m5_to_bingpai_holding_m0_does_not_substitute_m0() {
         let bingpai = Bingpai::default()
             .with_added(TileKind::M0)
-            .with_added(TileKind::M5);
+            .unwrap()
+            .with_added(TileKind::M5)
+            .unwrap();
 
         assert_eq!(
             [
@@ -208,7 +235,10 @@ mod tests {
     #[test]
     fn adding_p0_to_empty_bingpai_does_not_change_p5_count() {
         assert_eq!(
-            Bingpai::default().with_added(TileKind::P0).counts()[TileKind::P5.index()],
+            Bingpai::default()
+                .with_added(TileKind::P0)
+                .unwrap()
+                .counts()[TileKind::P5.index()],
             0,
         );
     }
@@ -216,7 +246,10 @@ mod tests {
     #[test]
     fn adding_s0_to_empty_bingpai_does_not_change_s5_count() {
         assert_eq!(
-            Bingpai::default().with_added(TileKind::S0).counts()[TileKind::S5.index()],
+            Bingpai::default()
+                .with_added(TileKind::S0)
+                .unwrap()
+                .counts()[TileKind::S5.index()],
             0,
         );
     }
@@ -224,17 +257,17 @@ mod tests {
     #[test]
     fn adding_fifth_copy_of_tile_kind_reports_count_exceeded() {
         let bingpai = Bingpai::default()
-            .try_with_added(TileKind::M1)
+            .with_added(TileKind::M1)
             .unwrap()
-            .try_with_added(TileKind::M1)
+            .with_added(TileKind::M1)
             .unwrap()
-            .try_with_added(TileKind::M1)
+            .with_added(TileKind::M1)
             .unwrap()
-            .try_with_added(TileKind::M1)
+            .with_added(TileKind::M1)
             .unwrap();
 
         assert_eq!(
-            bingpai.try_with_added(TileKind::M1),
+            bingpai.with_added(TileKind::M1),
             Err(BingpaiError::TileCountExceeded {
                 tile_kind: TileKind::M1,
                 max_count: 4,
