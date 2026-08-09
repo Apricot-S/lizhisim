@@ -56,6 +56,26 @@ impl TileSet {
             });
         }
 
+        let combined_p5_count = counts[TileKind::P0.index()] + counts[TileKind::P5.index()];
+        if combined_p5_count > 4 {
+            return Err(TileSetError::CombinedFiveCountExceeded {
+                hong_baopai: TileKind::P0,
+                base_tile: TileKind::P5,
+                actual_count: combined_p5_count,
+                max_count: 4,
+            });
+        }
+
+        let combined_s5_count = counts[TileKind::S0.index()] + counts[TileKind::S5.index()];
+        if combined_s5_count > 4 {
+            return Err(TileSetError::CombinedFiveCountExceeded {
+                hong_baopai: TileKind::S0,
+                base_tile: TileKind::S5,
+                actual_count: combined_s5_count,
+                max_count: 4,
+            });
+        }
+
         Ok(Self {
             counts,
             total_count,
@@ -125,6 +145,40 @@ mod tests {
             Err(TileSetError::CombinedFiveCountExceeded {
                 hong_baopai: TileKind::M0,
                 base_tile: TileKind::M5,
+                actual_count: 5,
+                max_count: 4,
+            }),
+        );
+    }
+
+    #[test]
+    fn tile_set_rejects_combined_p0_and_p5_count_above_four() {
+        let mut counts = [0; 37];
+        counts[TileKind::P0.index()] = 2;
+        counts[TileKind::P5.index()] = 3;
+
+        assert_eq!(
+            TileSet::try_from_counts(counts),
+            Err(TileSetError::CombinedFiveCountExceeded {
+                hong_baopai: TileKind::P0,
+                base_tile: TileKind::P5,
+                actual_count: 5,
+                max_count: 4,
+            }),
+        );
+    }
+
+    #[test]
+    fn tile_set_rejects_combined_s0_and_s5_count_above_four() {
+        let mut counts = [0; 37];
+        counts[TileKind::S0.index()] = 2;
+        counts[TileKind::S5.index()] = 3;
+
+        assert_eq!(
+            TileSet::try_from_counts(counts),
+            Err(TileSetError::CombinedFiveCountExceeded {
+                hong_baopai: TileKind::S0,
+                base_tile: TileKind::S5,
                 actual_count: 5,
                 max_count: 4,
             }),

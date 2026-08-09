@@ -35,8 +35,8 @@
 - [x] `TileSet`の総牌数は37 countの合計から一意に求まる。
 - [x] 一つの`TileKind`が4枚を超えるcountを拒否する。
 - [x] `M0`と`M5`の合計が4枚を超えるcountを拒否する。
-- [ ] `P0`と`P5`の合計が4枚を超えるcountを拒否する。
-- [ ] `S0`と`S5`の合計が4枚を超えるcountを拒否する。
+- [x] `P0`と`P5`の合計が4枚を超えるcountを拒否する。
+- [x] `S0`と`S5`の合計が4枚を超えるcountを拒否する。
 - [ ] 不正なcountのerrorは対象`TileKind`と上限を保持する。
 - [ ] 構築失敗時に部分的な`TileSet`を返さない。
 
@@ -91,10 +91,18 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: `M0`と`M5`の合計上限を検証するcycleがgreenになったため。
+- Why: `S0`と`S5`の合計上限を検証するcycleがgreenになったため。
 
 ## Cycle log
 
+- 2026-08-09: 「`S0`と`S5`の合計が4枚を超えるcountを拒否する」を選択し、`S0 = 2`、`S5 = 3`の合計5を一assertionで検証する。
+- 2026-08-09: `S0/S5`の合計検証が未実装のため、`Ok(TileSet)`になるredを確認した。
+- 2026-08-09: `S0`と`S5`の合計が4を超えた場合に既存のcombined-count errorを返す最小実装をgreenにした。
+- 2026-08-09: refactor変更なし。選択testがgreenになった。
+- 2026-08-09: 「`P0`と`P5`の合計が4枚を超えるcountを拒否する」を選択し、`P0 = 2`、`P5 = 3`の合計5を一assertionで検証する。
+- 2026-08-09: `P0/P5`の合計検証が未実装のため、`Ok(TileSet)`になるredを確認した。
+- 2026-08-09: `P0`と`P5`の合計が4を超えた場合に既存のcombined-count errorを返す最小実装をgreenにした。
+- 2026-08-09: refactor変更なし。選択testがgreenになった。
 - 2026-08-09: 「`M0`と`M5`の合計が4枚を超えるcountを拒否する」を選択し、`M0 = 2`、`M5 = 3`の合計5を一assertionで検証する。
 - 2026-08-09: `TileSetError::CombinedFiveCountExceeded`未定義によるvariant not foundで失敗するredを確認した。
 - 2026-08-09: `M0`と`M5`の合計が4を超えた場合に、赤牌、通常5、実枚数、上限を持つerrorを返す最小実装をgreenにした。`P0/P5`と`S0/S5`は後続testへ残した。
