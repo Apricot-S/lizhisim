@@ -1,14 +1,14 @@
 [workspace]
 resolver = "3"
 members = [
-    "lizhisim",
-    "lizhisim-core",
-    "lizhisim-rules",
+    "crates/lizhisim",
+    "crates/lizhisim-core",
+    "crates/lizhisim-rules",
 ]
 
 [workspace.package]
 description = "A Japanese (Riichi) mahjong game simulator."
-version = "0.1.0"
+version = "0.0.1"
 authors = ["Apricot S."]
 edition = "2024"
 rust-version = "1.97"
@@ -22,7 +22,7 @@ categories = ["simulation"]
 tag-prefix = ""
 
 [workspace.dependencies]
-lizhisim-core = { path = "lizhisim-core", version = "0.1.0" }
-lizhisim-rules = { path = "lizhisim-rules", version = "0.1.0" }
+lizhisim-core = { path = "crates/lizhisim-core", version = "0.0.1" }
+lizhisim-rules = { path = "crates/lizhisim-rules", version = "0.0.1" }
 
 thiserror = "2.0.20"
