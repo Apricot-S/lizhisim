@@ -49,6 +49,20 @@ const fn validate_combined_five_count(
 }
 
 impl TileSet {
+    pub const fn standard_four_player() -> Self {
+        let mut counts = [4; 37];
+        counts[TileKind::M0.index()] = 1;
+        counts[TileKind::M5.index()] = 3;
+        counts[TileKind::P0.index()] = 1;
+        counts[TileKind::P5.index()] = 3;
+        counts[TileKind::S0.index()] = 1;
+        counts[TileKind::S5.index()] = 3;
+        Self {
+            counts,
+            total_count: 136,
+        }
+    }
+
     pub const fn try_from_counts(counts: [u8; 37]) -> Result<Self, TileSetError> {
         let mut index = 0;
         let mut total_count = 0;

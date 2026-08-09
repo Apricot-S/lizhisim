@@ -17,14 +17,14 @@ pub enum BingpaiError {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Bingpai {
     counts: [u8; 37],
-    tile_set: Option<TileSet>,
+    tile_set: TileSet,
 }
 
 impl Default for Bingpai {
     fn default() -> Self {
         Self {
             counts: [0; 37],
-            tile_set: None,
+            tile_set: TileSet::standard_four_player(),
         }
     }
 }
@@ -33,16 +33,13 @@ impl Bingpai {
     pub const fn new(tile_set: TileSet) -> Self {
         Self {
             counts: [0; 37],
-            tile_set: Some(tile_set),
+            tile_set,
         }
     }
 
     pub fn with_added(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
         let count = &mut self.counts[tile_kind.index()];
-        let max_count = self
-            .tile_set
-            .as_ref()
-            .map_or(4, |tile_set| tile_set.max_count(tile_kind));
+        let max_count = self.tile_set.max_count(tile_kind);
         if *count >= max_count {
             return Err(BingpaiError::TileCountExceeded {
                 tile_kind,
