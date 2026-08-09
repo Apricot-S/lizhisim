@@ -31,7 +31,7 @@
 ### Core `TileSet`
 
 - [x] 37種類のcountから物理的に可能な`TileSet`を構築できる。
-- [ ] `TileSet`は指定した`TileKind`の最大枚数を返す。
+- [x] `TileSet`は指定した`TileKind`の最大枚数を返す。
 - [ ] `TileSet`の総牌数は37 countの合計から一意に求まる。
 - [ ] 一つの`TileKind`が4枚を超えるcountを拒否する。
 - [ ] `M0`と`M5`の合計が4枚を超えるcountを拒否する。
@@ -91,10 +91,14 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 37種類の物理的に可能なcountから`TileSet`を構築するtestをgreenにし、全体検証まで完了したため。
+- Why: `TileSet::max_count`で指定した`TileKind`の上限を読めることをgreenにし、全体検証まで完了したため。
 
 ## Cycle log
 
+- 2026-08-09: 「`TileSet`は指定した`TileKind`の最大枚数を返す」を選択し、`M1`の設定値3を一assertionで検証する。
+- 2026-08-09: `max_count`未実装によるmethod not foundで失敗するredを確認した。
+- 2026-08-09: `TileKind`の内部indexからcountを返す`TileSet::max_count`だけを実装してgreenにした。refactor変更なし。
+- 2026-08-09: workspace全28 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: ADR-0015をAcceptedとし、`TileSet`を独立した`tile_set.rs`へ置く方針でtest listを作成した。
 - 2026-08-09: module公開は単独の振る舞いtestにせずdesign constraintとして確認する。最初の項目に「37種類のcountから物理的に可能な`TileSet`を構築できる」を選択した。
 - 2026-08-09: `TileSet`と`TileSetError`が未定義のため失敗するredを確認した。
