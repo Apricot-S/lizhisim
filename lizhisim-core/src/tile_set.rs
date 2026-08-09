@@ -135,6 +135,23 @@ mod tests {
     }
 
     #[test]
+    fn tile_set_count_error_retains_tile_kind_and_max_count() {
+        let mut counts = [0; 37];
+        counts[TileKind::Z7.index()] = 5;
+
+        let error = TileSet::try_from_counts(counts).expect_err("count must be rejected");
+
+        assert_eq!(
+            error,
+            TileSetError::TileCountExceeded {
+                tile_kind: TileKind::Z7,
+                actual_count: 5,
+                max_count: 4,
+            },
+        );
+    }
+
+    #[test]
     fn tile_set_rejects_combined_m0_and_m5_count_above_four() {
         let mut counts = [0; 37];
         counts[TileKind::M0.index()] = 2;
