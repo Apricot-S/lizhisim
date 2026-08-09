@@ -44,7 +44,9 @@
 
 - [x] `lizhisim-rules` crateは`lizhisim-core`へだけ依存して最小scaffoldを構築できる。
 - [x] facade `lizhisim`はrulesとcoreの公開APIをre-exportする。
-- [ ] `M0`、`P0`、`S0`のraw枚数を独立に0〜4で受け付ける。
+- [x] `M0`のraw枚数を独立に0〜4で受け付ける。
+- [ ] `P0`のraw枚数を独立に0〜4で受け付ける。
+- [ ] `S0`のraw枚数を独立に0〜4で受け付ける。
 - [ ] `M0`のraw枚数5をschema validationで拒否する。
 - [ ] `P0`のraw枚数5をschema validationで拒否する。
 - [ ] `S0`のraw枚数5をschema validationで拒否する。
@@ -91,10 +93,14 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: facadeからcoreを直re-exportし、rulesを`rules` module内でre-exportできたため。
+- Why: `RawRuleSpec`が`M0`のraw枚数0〜4を受け付けることを確認できたため。
 
 ## Cycle log
 
+- 2026-08-09: 「`M0`のraw枚数を独立に0〜4で受け付ける」を選択し、0〜4の全入力を一assertionで検証する。
+- 2026-08-09: `RawRuleSpec`と`M0`枚数検証が未実装のため、rules crateのtestをコンパイルできないredを確認した。
+- 2026-08-09: `RawRuleSpec::new`と`M0`枚数フィールドを追加し、0〜4を受理する最小実装をgreenにした。`P0/S0`は後続項目に分割した。
+- 2026-08-09: refactor変更なし。選択testがgreenになった。
 - 2026-08-09: 「`lizhisim-rules` crateは`lizhisim-core`へだけ依存して最小scaffoldを構築できる」を選択した。crate未作成のため、workspaceへ追加してbuildできる状態が未達であることをredの前提として確認する。
 - 2026-08-09: workspaceへ`lizhisim-rules`を追加し、`lizhisim-core`だけを依存に持つ空のlibrary scaffoldを作成してgreenにした。
 - 2026-08-09: workspace build、全34 test、Clippy、format、`git diff --check`が成功した。
