@@ -191,4 +191,44 @@ mod tests {
             [0, 4, 0, 4, 0, 4],
         );
     }
+
+    #[test]
+    fn rule_spec_resolves_red_three_to_three_base_fives() {
+        let tile_set = RuleSpec::try_from(raw(1, 1, 1))
+            .unwrap()
+            .resolve_tile_set()
+            .unwrap();
+
+        assert_eq!(
+            [
+                tile_set.max_count(TileKind::M0),
+                tile_set.max_count(TileKind::M5),
+                tile_set.max_count(TileKind::P0),
+                tile_set.max_count(TileKind::P5),
+                tile_set.max_count(TileKind::S0),
+                tile_set.max_count(TileKind::S5),
+            ],
+            [1, 3, 1, 3, 1, 3],
+        );
+    }
+
+    #[test]
+    fn rule_spec_resolves_four_hong_baopai_to_zero_base_fives() {
+        let tile_set = RuleSpec::try_from(raw(4, 4, 4))
+            .unwrap()
+            .resolve_tile_set()
+            .unwrap();
+
+        assert_eq!(
+            [
+                tile_set.max_count(TileKind::M0),
+                tile_set.max_count(TileKind::M5),
+                tile_set.max_count(TileKind::P0),
+                tile_set.max_count(TileKind::P5),
+                tile_set.max_count(TileKind::S0),
+                tile_set.max_count(TileKind::S5),
+            ],
+            [4, 0, 4, 0, 4, 0],
+        );
+    }
 }

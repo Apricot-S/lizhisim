@@ -52,7 +52,8 @@
 - [x] `S0`のraw枚数5をschema validationで拒否する。
 - [x] 赤牌0枚を通常5が4枚、赤牌が0枚の`TileSet`へ解決する。
 - [ ] 赤牌1枚を通常5が3枚、赤牌が1枚の`TileSet`へ解決する。
-- [ ] 赤牌4枚を通常5が0枚、赤牌が4枚の`TileSet`へ解決する。
+- [x] 赤3（M/P/S各1枚、合計3枚）を通常5が各3枚の`TileSet`へ解決する。
+- [x] 赤牌4枚を通常5が0枚、赤牌が4枚の`TileSet`へ解決する。
 - [ ] 雀魂四人基準の各色赤1枚を合計136枚の`TileSet`へ解決する。
 - [ ] 雀魂四人基準では5以外の31種類を各4枚へ解決する。
 
@@ -170,6 +171,8 @@
 - 2026-08-09: `TileSet`と`TileSetError`が未定義のため失敗するredを確認した。
 - 2026-08-09: `lizhisim-core/src/tile_set.rs`へ37 countを保持する`TileSet`、将来のvalidation errorを追加する`TileSetError`、最小の`try_from_counts`を実装してgreenにした。上限検証は後続testへ残した。
 - 2026-08-09: refactor変更なし。workspace全27 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
+
+- 2026-08-10: 赤3（M/P/S各1枚、合計3枚）と全赤（各4枚）の解決testを追加し、M/P/S各色の赤牌・通常5のcountを各一assertionで検証した。既存の解決実装が契約を満たしていたためredなしでgreenを確認した。
 
 ## Completion review
 
