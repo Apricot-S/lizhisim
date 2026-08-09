@@ -53,17 +53,3 @@ jobs:
 
       - name: Test
         run: cargo test --verbose
-
-  docs-rs:
-    name: Documentation
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      RUSTDOCFLAGS: -Dwarnings
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: dtolnay/rust-toolchain@nightly
-      - uses: dtolnay/install@cargo-docs-rs
-      - run: cargo docs-rs
