@@ -3,6 +3,7 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[repr(u8)]
 #[rustfmt::skip]
 pub enum TileKind {
     // wanzi
@@ -24,6 +25,10 @@ pub enum TileKind {
 }
 
 impl TileKind {
+    pub(crate) const fn index(self) -> usize {
+        self as usize
+    }
+
     #[rustfmt::skip]
     pub const ALL: [Self; 37] = [
         // wanzi

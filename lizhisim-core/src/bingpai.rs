@@ -14,6 +14,11 @@ impl Default for Bingpai {
 }
 
 impl Bingpai {
+    pub fn with_added(mut self, tile_kind: crate::TileKind) -> Self {
+        self.counts[tile_kind.index()] += 1;
+        self
+    }
+
     pub const fn counts(&self) -> &[u8; 37] {
         &self.counts
     }
@@ -22,9 +27,15 @@ impl Bingpai {
 #[cfg(test)]
 mod tests {
     use super::Bingpai;
+    use crate::TileKind;
 
     #[test]
     fn empty_bingpai_has_zero_of_every_tile_kind() {
         assert_eq!(Bingpai::default().counts(), &[0; 37]);
+    }
+
+    #[test]
+    fn adding_m1_to_empty_bingpai_has_one_m1() {
+        assert_eq!(Bingpai::default().with_added(TileKind::M1).counts()[0], 1);
     }
 }

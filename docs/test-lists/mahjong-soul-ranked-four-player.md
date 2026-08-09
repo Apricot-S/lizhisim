@@ -44,7 +44,7 @@
 テストではmemory layoutそのものではなく、外部から観測できる枚数状態を検証する。
 
 - [x] 空の`bingpai`では37種類すべての所持枚数が0である。
-- [ ] 空の`bingpai`へ`M1`を1枚加えると、`M1`の所持枚数が1になる。
+- [x] 空の`bingpai`へ`M1`を1枚加えると、`M1`の所持枚数が1になる。
 - [ ] 空の`bingpai`へ`M1`を1枚加えても、ほかの36種類の所持枚数は変化しない。
 - [ ] 同じ`TileKind`を複数枚加えると、その所持枚数が加えた枚数になる。
 - [ ] `M0`を加えると、`M0`の所持枚数が1になる。
@@ -124,10 +124,14 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 空の`bingpai`の37 countがすべて0であることをgreenにし、refactor確認と全体検証まで完了したため。
+- Why: 空の`bingpai`への`M1`追加とcount 1をgreenにし、全体検証まで完了したため。
 
 ## Cycle log
 
+- 2026-08-09: 「空の`bingpai`へ`M1`を1枚加えると、`M1`の所持枚数が1になる」を選択した。追加は既存値を消費して新しい`Bingpai`を返すAPIとして検証する。
+- 2026-08-09: 選択testを実行し、`with_added`未実装によるmethod not foundで失敗するredを確認した。
+- 2026-08-09: `TileKind`へ`#[repr(u8)]`と内部indexを追加し、`Bingpai::with_added`で指定kindのcountだけを増やしてgreenにした。
+- 2026-08-09: refactor変更なし。workspace全10 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: 「空の`bingpai`では37種類すべての所持枚数が0である」を選択した。`Bingpai`の内部表現は`[u8; 37]`とし、testは全countを一つの配列として比較する一assertionで記述する。
 - 2026-08-09: 選択testを実行し、`Bingpai`未実装によるunresolved importで失敗するredを確認した。
 - 2026-08-09: 非公開の`[u8; 37]`と読取専用のcount参照だけを持つ`Bingpai`を実装した。追加・除去は未実装のままgreen検証へ進む。
