@@ -17,35 +17,29 @@ pub struct RawRuleSpec {
 
 #[derive(Debug, Error, PartialEq)]
 pub enum RawRuleSpecError {
-    #[error("M0 count {actual_count} exceeds maximum {max_count}")]
-    M0CountOutOfRange { actual_count: u8, max_count: u8 },
-    #[error("P0 count {actual_count} exceeds maximum {max_count}")]
-    P0CountOutOfRange { actual_count: u8, max_count: u8 },
-    #[error("S0 count {actual_count} exceeds maximum {max_count}")]
-    S0CountOutOfRange { actual_count: u8, max_count: u8 },
+    #[error("{hong_baopai:?} count {actual_count} exceeds maximum {max_count}")]
+    HongBaopaiCountOutOfRange {
+        hong_baopai: TileKind,
+        actual_count: u8,
+        max_count: u8,
+    },
     #[error("failed to resolve tile set: {0}")]
     TileSet(#[from] TileSetError),
 }
 
 impl RawRuleSpec {
     pub const fn new(m0_count: u8, p0_count: u8, s0_count: u8) -> Result<Self, RawRuleSpecError> {
-        if m0_count > 4 {
-            return Err(RawRuleSpecError::M0CountOutOfRange {
-                actual_count: m0_count,
-                max_count: 4,
-            });
+        match validate_hong_baopai_count(TileKind::M0, m0_count) {
+            Ok(()) => {}
+            Err(error) => return Err(error),
         }
-        if p0_count > 4 {
-            return Err(RawRuleSpecError::P0CountOutOfRange {
-                actual_count: p0_count,
-                max_count: 4,
-            });
+        match validate_hong_baopai_count(TileKind::P0, p0_count) {
+            Ok(()) => {}
+            Err(error) => return Err(error),
         }
-        if s0_count > 4 {
-            return Err(RawRuleSpecError::S0CountOutOfRange {
-                actual_count: s0_count,
-                max_count: 4,
-            });
+        match validate_hong_baopai_count(TileKind::S0, s0_count) {
+            Ok(()) => {}
+            Err(error) => return Err(error),
         }
         Ok(Self {
             m0_count,
@@ -68,6 +62,20 @@ impl RawRuleSpec {
             Err(error) => Err(RawRuleSpecError::TileSet(error)),
         }
     }
+}
+
+const fn validate_hong_baopai_count(
+    hong_baopai: TileKind,
+    actual_count: u8,
+) -> Result<(), RawRuleSpecError> {
+    if actual_count > 4 {
+        return Err(RawRuleSpecError::HongBaopaiCountOutOfRange {
+            hong_baopai,
+            actual_count,
+            max_count: 4,
+        });
+    }
+    Ok(())
 }
 
 #[cfg(test)]

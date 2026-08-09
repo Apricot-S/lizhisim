@@ -97,6 +97,8 @@
 
 ## Cycle log
 
+- 2026-08-09: refactorとして`M0CountOutOfRange`、`P0CountOutOfRange`、`S0CountOutOfRange`を`HongBaopaiCountOutOfRange`へ統合し、対象`TileKind`をpayloadへ保持する共通helperを追加した。`const fn`の制約により明示的な`match`でerrorを伝播した。
+- 2026-08-09: refactor後もworkspace全37 test、Clippy、format、`git diff --check`が成功した。
 - 2026-08-09: 「`S0`のraw枚数を独立に0〜4で受け付ける」を選択し、`M0 = 0`、`P0 = 0`を固定して0〜4の全入力を一assertionで検証する。
 - 2026-08-09: `RawRuleSpec`に`S0`設定が未実装のため、3引数constructorとS0 testをコンパイルできないredを確認した。
 - 2026-08-09: `RawRuleSpec`へ`s0_count`と範囲検証を追加し、牌数解決で`S0/S5`へ反映する最小実装をgreenにした。
