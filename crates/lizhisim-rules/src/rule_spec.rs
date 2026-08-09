@@ -71,6 +71,7 @@ impl TryFrom<RawRuleSpec> for RuleSpec {
 impl RuleSpec {
     pub fn resolve_tile_set(self) -> Result<TileSet, RuleSpecError> {
         let mut counts = [4; 37];
+
         counts[TileKind::M0.index()] = self.hong_baopai.m0_count;
         counts[TileKind::M5.index()] = 4 - self.hong_baopai.m0_count;
         counts[TileKind::P0.index()] = self.hong_baopai.p0_count;
@@ -78,10 +79,7 @@ impl RuleSpec {
         counts[TileKind::S0.index()] = self.hong_baopai.s0_count;
         counts[TileKind::S5.index()] = 4 - self.hong_baopai.s0_count;
 
-        match TileSet::try_from_counts(counts) {
-            Ok(tile_set) => Ok(tile_set),
-            Err(error) => Err(RuleSpecError::TileSet(error)),
-        }
+        TileSet::try_from_counts(counts).map_err(RuleSpecError::TileSet)
     }
 }
 
