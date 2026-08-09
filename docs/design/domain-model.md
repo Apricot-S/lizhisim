@@ -54,9 +54,17 @@ primitive obsession を避け、少なくとも次を区別する。
 
 `TileKind`は通常の34種類に赤`5m`、赤`5p`、赤`5s`を加えた37種類とする。同じ`TileKind`の複数枚は個別identityを持たず、個数またはmultisetとして表す。core domainに`TileCopy`を置かない。
 
+`TileSet`は`lizhisim-core`が所有する検証済み実行値であり、37種類それぞれの卓内最大枚数と
+総牌数を保持する。rawな赤牌設定、preset metadata、出典は保持しない。`lizhisim-rules`が
+設定をsemantic validationした後、coreの検証済みconstructorを通して`TileSet`を生成する。
+詳細は[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)を参照する。
+
 `bingpai`は`TileKind`の内部indexに対応する`[u8; 37]`の所持枚数配列として保持し、
 個々の牌を並べた可変長列としては保持しない。`zimopai`、`he`、canonical eventは
 牌の実個体を区別せず`TileKind`を保持する。
+
+`Bingpai`への追加は`TileSet`の対象kind上限を超える場合に失敗する。現在の固定4枚上限は
+walking skeletonの暫定実装であり、`TileSet`導入後は赤牌設定や除外牌を反映した上限へ置き換える。
 
 四人用`Bipai`は`[TileKind; 136]`と非公開cursorで保持する。`Zimo`では要素を移動せず、
 cursorを進める。三人用`Bipai`の固定長と型構成は、三人麻雀の設計時に決定する。

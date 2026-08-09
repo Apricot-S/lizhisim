@@ -187,7 +187,7 @@ event は少なくとも experiment、competition、table match、round の stre
 | 候補 crate | 責務 |
 |---|---|
 | `lizhisim-core` | 値型、typestate、純粋遷移、domain port。現在作成済み |
-| `lizhisim-rules` | 設定 schema、検証、preset registry |
+| `lizhisim-rules` | raw設定schema、検証、解決済みrule、preset registry。domain実行値は`lizhisim-core`の型へ変換する |
 | `lizhisim-protocol` | 観測、action、request/response、event schema |
 | `lizhisim-engine` | 論理卓 scheduler と continuation runtime |
 | `lizhisim-inference` | batching broker と backend port |
@@ -199,6 +199,11 @@ event は少なくとも experiment、competition、table match、round の stre
 | conformance app crate（crate名未決） | userがlocalに置いた`majsoul-record`のdecode、projection、匿名化、LizhiSimとの1パスfull-record比較、diff report。取得機能は持たず、`game_log`出力は任意の診断機能とする |
 
 `lizhisim-core`より先のcrate分割は、循環依存を避ける必要とwalking skeletonの変更頻度・compile costを確認してからADRで確定する。
+
+牌構成については[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)で、raw設定と
+`ValidatedRuleSet<P>`を`lizhisim-rules`、実行時の`TileSet`を`lizhisim-core`が所有する案を
+提案している。採用時の依存方向は`lizhisim-rules -> lizhisim-core`とし、coreからrulesへの
+逆依存を禁止する。
 
 ## 10. 拡張境界
 
@@ -216,3 +221,4 @@ event は少なくとも experiment、competition、table match、round の stre
 - [ADR-0004: 麻雀用語はピンインを基本とし、Roundを局専用にする](../adr/0004-pinyin-terminology-and-round.md)
 - [ADR-0006: Rust toolchain、初期 workspace、CI baselineを固定する](../adr/0006-rust-toolchain-workspace-and-ci.md)
 - [ADR-0014: facadeとcore crateを分離する](../adr/0014-facade-and-core-crates.md)
+- [ADR-0015: 牌構成設定と実行時牌上限の所有crateを分離する](../adr/0015-rule-and-domain-tile-ownership.md)

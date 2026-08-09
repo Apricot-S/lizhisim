@@ -48,6 +48,17 @@ Source evidence
 
 赤牌設定は`5m`、`5p`、`5s`を独立に0〜4枚とする。対応する通常の5の枚数は「その牌の総数 - 赤牌枚数」で解決し、負数を拒否する。`1m`等の数牌や字牌を赤牌にする一般化は行わない。解決後の設定とcore stateは、赤牌を独立させた37種類の`TileKind`ごとの枚数を持つ。
 
+### 3.1.1 crate ownership
+
+`lizhisim-rules`はrawな牌設定、schema、semantic validation、`ValidatedRuleSet<P>`、
+preset metadataを所有する。解決後にcoreが実行時検証で使う37種類の最大枚数は、
+`lizhisim-core`所有の`TileSet`へ変換する。rules crateがdomain型を使うのは、このような
+検証済み実行値を生成する境界に限定する。
+
+`ValidatedRuleSet<P>`全体をcore遷移へ渡さない。卓内runtimeが必要な`TileSet`や小さな
+policy値を抽出して渡し、coreはschema、preset identity、出典、内容hashを参照しない。
+詳細は[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)を参照する。
+
 親へ14枚を配る方式と、親へ13枚を配って第一`Zimo`を行う方式は、[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)に従い、内部ではどちらも`RoundStarted`後の最初の`Zimo`へ正規化する。設定は最初の牌がinitial deal由来かlive wall由来かを表し、`moqie`を別のrule optionとして重複設定しない。
 
 ### 3.2 行為
