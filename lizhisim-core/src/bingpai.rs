@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
+use crate::TileKind;
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Bingpai {
     counts: [u8; 37],
@@ -14,7 +16,7 @@ impl Default for Bingpai {
 }
 
 impl Bingpai {
-    pub fn with_added(mut self, tile_kind: crate::TileKind) -> Self {
+    pub fn with_added(mut self, tile_kind: TileKind) -> Self {
         self.counts[tile_kind.index()] += 1;
         self
     }
