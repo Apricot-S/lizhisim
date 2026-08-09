@@ -56,6 +56,16 @@
 - [ ] 雀魂四人基準の各色赤1枚を合計136枚の`TileSet`へ解決する。
 - [ ] 雀魂四人基準では5以外の31種類を各4枚へ解決する。
 
+### Configuration input adapters
+
+- [ ] TOML schemaは赤牌設定を`HongBaopaiConfig`相当の構造としてdecodeできる。
+- [ ] TOMLの赤牌枚数0〜4を`RawRuleSpec`へ変換できる。
+- [ ] TOMLの赤牌枚数5以上をschema validation errorとして拒否する。
+- [ ] TOML decode errorは入力位置または対象fieldを含む。
+- [ ] TOMLから解決した`TileSet`はRust APIから直接解決した結果と一致する。
+- [ ] TOML入力は未指定fieldのdefaultを暗黙に補完しない。
+- [ ] 環境変数overrideを設定経路へ導入しない。
+
 ### `Bingpai` integration
 
 - [ ] `Bingpai`は`TileSet`で0枚の`TileKind`を追加できない。
@@ -99,6 +109,8 @@
 
 - 2026-08-09: refactorとして`M0CountOutOfRange`、`P0CountOutOfRange`、`S0CountOutOfRange`を`HongBaopaiCountOutOfRange`へ統合し、対象`TileKind`をpayloadへ保持する共通helperを追加した。`const fn`の制約により明示的な`match`でerrorを伝播した。
 - 2026-08-09: refactor後もworkspace全37 test、Clippy、format、`git diff --check`が成功した。
+- 2026-08-09: rulesのmodule分割と`HongBaopaiConfig`導入は、既存behaviorを変えないrefactorとして別cycleで扱う方針を確認した。
+- 2026-08-09: TOML/serdeは入力adapterのtest list項目を選択した時点で導入する。domain型へ直接serde deriveを付けず、TOML schemaから`RawRuleSpec`へ変換する境界を置く。環境変数overrideは再現性のため導入しない。
 - 2026-08-09: 「`S0`のraw枚数を独立に0〜4で受け付ける」を選択し、`M0 = 0`、`P0 = 0`を固定して0〜4の全入力を一assertionで検証する。
 - 2026-08-09: `RawRuleSpec`に`S0`設定が未実装のため、3引数constructorとS0 testをコンパイルできないredを確認した。
 - 2026-08-09: `RawRuleSpec`へ`s0_count`と範囲検証を追加し、牌数解決で`S0/S5`へ反映する最小実装をgreenにした。
