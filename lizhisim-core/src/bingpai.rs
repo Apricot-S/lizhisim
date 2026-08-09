@@ -3,6 +3,13 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 use crate::TileKind;
+use thiserror::Error;
+
+#[derive(Debug, Eq, Error, PartialEq)]
+pub enum BingpaiError {
+    #[error("tile kind is not present in bingpai: {tile_kind:?}")]
+    TileNotPresent { tile_kind: TileKind },
+}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Bingpai {
@@ -21,9 +28,11 @@ impl Bingpai {
         self
     }
 
-    pub fn with_removed(mut self, tile_kind: TileKind) -> Option<Self> {
-        self.counts[tile_kind.index()] = self.counts[tile_kind.index()].checked_sub(1)?;
-        Some(self)
+    pub fn with_removed(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
+        self.counts[tile_kind.index()] = self.counts[tile_kind.index()]
+            .checked_sub(1)
+            .ok_or(BingpaiError::TileNotPresent { tile_kind })?;
+        Ok(self)
     }
 
     pub const fn counts(&self) -> &[u8; 37] {
@@ -107,6 +116,16 @@ mod tests {
                 .unwrap()
                 .counts()[TileKind::M1.index()],
             0,
+        );
+    }
+
+    #[test]
+    fn removing_absent_tile_kind_reports_the_tile_kind() {
+        assert_eq!(
+            Bingpai::default().with_removed(TileKind::M1),
+            Err(BingpaiError::TileNotPresent {
+                tile_kind: TileKind::M1,
+            }),
         );
     }
 }

@@ -52,7 +52,7 @@
 - [x] `M5`を加えると、`M5`の所持枚数が1になる。
 - [x] `M5`を加えても、`M0`の所持枚数は増えない。
 - [x] 所持している`TileKind`を1枚除くと、その所持枚数が1減る。
-- [ ] 所持していない`TileKind`を除こうとすると失敗する。
+- [x] 所持していない`TileKind`を除こうとすると、対象`TileKind`を含むerrorで失敗する。
 - [ ] 所持していない`TileKind`を除く操作が失敗した後も、`bingpai`は変化しない。
 - [ ] `M5`だけを所持するとき、`M0`を除こうとしても`M5`で代替しない。
 - [ ] `M0`だけを所持するとき、`M5`を除こうとしても`M0`で代替しない。
@@ -124,10 +124,13 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 所持している牌の除去で対象countが1減ることをgreenにし、全体検証まで完了したため。
+- Why: 未所持`TileKind`の除去失敗を対象kind付き`Result` errorで表現し、全体検証まで完了したため。
 
 ## Cycle log
 
+- 2026-08-09: 次項目として未所持`TileKind`の除去失敗を選択した。失敗理由を保持できる`Result<Bingpai, BingpaiError>`へ`with_removed`の戻り値を変更する。
+- 2026-08-09: `BingpaiError::TileNotPresent { tile_kind }`を`thiserror`で追加し、未所持`M1`の除去が対象kind付き`Err`になるtestをgreenにした。既存の所持牌除去testも`Result`へ移行してgreenを維持した。
+- 2026-08-09: refactor変更なし。workspace全18 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
 - 2026-08-09: 「所持している`TileKind`を1枚除くと、その所持枚数が1減る」を選択した。`M1`を追加してから除去し、対象countを一assertionで比較する。除去APIは`Option<Bingpai>`を返す。
 - 2026-08-09: `with_removed`を`checked_sub`で実装し、所持中の`M1`を除去する選択testをgreenにした。未所持時の失敗挙動は後続testへ残した。
 - 2026-08-09: refactor変更なし。workspace全17 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
