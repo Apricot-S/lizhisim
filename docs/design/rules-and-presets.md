@@ -310,3 +310,7 @@ match_rules:
 これらは preset の版、source mapping、unsupported clause、contract test で管理する。
 
 実装順と検証根拠の判断は [ADR-0005](../adr/0005-mahjong-soul-first.md) に記録する。
+
+### Raw入力と検証済み設定の境界
+
+`RawRuleSpec`はTOMLなど外部入力をserdeでdecodeした未検証の値を表す。構文・型のdecode後、`RuleSpec`へ変換する際にsemantic validationを行う。`RuleSpec`だけが`TileSet`解決やruntimeへ渡す設定を提供し、外部入力型をdomain遷移へ直接渡さない。
