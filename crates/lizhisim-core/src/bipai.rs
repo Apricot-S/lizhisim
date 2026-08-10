@@ -36,20 +36,16 @@ pub struct Bipai<P: PlayerSet> {
 
 impl Bipai<FourPlayer> {
     pub fn try_new(tiles: [TileKind; 136], tile_set: &TileSet) -> Result<Self, BipaiError> {
-        let mut actual_counts = [0; 37];
-        let mut index = 0;
-        while index < tiles.len() {
-            actual_counts[tiles[index].index()] += 1;
-            index += 1;
-        }
+        let actual_counts = tiles.iter().fold([0usize; 37], |mut counts, tile_kind| {
+            counts[tile_kind.index()] += 1;
+            counts
+        });
 
-        let mut tile_index = 0;
-        while tile_index < TileKind::ALL.len() {
-            let tile_kind = TileKind::ALL[tile_index];
-            if actual_counts[tile_index] != tile_set.max_count(tile_kind) {
-                return Err(BipaiError::TileSetMismatch);
-            }
-            tile_index += 1;
+        let matches_tile_set = TileKind::ALL.iter().enumerate().all(|(index, tile_kind)| {
+            actual_counts[index] == usize::from(tile_set.max_count(*tile_kind))
+        });
+        if !matches_tile_set {
+            return Err(BipaiError::TileSetMismatch);
         }
 
         Ok(Self { tiles, cursor: 52 })
