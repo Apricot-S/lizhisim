@@ -68,7 +68,7 @@
 
 ### `Bingpai` integration
 
-- [ ] `Bingpai`は`TileSet`で0枚の`TileKind`を追加できない。
+- [x] `Bingpai`は`TileSet`で0枚の`TileKind`を追加できない。
 - [ ] 赤牌1枚の`TileSet`では対応する赤牌を1枚だけ追加できる。
 - [ ] 赤牌1枚の`TileSet`では対応する通常5を3枚だけ追加できる。
 - [ ] 赤牌4枚の`TileSet`では対応する通常5を追加できない。
@@ -178,6 +178,8 @@
 - 2026-08-10: 雀魂四人基準の5以外31種類が各4枚となる解決testを追加した。既存の`RuleSpec::resolve_tile_set`が契約を満たしていたためredなしでgreenを確認した。
 
 - 2026-08-10: `Bingpai::new(TileSet)`を追加し、`Bingpai`が常に確定した`TileSet`を値で保持するようにした。公開`Default` traitは削除し、設定上限1枚の`M1`超過testを追加した。workspace全46 test、Clippy、format、`git diff --check`が成功した。
+
+- 2026-08-10: `M1=0`の`TileSet`から`Bingpai`を構築し、追加が`TileCountExceeded(max_count=0)`になるtestを追加した。既存実装が契約を満たしていたためredなしでgreenを確認した。
 
 ## Completion review
 

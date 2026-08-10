@@ -303,4 +303,18 @@ mod tests {
             }),
         );
     }
+
+    #[test]
+    fn adding_tile_kind_with_zero_tile_set_limit_is_rejected() {
+        let counts = [0; 37];
+        let tile_set = TileSet::try_from_counts(counts).unwrap();
+
+        assert_eq!(
+            Bingpai::new(tile_set).with_added(TileKind::M1),
+            Err(BingpaiError::TileCountExceeded {
+                tile_kind: TileKind::M1,
+                max_count: 0,
+            }),
+        );
+    }
 }
