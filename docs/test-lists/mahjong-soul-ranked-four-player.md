@@ -62,6 +62,16 @@
 - [x] 赤牌と通常5を代替しない性質は`P0`と`P5`にも成立する。
 - [x] 赤牌と通常5を代替しない性質は`S0`と`S5`にも成立する。
 
+#### `Bingpai` mutation boundary
+
+- [ ] 外部crateは任意の空`Bingpai`を公開constructorから構築できない。
+- [ ] 外部crateは`with_added`または同等の低水準追加操作を直接呼び出せない。
+- [ ] 外部crateは`with_removed`または同等の低水準除去操作を直接呼び出せない。
+- [ ] 配牌による`Bingpai`生成は、検証済み`Bipai::qipai`からだけ行える。
+- [ ] 通常ツモに続く打牌、および副露による`Bingpai`更新は、対応する検証済み`Round`遷移からだけ行える。
+- [ ] 低水準の追加・除去操作はcrate-privateとし、`Round`遷移のunit testから種類別上限と未所持牌除去を引き続き検証できる。
+- [ ] Property: 公開された配牌、通常ツモ、打牌、副露の任意の合法遷移列から、phaseと`fulu`数に矛盾する`Bingpai`枚数を作れない。
+
 #### Mahjong Soul four-player tile composition
 
 - [ ] 雀魂四人基準fixtureの牌構成は合計136枚になる。
@@ -102,6 +112,18 @@
 
 ### Typed suspension
 
+- [ ] 配牌完了後はツモ前typestateになり、この状態だけが通常`Zimo`へ進める。
+- [ ] 通常`Zimo`はツモ前typestateを消費し、13枚以下の`Bingpai`と分離した`zimopai`を持つツモ後typestateを返す。
+- [ ] ツモ後typestateから通常`Zimo`を連続して行えない。
+- [ ] ツモ前typestateから`Dapai`を行えない。
+- [ ] ツモ後typestateでは、`zimopai`または`Bingpai`内の合法な牌を`Dapai`できる。
+- [ ] `Bingpai`内の牌を`Dapai`した場合は、その牌を除去して`zimopai`を`Bingpai`へ取り込む操作を一つの遷移として行う。
+- [ ] `zimopai`を`Dapai`した場合は、`Bingpai`の種類別countsを変更しない。
+- [ ] `Chi`または`Peng`成立後は、通常ツモ後とは別の打牌待ちtypestateへ遷移する。
+- [ ] `Chi`または`Peng`後の打牌待ちtypestateから通常`Zimo`を行えない。
+- [ ] `Chi`または`Peng`後の打牌待ちtypestateでは、副露で消費した牌を除いた`Bingpai`から合法な`Dapai`を一回行える。
+- [ ] `Daminggang`成立後は`Chi`または`Peng`後の打牌待ちではなく、嶺上ツモ待ちtypestateへ遷移する。
+- [ ] 各遷移は元のtypestateを消費し、同じツモ牌、打牌、または副露を二重適用できない。
 - [ ] `RoundStarted`後、initial deal由来の最初の`Zimo`を発行し、親だけに`Dapai`要求を発行して中断する。
 - [ ] initial deal由来の牌を最初に`Dapai`した場合、`moqie = false`として記録する。
 - [ ] live wall由来の`zimopai`を直後に`Dapai`した場合、`moqie = true`として記録する。
@@ -135,6 +157,7 @@
 
 ## Cycle log
 
+- 2026-08-11: `Bingpai`の任意変更を公開せず、配牌、通常ツモ、打牌、副露の検証済み`Round`遷移だけから更新する境界を追加した。`new`、`with_added`、`with_removed`相当は外部crateへ公開せず、種類別count操作としてcrate内に閉じる。進行phaseは`Bingpai`自身へ重ねず`Round`のtypestateで表し、ツモ前、ツモ後、チー・ポン後の打牌待ち、嶺上ツモ待ちを区別する。`zimopai`は既存方針どおり13枚以下の`Bingpai`と分離する。
 - 2026-08-11: `Bipai::qipai`が未検証の`[[TileKind; 13]; 4]`ではなく`[Bingpai; 4]`を返す契約を追加した。各seatの固定counts、元の`TileSet`上限の継承、検証済み牌山からの失敗しない内部変換、未検証countsを受け取る公開constructorを作らないことを独立項目として追跡する。配牌順は`Bingpai`内に保持せず、index割当から得られるseat別multisetを固定期待countsで検証する。
 - 2026-08-11: `lingshang_zimo`でもlive wallだけを短縮できるよう、`remaining_count`をcursorからの都度計算ではなく`Bipai`の状態へrefactorした。constructorで122、`qipai`で52減算、通常`zimo`成功ごとに1減算し、公開挙動は維持した。
 - 2026-08-11: player set固有値に依存しない`remaining_count`と配牌完了後の`zimo`を`Bipai<P>`の共通implへ移した。136枚の検証と四人分の配牌を担う`try_new`、`qipai`は`FourPlayer`固有implに維持し、三人用の型や挙動は追加していない。
