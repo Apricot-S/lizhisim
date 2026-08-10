@@ -18,6 +18,7 @@
 
 このlistでは槓の合法性、槍槓の競合、和了計算、点数計算、三人麻雀の北抜き自体の合法性は
 実装しない。それらの遷移が発行した検証済みの取得権限を`wangpai`境界が正しく消費することを扱う。
+三人用`Bipai`の実装はPhase 4まで行わないが、北抜きruleによる嶺上牌容量の差は後続testとして追跡する。
 
 ## Decisions
 
@@ -30,6 +31,7 @@
 - 公開済みの表裏ドラ表示牌は`wangpai`内の牌へのread-only viewであり、何度参照しても公開枚数や取得位置を変えない。
 - 追加の表ドラ表示時点は、上位の`Round`遷移が槓種別とruleから決める。`wangpai`は槓種別やruleを解釈しない。
 - 槓と北抜きは`lingshang_zimo`の一回限りの権限を発行する。北抜きは追加の表ドラ表示を発生させない。
+- 三人麻雀の嶺上牌容量は、北抜き有効ruleでは8枚、北抜き無効ruleでは4枚とする。
 - `lingshang_zimo`を1回行うたびに通常`zimo`可能な`remaining_count`も1減らす。物理的な王牌補充によるlive wall短縮を、配列の移動なしでcountへ反映する。
 - 通常`zimo`と`lingshang_zimo`で同じindexを二重消費しない。表裏ドラ表示牌は消費せず、対応indexを参照する。
 
@@ -38,6 +40,7 @@
 - `Bipai` / `Wangpai`は、通常`zimo`位置、`lingshang_zimo`位置、公開済み表ドラ枚数、各領域の上限と非重複を管理する。
 - 公開済みの表裏ドラ表示牌一覧は何度でも参照でき、参照操作は状態を変更しない。
 - `Round`は、`Angang`、`Jiagang`、`Daminggang`、`Babei`の成立、rule、現在phaseから、次に許可する公開・`lingshang_zimo`を決める。
+- 三人用`Bipai` / `Wangpai`は解決済みruleから嶺上牌容量を構成するが、個々の北抜きが合法かどうかは判定しない。
 - `Round`は未処理の追加表示件数を保持する。複数の槓に由来する保留を上書きまたは一件へcollapseしない。
 - `Wangpai`へ槓種別やrule設定を渡して順序を判断させない。上位遷移が検証済みの一回分commandを渡す。
 
@@ -88,6 +91,16 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [ ] `lingshang_zimo`を1回行った後、通常`zimo`はindex 120までで終了し、補充対象となったindex 121を返さない。
 - [ ] 4回の`lingshang_zimo`後、通常`zimo`はindex 117までで終了し、index 118〜121を返さない。
 - [ ] 通常`zimo`は嶺上牌の取得位置を変えない。
+
+### Three-player replacement draw capacity
+
+- [ ] 三人麻雀で北抜き有効ruleから構成した`Bipai`は、嶺上牌を8枚持つ。
+- [ ] 三人麻雀で北抜き無効ruleから構成した`Bipai`は、嶺上牌を4枚持つ。
+- [ ] 北抜き有効ruleでは、検証済みの権限による8回目の`lingshang_zimo`まで成功する。
+- [ ] 北抜き有効ruleでは、8枚取得後の9回目の`lingshang_zimo`を拒否する。
+- [ ] 北抜き無効ruleでは、検証済みの権限による4回目の`lingshang_zimo`まで成功する。
+- [ ] 北抜き無効ruleでは、4枚取得後の5回目の`lingshang_zimo`を拒否する。
+- [ ] Property: 三人麻雀の嶺上牌容量は北抜きruleだけで決まり、同じ解決済みruleから常に同じ容量が構成される。
 
 ### Additional baopai indicators
 
@@ -162,7 +175,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Cycle log
 
-実装未着手。
+- 2026-08-11: 三人麻雀では北抜き有効時に嶺上牌8枚、無効時に4枚とする要件を追加した。容量と取得上限は`Bipai` / `Wangpai`、北抜きの合法性と一回分の取得権限発行は`Round`の責務として分離した。三人用実装はPhase 4まで行わない。
 
 ## Completion review
 
