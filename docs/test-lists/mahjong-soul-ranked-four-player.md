@@ -129,13 +129,14 @@
 
 ## Cycle log
 
+- 2026-08-11: `lingshang_zimo`でもlive wallだけを短縮できるよう、`remaining_count`をcursorからの都度計算ではなく`Bipai`の状態へrefactorした。constructorで122、`qipai`で52減算、通常`zimo`成功ごとに1減算し、公開挙動は維持した。
 - 2026-08-11: `Bipai::zimo`を`Option`から`Result`へ変更し、通常取得可能な牌がない理由を`BipaiError::LiveWallExhausted`として保持するようにした。`remaining_count`は末尾14枚の`wangpai`を除外し、構築直後122枚、`qipai`後70枚、最初の`zimo`後69枚を返す契約へ更新した。
-- 2026-08-11: Four-player `Bipai`の配牌後項目を順に検証した。`qipai`後の未読84枚、最初の`Zimo`が固定fixtureのindex 52に対応する`P5`、その後の未読83枚、連続4回の`Zimo`が`[P5, P5, P6, P6]`となることを各一assertionで確認した。cursorの直接検証は内部実装を拘束するため削除し、`remaining_count`による外部契約へ置き換えた。
+- 2026-08-11: Four-player `Bipai`の配牌後項目を順に検証した。`qipai`後の残り70枚、最初の`Zimo`が固定fixtureのindex 52に対応する`P5`、その後の残り69枚、連続4回の`Zimo`が`[P5, P5, P6, P6]`となることを各一assertionで確認した。cursorの直接検証は内部実装を拘束するため削除し、`remaining_count`による外部契約へ置き換えた。
 - 2026-08-11: 配牌前の`Bipai`から`zimo`できないよう`QipaiPending`/`QipaiCompleted` typestateを導入し、`qipai`だけが配牌後型を返し、その型だけがcheckedな`zimo`を提供する構造にした。
 - 2026-08-11: 「配牌の最後の1枚取りでは、各seatがindex `48 + seat_index`の牌を受け取る」を選択した。先行testが実装と同じindex計算式を期待値に使っていたため、3回の4枚取りと最後の1枚取りを、4人分13枚の固定`TileKind`配列を一assertionで比較する一つのtestへ統合した。既存`qipai`でgreenを確認した。
 - 2026-08-11: 「配牌の3回の4枚取りでは、各seatが`i * 16 + seat_index * 4 + j`の牌を受け取る」を選択し、`qipai`未定義によるmethod not foundでredを確認した。`Bipai`を消費して4人分の固定長13枚配列とcursor 52の`Bipai`を一括で返す`qipai`を実装し、先頭12枚の配牌順を一assertionでgreenにした。
 - 2026-08-11: 配牌を外部の任意index取得へ委ねず、`Bipai::qipai`で原子的に行う方針をdomain modelとglossaryへ反映した。13枚目のindex対応と配牌後cursorは後続testで独立に検証する。
-- 2026-08-11: 「構築直後の四人用`Bipai`の残り枚数は136枚である」を選択し、`remaining_count`未定義によるmethod not foundでredを確認した。constructorのcursorを配牌前の0とし、固定配列長から未読枚数を返す最小実装でgreenにした。
+- 2026-08-11: 「構築直後の四人用`Bipai`の王牌を除いた残り枚数は122枚である」を選択し、`remaining_count`未定義によるmethod not foundでredを確認した。constructorのcursorを配牌前の0とし、通常ツモ可能枚数を返す最小実装でgreenにした。
 - 2026-08-11: `TileSet`との完全multiset一致を検証する既存testを、active listの「検証済みの136枚の固定配列から四人用`Bipai`を構築できる」へ対応付けて完了とした。
 
 - 2026-08-09: 「各`TileKind`の最大枚数以上に追加しようとすると、上限超過errorで失敗する」を選択し、`BingpaiError::TileCountExceeded { tile_kind, max_count }`とcheckedな`with_added`を実装した。検証なしの追加APIは削除し、既存testを`unwrap()`で更新した。

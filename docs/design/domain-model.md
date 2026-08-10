@@ -87,6 +87,8 @@ index 52から最初の`Zimo`として正規化する。したがって通常の
 提供する。これにより配牌前の牌山から通常の`zimo`を行う状態を表現不能にする。
 `remaining_count`は末尾14枚の`wangpai`を除いた残り枚数を返し、通常の`zimo`はこのlive wallが
 尽きた時点で`LiveWallExhausted`を返す。`wangpai`からの取得は通常の`zimo`へ含めない。
+この値はcursorから都度導出せず`Bipai`の状態として保持し、`qipai`、通常`zimo`、将来の
+`lingshang_zimo`が消費した通常ツモ可能枚数に応じて減算する。
 
 `xiangting`や`hule`が34種類のcount表現を要求する場合、adapter境界で赤牌を対応する通常の5へ射影する。34種類用の別domain識別子は、必要性が確認されるまで追加しない。
 

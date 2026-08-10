@@ -10,6 +10,9 @@ use crate::seat::FourPlayer;
 use crate::tile::TileKind;
 use crate::tile_set::TileSet;
 
+const FOUR_PLAYER_QIPAI_TILE_COUNT: usize = 52;
+const FOUR_PLAYER_WANGPAI_TILE_COUNT: usize = 14;
+
 mod private {
     pub trait Sealed {}
 }
@@ -45,15 +48,14 @@ pub struct QipaiCompleted;
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Bipai<P: PlayerSet, QipaiState = QipaiPending> {
     tiles: P::BipaiTiles,
+    remaining_count: usize,
     cursor: usize,
     qipai_state: PhantomData<fn() -> QipaiState>,
 }
 
 impl<QipaiState> Bipai<FourPlayer, QipaiState> {
     pub fn remaining_count(&self) -> usize {
-        const WANGPAI_TILE_COUNT: usize = 14;
-
-        (self.tiles.as_ref().len() - WANGPAI_TILE_COUNT).saturating_sub(self.cursor)
+        self.remaining_count
     }
 }
 
@@ -79,8 +81,10 @@ impl Bipai<FourPlayer, QipaiPending> {
             });
         }
 
+        let remaining_count = tiles.len() - FOUR_PLAYER_WANGPAI_TILE_COUNT;
         Ok(Self {
             tiles,
+            remaining_count,
             cursor: 0,
             qipai_state: PhantomData,
         })
@@ -103,7 +107,8 @@ impl Bipai<FourPlayer, QipaiPending> {
         (
             Bipai {
                 tiles: self.tiles,
-                cursor: 52,
+                remaining_count: self.remaining_count - FOUR_PLAYER_QIPAI_TILE_COUNT,
+                cursor: FOUR_PLAYER_QIPAI_TILE_COUNT,
                 qipai_state: PhantomData,
             },
             bingpai,
@@ -117,6 +122,7 @@ impl Bipai<FourPlayer, QipaiCompleted> {
             return Err(BipaiError::LiveWallExhausted);
         }
         let tile_kind = self.tiles.as_ref()[self.cursor];
+        self.remaining_count -= 1;
         self.cursor += 1;
         Ok((self, tile_kind))
     }
