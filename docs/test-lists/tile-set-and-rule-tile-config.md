@@ -69,7 +69,7 @@
 ### `Bingpai` integration
 
 - [x] `Bingpai`は`TileSet`で0枚の`TileKind`を追加できない。
-- [ ] 赤牌1枚の`TileSet`では対応する赤牌を1枚だけ追加できる。
+- [x] 赤牌1枚の`TileSet`では対応する赤牌を1枚だけ追加できる。
 - [ ] 赤牌1枚の`TileSet`では対応する通常5を3枚だけ追加できる。
 - [ ] 赤牌4枚の`TileSet`では対応する通常5を追加できない。
 - [x] 上限超過errorは対象`TileKind`、現在枚数、設定上限を保持する。
@@ -180,6 +180,8 @@
 - 2026-08-10: `Bingpai::new(TileSet)`を追加し、`Bingpai`が常に確定した`TileSet`を値で保持するようにした。公開`Default` traitは削除し、設定上限1枚の`M1`超過testを追加した。workspace全46 test、Clippy、format、`git diff --check`が成功した。
 
 - 2026-08-10: `M1=0`の`TileSet`から`Bingpai`を構築し、追加が`TileCountExceeded(max_count=0)`になるtestを追加した。既存実装が契約を満たしていたためredなしでgreenを確認した。
+
+- 2026-08-10: `M0=1`の`TileSet`で赤牌を1枚追加できるtestを追加した。既存の設定上限利用が契約を満たしていたためredなしでgreenを確認した。
 
 ## Completion review
 

@@ -317,4 +317,15 @@ mod tests {
             }),
         );
     }
+
+    #[test]
+    fn adding_red_tile_with_one_copy_tile_set_limit_allows_one_copy() {
+        let mut counts = [0; 37];
+        counts[TileKind::M0.index()] = 1;
+        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap())
+            .with_added(TileKind::M0)
+            .unwrap();
+
+        assert_eq!(bingpai.counts()[TileKind::M0.index()], 1);
+    }
 }
