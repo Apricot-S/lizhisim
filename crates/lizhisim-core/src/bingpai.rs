@@ -359,4 +359,17 @@ mod tests {
             }),
         );
     }
+
+    #[test]
+    fn failed_addition_does_not_change_original_bingpai() {
+        let mut counts = [0; 37];
+        counts[TileKind::M1.index()] = 1;
+        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap())
+            .with_added(TileKind::M1)
+            .unwrap();
+        let original = bingpai.clone();
+        let _ = bingpai.with_added(TileKind::M1);
+
+        assert_eq!(original.counts()[TileKind::M1.index()], 1);
+    }
 }

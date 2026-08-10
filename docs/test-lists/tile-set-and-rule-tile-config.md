@@ -73,7 +73,7 @@
 - [x] 赤牌1枚の`TileSet`では対応する通常5を3枚だけ追加できる。
 - [x] 赤牌4枚の`TileSet`では対応する通常5を追加できない。
 - [x] 上限超過errorは対象`TileKind`、現在枚数、設定上限を保持する。
-- [ ] 追加失敗後も元の`Bingpai`は変化しない。
+- [x] 追加失敗後も元の`Bingpai`は変化しない。
 - [ ] 現在の固定4枚上限testを`TileSet`由来の上限testへ置き換える。
 
 ### Four-player `Bipai` integration
@@ -184,6 +184,8 @@
 - 2026-08-10: `M0=1`の`TileSet`で赤牌を1枚追加できるtestを追加した。既存の設定上限利用が契約を満たしていたためredなしでgreenを確認した。
 
 - 2026-08-10: 赤1枚設定で通常5を3枚追加できるtestと、赤4枚設定で通常5が`max_count=0`として拒否されるtestを追加した。既存の`TileSet`上限利用が契約を満たしていたためredなしでgreenを確認した。
+
+- 2026-08-10: 上限到達済み`Bingpai`への追加失敗後、保存した元状態のcountが変化しないtestを追加した。`with_added`の消費型APIとcloneした元状態により契約を確認し、workspace全51 test、Clippy、format、`git diff --check`が成功した。
 
 ## Completion review
 
