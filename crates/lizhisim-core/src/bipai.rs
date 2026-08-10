@@ -4,24 +4,27 @@
 
 use core::marker::PhantomData;
 
+use thiserror::Error;
+
 use crate::{FourPlayer, TileKind, TileSet};
 
-mod sealed {
+mod private {
     pub trait Sealed {}
 }
 
-pub trait PlayerSet: sealed::Sealed {
+pub trait PlayerSet: private::Sealed {
     type BipaiTiles: AsRef<[TileKind]>;
 }
 
-impl sealed::Sealed for FourPlayer {}
+impl private::Sealed for FourPlayer {}
 
 impl PlayerSet for FourPlayer {
     type BipaiTiles = [TileKind; 136];
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Error, PartialEq)]
 pub enum BipaiError {
+    #[error("bipai tiles do not match the tile set")]
     TileSetMismatch,
 }
 
@@ -63,14 +66,7 @@ mod tests {
     use super::*;
 
     fn red_three_tiles() -> ([TileKind; 136], TileSet) {
-        let mut counts = [4; 37];
-        counts[TileKind::M0.index()] = 1;
-        counts[TileKind::M5.index()] = 3;
-        counts[TileKind::P0.index()] = 1;
-        counts[TileKind::P5.index()] = 3;
-        counts[TileKind::S0.index()] = 1;
-        counts[TileKind::S5.index()] = 3;
-        let tile_set = TileSet::try_from_counts(counts).unwrap();
+        let tile_set = TileSet::red_three_four_player();
 
         let mut tiles = [TileKind::M1; 136];
         let mut cursor = 0;

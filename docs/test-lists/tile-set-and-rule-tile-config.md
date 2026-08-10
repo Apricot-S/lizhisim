@@ -191,6 +191,8 @@
 
 - 2026-08-10: `FourPlayer`を既存seat markerと共用し、sealed `PlayerSet`のassociated typeを`[TileKind; 136]`とする`Bipai<P>`を追加した。固定配列と`TileSet`の完全multiset一致で構築できる最初のtestをgreenにした。
 
+- 2026-08-10: `Bipai` refactorとして赤3fixtureを`TileSet::red_three_four_player()`へ統一し、sealed traitのmodule名を`private`へ変更し、`BipaiError`へ`thiserror`を適用した。
+
 ## Completion review
 
 - [ ] coreとrulesの依存方向がADR-0015に一致する。
