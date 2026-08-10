@@ -38,6 +38,12 @@ pub struct Bipai<P: PlayerSet> {
     cursor: usize,
 }
 
+impl<P: PlayerSet> Bipai<P> {
+    pub fn remaining_count(&self) -> usize {
+        self.tiles.as_ref().len() - self.cursor
+    }
+}
+
 impl Bipai<FourPlayer> {
     pub fn try_new(tiles: [TileKind; 136], tile_set: &TileSet) -> Result<Self, BipaiError> {
         let actual_counts = tiles.iter().fold([0usize; 37], |mut counts, tile_kind| {
@@ -60,7 +66,7 @@ impl Bipai<FourPlayer> {
             });
         }
 
-        Ok(Self { tiles, cursor: 52 })
+        Ok(Self { tiles, cursor: 0 })
     }
 }
 
@@ -87,6 +93,14 @@ mod tests {
         let (tiles, tile_set) = red_three_tiles();
 
         assert!(Bipai::<FourPlayer>::try_new(tiles, &tile_set).is_ok());
+    }
+
+    #[test]
+    fn newly_constructed_four_player_bipai_has_136_remaining_tiles() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+
+        assert_eq!(bipai.remaining_count(), 136);
     }
 
     #[test]

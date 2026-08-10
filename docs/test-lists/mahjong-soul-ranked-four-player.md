@@ -79,8 +79,8 @@
 先頭要素の削除や再確保をせずに`Zimo`を進める。
 三人用`Bipai`の固定長と型構成は、三人麻雀のtest listを作る時点まで保留する。
 
-- [ ] 検証済みの136枚の固定配列から四人用`Bipai`を構築できる。
-- [ ] 構築直後の四人用`Bipai`の残り枚数は136枚である。
+- [x] 検証済みの136枚の固定配列から四人用`Bipai`を構築できる。
+- [x] 構築直後の四人用`Bipai`の残り枚数は136枚である。
 - [ ] 配牌の3回の4枚取りでは、各seatが`i * 16 + seat_index * 4 + j`の牌を受け取る。
 - [ ] 配牌の最後の1枚取りでは、各seatがindex `48 + seat_index`の牌を受け取る。
 - [ ] 四人全員への13枚配牌後のcursorは52である。
@@ -125,9 +125,12 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 同一`TileKind`の物理上限4枚を`with_added`の`Result`で検証し、全体検証まで完了したため。
+- Why: 構築直後の四人用`Bipai`が136枚すべてを未読として保持することを確認したため。
 
 ## Cycle log
+
+- 2026-08-11: 「構築直後の四人用`Bipai`の残り枚数は136枚である」を選択し、`remaining_count`未定義によるmethod not foundでredを確認した。constructorのcursorを配牌前の0とし、固定配列長から未読枚数を返す最小実装でgreenにした。
+- 2026-08-11: `TileSet`との完全multiset一致を検証する既存testを、active listの「検証済みの136枚の固定配列から四人用`Bipai`を構築できる」へ対応付けて完了とした。
 
 - 2026-08-09: 「各`TileKind`の最大枚数以上に追加しようとすると、上限超過errorで失敗する」を選択し、`BingpaiError::TileCountExceeded { tile_kind, max_count }`とcheckedな`with_added`を実装した。検証なしの追加APIは削除し、既存testを`unwrap()`で更新した。
 - 2026-08-09: workspace全26 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
