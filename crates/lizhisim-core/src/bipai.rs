@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use core::marker::PhantomData;
-
 use thiserror::Error;
 
 use crate::{FourPlayer, TileKind, TileSet};
@@ -32,7 +30,6 @@ pub enum BipaiError {
 pub struct Bipai<P: PlayerSet> {
     tiles: P::BipaiTiles,
     cursor: usize,
-    player_set: PhantomData<fn() -> P>,
 }
 
 impl Bipai<FourPlayer> {
@@ -53,11 +50,7 @@ impl Bipai<FourPlayer> {
             tile_index += 1;
         }
 
-        Ok(Self {
-            tiles,
-            cursor: 52,
-            player_set: PhantomData,
-        })
+        Ok(Self { tiles, cursor: 52 })
     }
 }
 
