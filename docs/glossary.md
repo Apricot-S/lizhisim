@@ -33,6 +33,7 @@
 |---|---|---|---|
 | 牌種（赤牌を区別する37種類） | 英語（例外） | `tile` | `TileKind` |
 | 牌山 | 壁牌 | `bipai` | `Bipai` |
+| 配牌 | 起牌 | `qipai` | `Bipai::qipai` |
 | 摸牌・ツモ動作 | 自摸 | `zimo` | `Zimo` |
 | 打牌 | 打牌 | `dapai` | `Dapai` |
 | 摸切・ツモ切り | 摸切 | `moqie` | `Moqie`、`moqie: bool` |

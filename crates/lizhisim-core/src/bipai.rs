@@ -68,6 +68,23 @@ impl Bipai<FourPlayer> {
 
         Ok(Self { tiles, cursor: 0 })
     }
+
+    pub fn qipai(mut self) -> (Self, [[TileKind; 13]; 4]) {
+        let tiles = self.tiles.as_ref();
+        let bingpai = core::array::from_fn(|seat_index| {
+            core::array::from_fn(|hand_index| {
+                if hand_index < 12 {
+                    let batch_index = hand_index / 4;
+                    let index_in_batch = hand_index % 4;
+                    tiles[batch_index * 16 + seat_index * 4 + index_in_batch]
+                } else {
+                    tiles[48 + seat_index]
+                }
+            })
+        });
+        self.cursor = 52;
+        (self, bingpai)
+    }
 }
 
 #[cfg(test)]
@@ -101,6 +118,23 @@ mod tests {
         let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
 
         assert_eq!(bipai.remaining_count(), 136);
+    }
+
+    #[test]
+    fn qipai_deals_three_batches_of_four_tiles_to_each_seat() {
+        let (tiles, tile_set) = red_three_tiles();
+        let expected = core::array::from_fn(|seat_index| {
+            core::array::from_fn(|hand_index| {
+                let batch_index = hand_index / 4;
+                let index_in_batch = hand_index % 4;
+                tiles[batch_index * 16 + seat_index * 4 + index_in_batch]
+            })
+        });
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let (_, qipai_tiles) = bipai.qipai();
+        let actual: [[TileKind; 12]; 4] = qipai_tiles.map(|tiles| tiles[..12].try_into().unwrap());
+
+        assert_eq!(actual, expected);
     }
 
     #[test]

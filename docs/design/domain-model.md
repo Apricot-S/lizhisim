@@ -81,6 +81,8 @@ source projectorがtrace用metadataとして保持できるが、canonical state
 1枚を受け取る。配牌後のcursorは52とし、親のinitial deal由来の14枚目を
 index 52から最初の`Zimo`として正規化する。したがって通常の`Zimo`をindex 0から
 開始しない。
+配牌は`Bipai::qipai`が状態を消費して4人分の固定長13枚配列と配牌後の`Bipai`を
+一括で返す。外部へ任意indexの取得APIを公開せず、部分配牌やcursorとの不整合を作れないようにする。
 
 `xiangting`や`hule`が34種類のcount表現を要求する場合、adapter境界で赤牌を対応する通常の5へ射影する。34種類用の別domain識別子は、必要性が確認されるまで追加しない。
 
