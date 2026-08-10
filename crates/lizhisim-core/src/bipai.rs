@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
+use core::marker::PhantomData;
+
 use thiserror::Error;
 
 use crate::seat::FourPlayer;
@@ -33,18 +35,25 @@ pub enum BipaiError {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Bipai<P: PlayerSet> {
+pub struct QipaiPending;
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct QipaiCompleted;
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Bipai<P: PlayerSet, QipaiState = QipaiPending> {
     tiles: P::BipaiTiles,
     cursor: usize,
+    qipai_state: PhantomData<fn() -> QipaiState>,
 }
 
-impl<P: PlayerSet> Bipai<P> {
+impl<P: PlayerSet, QipaiState> Bipai<P, QipaiState> {
     pub fn remaining_count(&self) -> usize {
         self.tiles.as_ref().len() - self.cursor
     }
 }
 
-impl Bipai<FourPlayer> {
+impl Bipai<FourPlayer, QipaiPending> {
     pub fn try_new(tiles: [TileKind; 136], tile_set: &TileSet) -> Result<Self, BipaiError> {
         let actual_counts = tiles.iter().fold([0usize; 37], |mut counts, tile_kind| {
             counts[tile_kind.index()] += 1;
@@ -66,10 +75,14 @@ impl Bipai<FourPlayer> {
             });
         }
 
-        Ok(Self { tiles, cursor: 0 })
+        Ok(Self {
+            tiles,
+            cursor: 0,
+            qipai_state: PhantomData,
+        })
     }
 
-    pub fn qipai(mut self) -> (Self, [[TileKind; 13]; 4]) {
+    pub fn qipai(self) -> (Bipai<FourPlayer, QipaiCompleted>, [[TileKind; 13]; 4]) {
         let tiles = self.tiles.as_ref();
         let bingpai = core::array::from_fn(|seat_index| {
             core::array::from_fn(|hand_index| {
@@ -82,8 +95,23 @@ impl Bipai<FourPlayer> {
                 }
             })
         });
-        self.cursor = 52;
-        (self, bingpai)
+
+        (
+            Bipai {
+                tiles: self.tiles,
+                cursor: 52,
+                qipai_state: PhantomData,
+            },
+            bingpai,
+        )
+    }
+}
+
+impl Bipai<FourPlayer, QipaiCompleted> {
+    pub fn zimo(mut self) -> Option<(Self, TileKind)> {
+        let tile_kind = self.tiles.as_ref().get(self.cursor).copied()?;
+        self.cursor += 1;
+        Some((self, tile_kind))
     }
 }
 
@@ -190,6 +218,61 @@ mod tests {
                     TileKind::P5,
                 ],
             ]
+        );
+    }
+
+    #[test]
+    fn qipai_advances_cursor_to_52() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+
+        assert_eq!(bipai.cursor, 52);
+    }
+
+    #[test]
+    fn first_zimo_after_qipai_returns_tile_at_index_52() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let (_, zimopai) = bipai.zimo().unwrap();
+
+        assert_eq!(zimopai, TileKind::P5);
+    }
+
+    #[test]
+    fn first_zimo_after_qipai_advances_cursor_to_53() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let (bipai, _) = bipai.zimo().unwrap();
+
+        assert_eq!(bipai.cursor, 53);
+    }
+
+    #[test]
+    fn first_zimo_after_qipai_leaves_83_unread_tiles() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let (bipai, _) = bipai.zimo().unwrap();
+
+        assert_eq!(bipai.remaining_count(), 83);
+    }
+
+    #[test]
+    fn consecutive_zimo_after_qipai_preserves_wall_order() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let (bipai, first) = bipai.zimo().unwrap();
+        let (bipai, second) = bipai.zimo().unwrap();
+        let (bipai, third) = bipai.zimo().unwrap();
+        let (_, fourth) = bipai.zimo().unwrap();
+
+        assert_eq!(
+            [first, second, third, fourth],
+            [TileKind::P5, TileKind::P5, TileKind::P6, TileKind::P6],
         );
     }
 

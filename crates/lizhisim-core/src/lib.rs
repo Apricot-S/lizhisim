@@ -9,7 +9,7 @@ mod tile;
 mod tile_set;
 
 pub use bingpai::Bingpai;
-pub use bipai::{Bipai, BipaiError, PlayerSet};
+pub use bipai::{Bipai, BipaiError, PlayerSet, QipaiCompleted, QipaiPending};
 pub use seat::{FourPlayer, Seat, SeatIndexOutOfRange};
 pub use tile::TileKind;
 pub use tile_set::{TileSet, TileSetError};
