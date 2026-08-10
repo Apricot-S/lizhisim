@@ -46,6 +46,7 @@
 | 荒牌平局 | 荒牌平局 | `huangpai_pingju` | `HuangpaiPingju` |
 | 北抜き | 抜北 | `babei` | `Babei` |
 | 王牌 | 王牌 | `wangpai` | `Wangpai` |
+| 嶺上牌からの補充ツモ・嶺上ツモ | 嶺上 | `lingshang_zimo` | `LingshangZimo` |
 | 宝牌・ドラ | 宝牌 | `baopai` | `Baopai` |
 | 里宝牌・裏ドラ | 里宝牌 | `li_baopai` | `LiBaopai` |
 | 紅宝牌・赤ドラ | 紅宝牌 | `hong_baopai` | `HongBaopai` |

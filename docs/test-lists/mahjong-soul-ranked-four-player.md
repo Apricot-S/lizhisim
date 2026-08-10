@@ -116,7 +116,7 @@
 ### Later listsへ移送する項目
 
 - [ ] `Chi`、`Peng`、`Daminggang`、`Rong`を競合解決する`CallWindow`。
-- [ ] `Angang`、`Jiagang`、`wangpai`、`baopai`更新。
+- [x] `Angang`、`Jiagang`、`wangpai`、`baopai`更新は[王牌・嶺上ツモ・宝牌表示](wangpai-replacement-draw-and-baopai.md)へ移送した。
 - [ ] `hule` / `huangpai_pingju`による`RoundResult`。
 - [ ] `ben`、`lizhibang`、連荘、終局を含む`TableMatch`。
 - [ ] 雀魂牌譜corner caseごとのregression/golden test。

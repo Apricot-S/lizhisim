@@ -96,7 +96,7 @@
 
 - [ ] 三人麻雀の`M2`〜`M8`、`M0`除外を`TileSet`へ解決する。
 - [ ] 北抜き後の領域間tile conservation。
-- [ ] 槓、王牌、嶺上牌、宝牌表示を含む領域間tile conservation。
+- [x] 槓、王牌、嶺上牌、宝牌表示を含む領域間tile conservationは[王牌・嶺上ツモ・宝牌表示](wangpai-replacement-draw-and-baopai.md)へ移送した。
 - [ ] preset metadata、canonical serialization、内容hash。
 
 ## Current
