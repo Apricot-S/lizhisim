@@ -28,7 +28,7 @@ pub enum TileSetError {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct TileSet {
     counts: [u8; 37],
-    total_count: u16,
+    total_count: u8,
 }
 
 const fn validate_combined_five_count(
@@ -75,7 +75,7 @@ impl TileSet {
                     max_count: 4,
                 });
             }
-            total_count += counts[index] as u16;
+            total_count += counts[index];
             index += 1;
         }
 
@@ -102,7 +102,7 @@ impl TileSet {
         self.counts[tile_kind.index()]
     }
 
-    pub const fn total_count(&self) -> u16 {
+    pub const fn total_count(&self) -> u8 {
         self.total_count
     }
 }
