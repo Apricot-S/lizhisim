@@ -78,7 +78,7 @@
 
 ### Four-player `Bipai` integration
 
-- [ ] 136枚の入力multisetが`TileSet`と完全一致すると四人用`Bipai`を構築できる。
+- [x] 136枚の入力multisetが`TileSet`と完全一致すると四人用`Bipai`を構築できる。
 - [ ] 入力の総牌数が`TileSet`より1枚少ない場合を拒否する。
 - [ ] 入力の総牌数が`TileSet`より1枚多い場合を拒否する。
 - [ ] 総牌数が同じでも一つの`TileKind`が不足する入力を拒否する。
@@ -188,6 +188,8 @@
 - 2026-08-10: 上限到達済み`Bingpai`への追加失敗後、保存した元状態のcountが変化しないtestを追加した。`with_added`の消費型APIとcloneした元状態により契約を確認し、workspace全51 test、Clippy、format、`git diff --check`が成功した。
 
 - 2026-08-10: 既存の5枚目追加拒否testを、明示的に`TileSet`で`M1=4`を設定する構成へ置き換えた。固定値ではなく`TileSet::max_count`由来の上限を検証し、workspace全52 test、Clippy、format、`git diff --check`が成功した。
+
+- 2026-08-10: `FourPlayer`を既存seat markerと共用し、sealed `PlayerSet`のassociated typeを`[TileKind; 136]`とする`Bipai<P>`を追加した。固定配列と`TileSet`の完全multiset一致で構築できる最初のtestをgreenにした。
 
 ## Completion review
 

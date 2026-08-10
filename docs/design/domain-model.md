@@ -240,3 +240,9 @@ command/response と event を区別する。event は起きた事実を過去�
 - `TableMatchResult` の順位は player set の全 seat を重複なく含む。
 
 これらは example test だけでなく property/model-based test の対象にする。
+
+### `Bipai`の固定配列とplayer set
+
+`Bipai<P>`は既存のplayer set markerをgeneric parameterに使い、牌列の固定配列型をsealed `PlayerSet` traitのassociated typeで決める。四人用`FourPlayer`は`[TileKind; 136]`を使う。これにより`Bipai<P, const N: usize>`のようにplayer setと牌数を別々に指定せず、矛盾する組合せを型として作れない。
+
+coreはshuffleを行わず、shellが乱数で生成した配列、unit testの固定配列、conformance入力から復元した配列を同じconstructorへ渡す。constructorは`TileSet`を借用して完全multiset一致を検証し、`Bipai`は検証後の固定配列を値として保持する。三人用配列は三人麻雀を実装するPhaseまで追加しない。
