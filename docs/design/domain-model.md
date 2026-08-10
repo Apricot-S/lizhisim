@@ -253,4 +253,8 @@ command/response と event を区別する。event は起きた事実を過去�
 
 `Bipai<P>`は既存のplayer set markerをgeneric parameterに使い、牌列の固定配列型をsealed `PlayerSet` traitのassociated typeで決める。四人用`FourPlayer`は`[TileKind; 136]`を使う。これにより`Bipai<P, const N: usize>`のようにplayer setと牌数を別々に指定せず、矛盾する組合せを型として作れない。
 
+`remaining_count`と配牌完了後の`zimo`はplayer set固有の定数や配牌形式に依存しないため、
+`Bipai<P>`の共通操作とする。固定配列の検証と初期値を決めるconstructor、および配牌形式を
+決める`qipai`はplayer set固有の実装とする。
+
 coreはshuffleを行わず、shellが乱数で生成した配列、unit testの固定配列、conformance入力から復元した配列を同じconstructorへ渡す。constructorは`TileSet`を借用して完全multiset一致を検証し、`Bipai`は検証後の固定配列を値として保持する。三人用配列は三人麻雀を実装するPhaseまで追加しない。

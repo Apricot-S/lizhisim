@@ -53,7 +53,7 @@ pub struct Bipai<P: PlayerSet, QipaiState = QipaiPending> {
     qipai_state: PhantomData<fn() -> QipaiState>,
 }
 
-impl<QipaiState> Bipai<FourPlayer, QipaiState> {
+impl<P: PlayerSet, QipaiState> Bipai<P, QipaiState> {
     pub fn remaining_count(&self) -> usize {
         self.remaining_count
     }
@@ -116,7 +116,7 @@ impl Bipai<FourPlayer, QipaiPending> {
     }
 }
 
-impl Bipai<FourPlayer, QipaiCompleted> {
+impl<P: PlayerSet> Bipai<P, QipaiCompleted> {
     pub fn zimo(mut self) -> Result<(Self, TileKind), BipaiError> {
         if self.remaining_count() == 0 {
             return Err(BipaiError::LiveWallExhausted);

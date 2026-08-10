@@ -130,6 +130,7 @@
 ## Cycle log
 
 - 2026-08-11: `lingshang_zimo`でもlive wallだけを短縮できるよう、`remaining_count`をcursorからの都度計算ではなく`Bipai`の状態へrefactorした。constructorで122、`qipai`で52減算、通常`zimo`成功ごとに1減算し、公開挙動は維持した。
+- 2026-08-11: player set固有値に依存しない`remaining_count`と配牌完了後の`zimo`を`Bipai<P>`の共通implへ移した。136枚の検証と四人分の配牌を担う`try_new`、`qipai`は`FourPlayer`固有implに維持し、三人用の型や挙動は追加していない。
 - 2026-08-11: `Bipai::zimo`を`Option`から`Result`へ変更し、通常取得可能な牌がない理由を`BipaiError::LiveWallExhausted`として保持するようにした。`remaining_count`は末尾14枚の`wangpai`を除外し、構築直後122枚、`qipai`後70枚、最初の`zimo`後69枚を返す契約へ更新した。
 - 2026-08-11: Four-player `Bipai`の配牌後項目を順に検証した。`qipai`後の残り70枚、最初の`Zimo`が固定fixtureのindex 52に対応する`P5`、その後の残り69枚、連続4回の`Zimo`が`[P5, P5, P6, P6]`となることを各一assertionで確認した。cursorの直接検証は内部実装を拘束するため削除し、`remaining_count`による外部契約へ置き換えた。
 - 2026-08-11: 配牌前の`Bipai`から`zimo`できないよう`QipaiPending`/`QipaiCompleted` typestateを導入し、`qipai`だけが配牌後型を返し、その型だけがcheckedな`zimo`を提供する構造にした。
