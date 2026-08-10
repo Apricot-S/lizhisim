@@ -121,20 +121,76 @@ mod tests {
     }
 
     #[test]
-    fn qipai_deals_three_batches_of_four_tiles_to_each_seat() {
+    fn qipai_deals_thirteen_expected_tiles_to_each_seat() {
         let (tiles, tile_set) = red_three_tiles();
-        let expected = core::array::from_fn(|seat_index| {
-            core::array::from_fn(|hand_index| {
-                let batch_index = hand_index / 4;
-                let index_in_batch = hand_index % 4;
-                tiles[batch_index * 16 + seat_index * 4 + index_in_batch]
-            })
-        });
         let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
-        let (_, qipai_tiles) = bipai.qipai();
-        let actual: [[TileKind; 12]; 4] = qipai_tiles.map(|tiles| tiles[..12].try_into().unwrap());
+        let (_, actual) = bipai.qipai();
 
-        assert_eq!(actual, expected);
+        assert_eq!(
+            actual,
+            [
+                [
+                    TileKind::M1,
+                    TileKind::M1,
+                    TileKind::M1,
+                    TileKind::M1,
+                    TileKind::M5,
+                    TileKind::M5,
+                    TileKind::M5,
+                    TileKind::M6,
+                    TileKind::M9,
+                    TileKind::M9,
+                    TileKind::M9,
+                    TileKind::P1,
+                    TileKind::P4,
+                ],
+                [
+                    TileKind::M2,
+                    TileKind::M2,
+                    TileKind::M2,
+                    TileKind::M2,
+                    TileKind::M6,
+                    TileKind::M6,
+                    TileKind::M6,
+                    TileKind::M7,
+                    TileKind::P1,
+                    TileKind::P1,
+                    TileKind::P1,
+                    TileKind::P2,
+                    TileKind::P4,
+                ],
+                [
+                    TileKind::M3,
+                    TileKind::M3,
+                    TileKind::M3,
+                    TileKind::M3,
+                    TileKind::M7,
+                    TileKind::M7,
+                    TileKind::M7,
+                    TileKind::M8,
+                    TileKind::P2,
+                    TileKind::P2,
+                    TileKind::P2,
+                    TileKind::P3,
+                    TileKind::P4,
+                ],
+                [
+                    TileKind::M4,
+                    TileKind::M4,
+                    TileKind::M4,
+                    TileKind::M4,
+                    TileKind::M8,
+                    TileKind::M8,
+                    TileKind::M8,
+                    TileKind::M9,
+                    TileKind::P3,
+                    TileKind::P3,
+                    TileKind::P3,
+                    TileKind::P4,
+                    TileKind::P5,
+                ],
+            ]
+        );
     }
 
     #[test]

@@ -82,7 +82,7 @@
 - [x] 検証済みの136枚の固定配列から四人用`Bipai`を構築できる。
 - [x] 構築直後の四人用`Bipai`の残り枚数は136枚である。
 - [x] 配牌の3回の4枚取りでは、各seatが`i * 16 + seat_index * 4 + j`の牌を受け取る。
-- [ ] 配牌の最後の1枚取りでは、各seatがindex `48 + seat_index`の牌を受け取る。
+- [x] 配牌の最後の1枚取りでは、各seatがindex `48 + seat_index`の牌を受け取る。
 - [ ] 四人全員への13枚配牌後のcursorは52である。
 - [ ] 親のinitial deal由来の最初の`Zimo`はindex 52の牌を返す。
 - [ ] 親のinitial deal由来の最初の`Zimo`後のcursorは53である。
@@ -129,6 +129,7 @@
 
 ## Cycle log
 
+- 2026-08-11: 「配牌の最後の1枚取りでは、各seatがindex `48 + seat_index`の牌を受け取る」を選択した。先行testが実装と同じindex計算式を期待値に使っていたため、3回の4枚取りと最後の1枚取りを、4人分13枚の固定`TileKind`配列を一assertionで比較する一つのtestへ統合した。既存`qipai`でgreenを確認した。
 - 2026-08-11: 「配牌の3回の4枚取りでは、各seatが`i * 16 + seat_index * 4 + j`の牌を受け取る」を選択し、`qipai`未定義によるmethod not foundでredを確認した。`Bipai`を消費して4人分の固定長13枚配列とcursor 52の`Bipai`を一括で返す`qipai`を実装し、先頭12枚の配牌順を一assertionでgreenにした。
 - 2026-08-11: 配牌を外部の任意index取得へ委ねず、`Bipai::qipai`で原子的に行う方針をdomain modelとglossaryへ反映した。13枚目のindex対応と配牌後cursorは後続testで独立に検証する。
 - 2026-08-11: 「構築直後の四人用`Bipai`の残り枚数は136枚である」を選択し、`remaining_count`未定義によるmethod not foundでredを確認した。constructorのcursorを配牌前の0とし、固定配列長から未読枚数を返す最小実装でgreenにした。
