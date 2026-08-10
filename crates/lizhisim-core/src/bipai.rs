@@ -32,6 +32,8 @@ pub enum BipaiError {
         actual_count: u8,
         expected_count: u8,
     },
+    #[error("no tile remains in the live wall")]
+    LiveWallExhausted,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -47,9 +49,11 @@ pub struct Bipai<P: PlayerSet, QipaiState = QipaiPending> {
     qipai_state: PhantomData<fn() -> QipaiState>,
 }
 
-impl<P: PlayerSet, QipaiState> Bipai<P, QipaiState> {
+impl<QipaiState> Bipai<FourPlayer, QipaiState> {
     pub fn remaining_count(&self) -> usize {
-        self.tiles.as_ref().len() - self.cursor
+        const WANGPAI_TILE_COUNT: usize = 14;
+
+        (self.tiles.as_ref().len() - WANGPAI_TILE_COUNT).saturating_sub(self.cursor)
     }
 }
 
@@ -108,10 +112,13 @@ impl Bipai<FourPlayer, QipaiPending> {
 }
 
 impl Bipai<FourPlayer, QipaiCompleted> {
-    pub fn zimo(mut self) -> Option<(Self, TileKind)> {
-        let tile_kind = self.tiles.as_ref().get(self.cursor).copied()?;
+    pub fn zimo(mut self) -> Result<(Self, TileKind), BipaiError> {
+        if self.remaining_count() == 0 {
+            return Err(BipaiError::LiveWallExhausted);
+        }
+        let tile_kind = self.tiles.as_ref()[self.cursor];
         self.cursor += 1;
-        Some((self, tile_kind))
+        Ok((self, tile_kind))
     }
 }
 
@@ -141,11 +148,11 @@ mod tests {
     }
 
     #[test]
-    fn newly_constructed_four_player_bipai_has_136_remaining_tiles() {
+    fn newly_constructed_four_player_bipai_has_122_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
 
-        assert_eq!(bipai.remaining_count(), 136);
+        assert_eq!(bipai.remaining_count(), 122);
     }
 
     #[test]
@@ -222,12 +229,12 @@ mod tests {
     }
 
     #[test]
-    fn qipai_leaves_84_unread_tiles() {
+    fn qipai_leaves_70_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
         let (bipai, _) = bipai.qipai();
 
-        assert_eq!(bipai.remaining_count(), 84);
+        assert_eq!(bipai.remaining_count(), 70);
     }
 
     #[test]
@@ -241,13 +248,13 @@ mod tests {
     }
 
     #[test]
-    fn first_zimo_after_qipai_leaves_83_unread_tiles() {
+    fn first_zimo_after_qipai_leaves_69_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
         let (bipai, _) = bipai.qipai();
         let (bipai, _) = bipai.zimo().unwrap();
 
-        assert_eq!(bipai.remaining_count(), 83);
+        assert_eq!(bipai.remaining_count(), 69);
     }
 
     #[test]
@@ -264,6 +271,18 @@ mod tests {
             [first, second, third, fourth],
             [TileKind::P5, TileKind::P5, TileKind::P6, TileKind::P6],
         );
+    }
+
+    #[test]
+    fn zimo_rejects_draw_after_live_wall_is_exhausted() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let (mut bipai, _) = bipai.qipai();
+        for _ in 0..70 {
+            (bipai, _) = bipai.zimo().unwrap();
+        }
+
+        assert_eq!(bipai.zimo(), Err(BipaiError::LiveWallExhausted));
     }
 
     #[test]

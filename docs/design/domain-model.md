@@ -85,6 +85,8 @@ index 52から最初の`Zimo`として正規化する。したがって通常の
 一括で返す。外部へ任意indexの取得APIを公開せず、部分配牌やcursorとの不整合を作れないようにする。
 `Bipai`は`QipaiPending`と`QipaiCompleted`のtypestateを持ち、`zimo`は`QipaiCompleted`にだけ
 提供する。これにより配牌前の牌山から通常の`zimo`を行う状態を表現不能にする。
+`remaining_count`は末尾14枚の`wangpai`を除いた残り枚数を返し、通常の`zimo`はこのlive wallが
+尽きた時点で`LiveWallExhausted`を返す。`wangpai`からの取得は通常の`zimo`へ含めない。
 
 `xiangting`や`hule`が34種類のcount表現を要求する場合、adapter境界で赤牌を対応する通常の5へ射影する。34種類用の別domain識別子は、必要性が確認されるまで追加しない。
 
