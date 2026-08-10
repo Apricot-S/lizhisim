@@ -4,7 +4,9 @@
 
 use thiserror::Error;
 
-use crate::{FourPlayer, TileKind, TileSet};
+use crate::seat::FourPlayer;
+use crate::tile::TileKind;
+use crate::tile_set::TileSet;
 
 mod private {
     pub trait Sealed {}

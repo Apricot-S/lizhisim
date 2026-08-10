@@ -4,7 +4,7 @@
 
 use thiserror::Error;
 
-use crate::TileKind;
+use crate::tile::TileKind;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum TileSetError {

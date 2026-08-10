@@ -4,7 +4,8 @@
 
 use thiserror::Error;
 
-use crate::{TileKind, TileSet};
+use crate::tile::TileKind;
+use crate::tile_set::TileSet;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum BingpaiError {
