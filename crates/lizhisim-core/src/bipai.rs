@@ -222,12 +222,12 @@ mod tests {
     }
 
     #[test]
-    fn qipai_advances_cursor_to_52() {
+    fn qipai_leaves_84_unread_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
         let (bipai, _) = bipai.qipai();
 
-        assert_eq!(bipai.cursor, 52);
+        assert_eq!(bipai.remaining_count(), 84);
     }
 
     #[test]
@@ -238,16 +238,6 @@ mod tests {
         let (_, zimopai) = bipai.zimo().unwrap();
 
         assert_eq!(zimopai, TileKind::P5);
-    }
-
-    #[test]
-    fn first_zimo_after_qipai_advances_cursor_to_53() {
-        let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
-        let (bipai, _) = bipai.qipai();
-        let (bipai, _) = bipai.zimo().unwrap();
-
-        assert_eq!(bipai.cursor, 53);
     }
 
     #[test]

@@ -83,9 +83,8 @@
 - [x] 構築直後の四人用`Bipai`の残り枚数は136枚である。
 - [x] 配牌の3回の4枚取りでは、各seatが`i * 16 + seat_index * 4 + j`の牌を受け取る。
 - [x] 配牌の最後の1枚取りでは、各seatがindex `48 + seat_index`の牌を受け取る。
-- [x] 四人全員への13枚配牌後のcursorは52である。
+- [x] 四人全員への13枚配牌後の`Bipai`の未読部分は84枚である。
 - [x] 親のinitial deal由来の最初の`Zimo`はindex 52の牌を返す。
-- [x] 親のinitial deal由来の最初の`Zimo`後のcursorは53である。
 - [x] 親のinitial deal由来の最初の`Zimo`後の`Bipai`の未読部分は83枚である。
 - [x] initial deal完了後の連続する`Zimo`はindex 52以降の順序を保つ。
 
@@ -129,7 +128,7 @@
 
 ## Cycle log
 
-- 2026-08-11: Four-player `Bipai`の配牌後5項目を順に検証した。`qipai`後cursor 52、最初の`Zimo`が固定fixtureのindex 52に対応する`P5`、その後cursor 53、未読83枚、連続4回の`Zimo`が`[P5, P5, P6, P6]`となることを各一assertionで確認した。
+- 2026-08-11: Four-player `Bipai`の配牌後項目を順に検証した。`qipai`後の未読84枚、最初の`Zimo`が固定fixtureのindex 52に対応する`P5`、その後の未読83枚、連続4回の`Zimo`が`[P5, P5, P6, P6]`となることを各一assertionで確認した。cursorの直接検証は内部実装を拘束するため削除し、`remaining_count`による外部契約へ置き換えた。
 - 2026-08-11: 配牌前の`Bipai`から`zimo`できないよう`QipaiPending`/`QipaiCompleted` typestateを導入し、`qipai`だけが配牌後型を返し、その型だけがcheckedな`zimo`を提供する構造にした。
 - 2026-08-11: 「配牌の最後の1枚取りでは、各seatがindex `48 + seat_index`の牌を受け取る」を選択した。先行testが実装と同じindex計算式を期待値に使っていたため、3回の4枚取りと最後の1枚取りを、4人分13枚の固定`TileKind`配列を一assertionで比較する一つのtestへ統合した。既存`qipai`でgreenを確認した。
 - 2026-08-11: 「配牌の3回の4枚取りでは、各seatが`i * 16 + seat_index * 4 + j`の牌を受け取る」を選択し、`qipai`未定義によるmethod not foundでredを確認した。`Bipai`を消費して4人分の固定長13枚配列とcursor 52の`Bipai`を一括で返す`qipai`を実装し、先頭12枚の配牌順を一assertionでgreenにした。
