@@ -268,7 +268,9 @@ mod tests {
 
     #[test]
     fn adding_fifth_copy_of_tile_kind_reports_count_exceeded() {
-        let bingpai = Bingpai::red_three_four_player()
+        let mut counts = [0; 37];
+        counts[TileKind::M1.index()] = 4;
+        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap())
             .with_added(TileKind::M1)
             .unwrap()
             .with_added(TileKind::M1)
