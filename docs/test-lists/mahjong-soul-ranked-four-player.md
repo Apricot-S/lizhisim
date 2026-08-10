@@ -91,6 +91,12 @@
 
 #### Dealing and conservation
 
+- [ ] `Bipai::qipai`は四人分の未検証な`TileKind`配列ではなく、`[Bingpai; 4]`を返す。
+- [ ] 固定した`Bipai`を`qipai`すると、各seatの`Bingpai::counts()`が固定した期待値と一致する。
+- [ ] `qipai`が返す各`Bingpai`は、元の`Bipai`を検証した`TileSet`と同じ種類別上限を適用する。
+- [ ] 検証済み`Bipai`からの配牌は失敗しない変換であり、`qipai`の戻り値を`Result`にしない。
+- [ ] `qipai`用の変換経路から、任意の未検証countsを持つ`Bingpai`を公開APIで構築できない。
+- [ ] 配牌indexの割当規則は、順序を保持しない`Bingpai`の内部表現ではなく、各seatの固定期待countsで検証する。
 - [ ] `Bipai`の順序を固定すると、14枚配牌を正規化した最初の`Zimo`が一意に決まる。
 - [ ] Property: 配牌、`bingpai`、`Bipai`の間でtile conservationが保たれる。
 
@@ -129,6 +135,7 @@
 
 ## Cycle log
 
+- 2026-08-11: `Bipai::qipai`が未検証の`[[TileKind; 13]; 4]`ではなく`[Bingpai; 4]`を返す契約を追加した。各seatの固定counts、元の`TileSet`上限の継承、検証済み牌山からの失敗しない内部変換、未検証countsを受け取る公開constructorを作らないことを独立項目として追跡する。配牌順は`Bingpai`内に保持せず、index割当から得られるseat別multisetを固定期待countsで検証する。
 - 2026-08-11: `lingshang_zimo`でもlive wallだけを短縮できるよう、`remaining_count`をcursorからの都度計算ではなく`Bipai`の状態へrefactorした。constructorで122、`qipai`で52減算、通常`zimo`成功ごとに1減算し、公開挙動は維持した。
 - 2026-08-11: player set固有値に依存しない`remaining_count`と配牌完了後の`zimo`を`Bipai<P>`の共通implへ移した。136枚の検証と四人分の配牌を担う`try_new`、`qipai`は`FourPlayer`固有implに維持し、三人用の型や挙動は追加していない。
 - 2026-08-11: `Bipai::zimo`を`Option`から`Result`へ変更し、通常取得可能な牌がない理由を`BipaiError::LiveWallExhausted`として保持するようにした。`remaining_count`は末尾14枚の`wangpai`を除外し、構築直後122枚、`qipai`後70枚、最初の`zimo`後69枚を返す契約へ更新した。
