@@ -79,12 +79,12 @@
 ### Four-player `Bipai` integration
 
 - [x] 136枚の入力multisetが`TileSet`と完全一致すると四人用`Bipai`を構築できる。
-- [ ] 入力の総牌数が`TileSet`より1枚少ない場合を拒否する。
-- [ ] 入力の総牌数が`TileSet`より1枚多い場合を拒否する。
-- [ ] 総牌数が同じでも一つの`TileKind`が不足する入力を拒否する。
-- [ ] 総牌数が同じでも一つの`TileKind`が過剰な入力を拒否する。
-- [ ] 赤牌と通常5を入れ替えた入力を同じmultisetとして扱わない。
-- [ ] 構築errorは最初に不一致となった`TileKind`、期待枚数、実枚数を保持する。
+- [x] 入力の総牌数が`TileSet`より1枚少ない場合を拒否する。
+- [x] 入力の総牌数が`TileSet`より1枚多い場合を拒否する。
+- [x] 総牌数が同じでも一つの`TileKind`が不足する入力を拒否する。
+- [x] 総牌数が同じでも一つの`TileKind`が過剰な入力を拒否する。
+- [x] シャッフルによって赤牌と通常5の順序が入れ替わった入力を同じmultisetとして扱う。
+- [x] 構築errorは最初に不一致となった`TileKind`、期待枚数、実枚数を保持する。
 
 ### Conservation consumers
 
@@ -107,6 +107,7 @@
 
 ## Cycle log
 
+- 2026-08-11: Four-player `Bipai` integration のテストを完了。one-more fixture は M1 を4枚のまま赤牌設定を変更し、シャッフルで赤牌と通常5の順序が変わっても同じ multiset として受理する test へ修正した。workspace 46 core tests + 11 rules tests、Clippy、format、`git diff --check` が成功した。
 - 2026-08-10: 「赤牌0枚を通常5が4枚、赤牌が0枚の`TileSet`へ解決する」を選択し、M/P/S各0枚の解決結果を一assertionで検証する。既存の`RuleSpec::resolve_tile_set`がすでに契約を満たしていたため、redなしでgreenを確認した。
 - 2026-08-10: M/P/Sの赤牌と通常5のcountをまとめて比較する回帰testを追加した。
 - 2026-08-10: `P0`と`S0`のraw枚数5拒否をM0と同じサイクルで選択し、対象牌、実枚数、上限を各一assertionで検証した。既存の共通validationが契約を満たしていたため、redなしでgreenを確認した。
@@ -170,27 +171,16 @@
 - 2026-08-09: `TileSet`と`TileSetError`が未定義のため失敗するredを確認した。
 - 2026-08-09: `lizhisim-core/src/tile_set.rs`へ37 countを保持する`TileSet`、将来のvalidation errorを追加する`TileSetError`、最小の`try_from_counts`を実装してgreenにした。上限検証は後続testへ残した。
 - 2026-08-09: refactor変更なし。workspace全27 test、Clippy `-D warnings`、format、`git diff --check`が成功した。
-
 - 2026-08-10: 赤3（M/P/S各1枚、合計3枚）と全赤（各4枚）の解決testを追加し、M/P/S各色の赤牌・通常5のcountを各一assertionで検証した。既存の解決実装が契約を満たしていたためredなしでgreenを確認した。
-
 - 2026-08-10: 雀魂四人基準（赤3、各色赤1枚）の`TileSet::total_count() == 136`を検証する回帰testを追加した。既存の解決実装が契約を満たしていたためredなしでgreenを確認した。
-
 - 2026-08-10: 雀魂四人基準の5以外31種類が各4枚となる解決testを追加した。既存の`RuleSpec::resolve_tile_set`が契約を満たしていたためredなしでgreenを確認した。
-
 - 2026-08-10: `Bingpai::new(TileSet)`を追加し、`Bingpai`が常に確定した`TileSet`を値で保持するようにした。公開`Default` traitは削除し、設定上限1枚の`M1`超過testを追加した。workspace全46 test、Clippy、format、`git diff --check`が成功した。
-
 - 2026-08-10: `M1=0`の`TileSet`から`Bingpai`を構築し、追加が`TileCountExceeded(max_count=0)`になるtestを追加した。既存実装が契約を満たしていたためredなしでgreenを確認した。
-
 - 2026-08-10: `M0=1`の`TileSet`で赤牌を1枚追加できるtestを追加した。既存の設定上限利用が契約を満たしていたためredなしでgreenを確認した。
-
 - 2026-08-10: 赤1枚設定で通常5を3枚追加できるtestと、赤4枚設定で通常5が`max_count=0`として拒否されるtestを追加した。既存の`TileSet`上限利用が契約を満たしていたためredなしでgreenを確認した。
-
 - 2026-08-10: 上限到達済み`Bingpai`への追加失敗後、保存した元状態のcountが変化しないtestを追加した。`with_added`の消費型APIとcloneした元状態により契約を確認し、workspace全51 test、Clippy、format、`git diff --check`が成功した。
-
 - 2026-08-10: 既存の5枚目追加拒否testを、明示的に`TileSet`で`M1=4`を設定する構成へ置き換えた。固定値ではなく`TileSet::max_count`由来の上限を検証し、workspace全52 test、Clippy、format、`git diff --check`が成功した。
-
 - 2026-08-10: `FourPlayer`を既存seat markerと共用し、sealed `PlayerSet`のassociated typeを`[TileKind; 136]`とする`Bipai<P>`を追加した。固定配列と`TileSet`の完全multiset一致で構築できる最初のtestをgreenにした。
-
 - 2026-08-10: `Bipai` refactorとして赤3fixtureを`TileSet::red_three_four_player()`へ統一し、sealed traitのmodule名を`private`へ変更し、`BipaiError`へ`thiserror`を適用した。
 
 ## Completion review

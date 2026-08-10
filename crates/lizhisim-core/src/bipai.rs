@@ -24,8 +24,12 @@ impl PlayerSet for FourPlayer {
 
 #[derive(Debug, Error, PartialEq)]
 pub enum BipaiError {
-    #[error("bipai tiles do not match the tile set")]
-    TileSetMismatch,
+    #[error("bipai tile kind {tile_kind:?} has {actual_count} copies, expected {expected_count}")]
+    TileSetMismatch {
+        tile_kind: TileKind,
+        actual_count: u8,
+        expected_count: u8,
+    },
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -41,11 +45,19 @@ impl Bipai<FourPlayer> {
             counts
         });
 
-        let matches_tile_set = TileKind::ALL.iter().enumerate().all(|(index, tile_kind)| {
-            actual_counts[index] == usize::from(tile_set.max_count(*tile_kind))
-        });
-        if !matches_tile_set {
-            return Err(BipaiError::TileSetMismatch);
+        if let Some((_index, (actual_count, tile_kind))) = TileKind::ALL
+            .iter()
+            .enumerate()
+            .map(|(index, tile_kind)| (index, (actual_counts[index], tile_kind)))
+            .find(|(_, (actual_count, tile_kind))| {
+                *actual_count != usize::from(tile_set.max_count(**tile_kind))
+            })
+        {
+            return Err(BipaiError::TileSetMismatch {
+                tile_kind: *tile_kind,
+                actual_count: actual_count as u8,
+                expected_count: tile_set.max_count(*tile_kind),
+            });
         }
 
         Ok(Self { tiles, cursor: 52 })
@@ -73,6 +85,97 @@ mod tests {
     #[test]
     fn four_player_bipai_accepts_tiles_matching_tile_set() {
         let (tiles, tile_set) = red_three_tiles();
+
+        assert!(Bipai::<FourPlayer>::try_new(tiles, &tile_set).is_ok());
+    }
+
+    #[test]
+    fn four_player_bipai_rejects_tile_set_with_one_fewer_tile() {
+        let (tiles, _) = red_three_tiles();
+        let mut counts = [4; 37];
+        counts[TileKind::M1.index()] = 3;
+        counts[TileKind::M0.index()] = 1;
+        counts[TileKind::M5.index()] = 3;
+        counts[TileKind::P0.index()] = 1;
+        counts[TileKind::P5.index()] = 3;
+        counts[TileKind::S0.index()] = 1;
+        counts[TileKind::S5.index()] = 3;
+        let tile_set = TileSet::try_from_counts(counts).unwrap();
+
+        assert_eq!(
+            Bipai::<FourPlayer>::try_new(tiles, &tile_set),
+            Err(BipaiError::TileSetMismatch {
+                tile_kind: TileKind::M1,
+                actual_count: 4,
+                expected_count: 3,
+            }),
+        );
+    }
+
+    #[test]
+    fn four_player_bipai_rejects_tile_set_with_one_more_tile() {
+        let (tiles, _) = red_three_tiles();
+        let mut counts = [4; 37];
+        counts[TileKind::M0.index()] = 0;
+        counts[TileKind::M5.index()] = 4;
+        counts[TileKind::P0.index()] = 1;
+        counts[TileKind::P5.index()] = 3;
+        counts[TileKind::S0.index()] = 1;
+        counts[TileKind::S5.index()] = 3;
+        let tile_set = TileSet::try_from_counts(counts).unwrap();
+
+        assert_eq!(
+            Bipai::<FourPlayer>::try_new(tiles, &tile_set),
+            Err(BipaiError::TileSetMismatch {
+                tile_kind: TileKind::M5,
+                actual_count: 3,
+                expected_count: 4,
+            }),
+        );
+    }
+
+    #[test]
+    fn four_player_bipai_rejects_duplicate_tile_kind_when_counts_differ() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles[0] = TileKind::M2;
+
+        assert_eq!(
+            Bipai::<FourPlayer>::try_new(tiles, &tile_set),
+            Err(BipaiError::TileSetMismatch {
+                tile_kind: TileKind::M1,
+                actual_count: 3,
+                expected_count: 4,
+            }),
+        );
+    }
+
+    #[test]
+    fn four_player_bipai_rejects_excess_tile_kind_when_counts_differ() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles[4] = TileKind::M1;
+
+        assert_eq!(
+            Bipai::<FourPlayer>::try_new(tiles, &tile_set),
+            Err(BipaiError::TileSetMismatch {
+                tile_kind: TileKind::M1,
+                actual_count: 5,
+                expected_count: 4,
+            }),
+        );
+    }
+
+    #[test]
+    fn four_player_bipai_accepts_shuffled_red_and_base_five_order() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        let red_index = tiles
+            .iter()
+            .position(|tile_kind| *tile_kind == TileKind::M0)
+            .unwrap();
+        let base_index = tiles
+            .iter()
+            .position(|tile_kind| *tile_kind == TileKind::M5)
+            .unwrap();
+        tiles.swap(red_index, base_index);
 
         assert!(Bipai::<FourPlayer>::try_new(tiles, &tile_set).is_ok());
     }
