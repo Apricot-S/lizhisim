@@ -328,4 +328,35 @@ mod tests {
 
         assert_eq!(bingpai.counts()[TileKind::M0.index()], 1);
     }
+
+    #[test]
+    fn adding_base_five_with_one_red_tile_allows_three_copies() {
+        let mut counts = [0; 37];
+        counts[TileKind::M0.index()] = 1;
+        counts[TileKind::M5.index()] = 3;
+        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap())
+            .with_added(TileKind::M5)
+            .unwrap()
+            .with_added(TileKind::M5)
+            .unwrap()
+            .with_added(TileKind::M5)
+            .unwrap();
+
+        assert_eq!(bingpai.counts()[TileKind::M5.index()], 3);
+    }
+
+    #[test]
+    fn adding_base_five_with_four_red_tiles_is_rejected() {
+        let mut counts = [0; 37];
+        counts[TileKind::M0.index()] = 4;
+        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap());
+
+        assert_eq!(
+            bingpai.with_added(TileKind::M5),
+            Err(BingpaiError::TileCountExceeded {
+                tile_kind: TileKind::M5,
+                max_count: 0,
+            }),
+        );
+    }
 }
