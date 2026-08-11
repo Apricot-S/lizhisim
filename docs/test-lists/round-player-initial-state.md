@@ -51,8 +51,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 - [x] 配牌前の`Round`は`Bipai<FourPlayer, QipaiPending>`と親`Seat`を所有する。
 - [x] 配牌前の`Round`には通常`zimo`操作を提供しない。
-- [ ] **Selected:** `qipai`は配牌前の`Round`を消費し、ツモ前typestateを返す。
-- [ ] `qipai`後の`Round`は四人分の`Player`を所有する。
+- [x] `qipai`は配牌前の`Round`を消費し、ツモ前typestateを返す。
+- [ ] **Selected:** `qipai`後の`Round`は四人分の`Player`を所有する。
 - [ ] `qipai`後の最初のactorは親である。
 - [ ] `qipai`後の`Round`が所有する`Bipai`の`remaining_count`は70である。
 - [ ] Property: `qipai`後の四人分の`Player`と未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。
@@ -80,9 +80,9 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: `qipai`は配牌前の`Round`を消費し、ツモ前typestateを返す。
+- Selected: `qipai`後の`Round`は四人分の`Player`を所有する。
 - Phase: Not started
-- Why this is the smallest useful next test: 配牌前から通常ツモへ進めない型境界を確認できたため、状態を消費して最初の有効な次phaseへ進む遷移を実装する。
+- Why this is the smallest useful next test: `qipai`の消費型遷移を導入できたため、遷移時に生成した四人分の永続状態が新しい`Round`に保存されることを次に確認する。
 
 ## Cycle log
 
@@ -95,6 +95,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: 外部crateからの不正な`Player`構築は、全fieldがprivateで唯一のconstructor `from_qipai`もcrate-privateであることを公開API reviewで確認した。失敗理由を限定できない`compile_fail` testは追加しない。`fulu`の初期状態は構成要素の型が決まるまでdeferし、配牌前`Round`を次に選択した。
 - 2026-08-12: `qipai_pending_round_preserves_bipai_and_zhuangjia`を追加し、`Round`未定義のcompile errorをredとして確認した。`Round<P>`に`Bipai<P, QipaiPending>`と`Seat<P>`だけを持たせ、両方の保持を一assertionで確認してgreenにした。後続phaseの汎用化は先行実装していない。
 - 2026-08-12: 配牌前`Round`に通常`zimo`を提供しないことをAPI reviewで確認した。`Round<P>`自身に`zimo`はなく、保持する`Bipai<P, QipaiPending>`にも`zimo`が定義されていない。失敗理由を限定できない`compile_fail` testは追加せず、正の遷移testとして`qipai`を次に選択した。
+- 2026-08-12: `qipai_consumes_pending_round_and_returns_zimo_pending_round`を追加し、`ZimoPendingRound`と`Round::qipai`未定義のcompile errorをredとして確認した。`qipai(self)`が配牌済み`Bipai`、四人分の`Player`、親を失わずに別型へ移し、戻り型と親の保持を一assertionで確認してgreenにした。現在フェーズに合わせて四人用だけを実装した。
 
 ## Completion review
 

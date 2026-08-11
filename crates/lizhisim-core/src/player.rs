@@ -13,10 +13,6 @@ pub struct Player<P> {
 }
 
 impl<P> Player<P> {
-    #[cfg_attr(
-        not(test),
-        expect(dead_code, reason = "will be used by the Round qipai transition")
-    )]
     pub(crate) fn from_qipai(seat: Seat<P>, bingpai: Bingpai) -> Self {
         Self {
             seat,
