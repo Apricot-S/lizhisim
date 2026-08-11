@@ -131,18 +131,6 @@ impl Bipai<FourPlayer, QipaiPending> {
 }
 
 impl<P: BipaiSpec> Bipai<P, QipaiCompleted> {
-    pub fn zimo(mut self) -> Result<(Self, TileKind), BipaiError> {
-        if self.remaining_count() == 0 {
-            return Err(BipaiError::LiveWallExhausted);
-        }
-        let tile_kind = self.tiles.as_ref()[self.cursor];
-        self.remaining_count -= 1;
-        self.cursor += 1;
-        Ok((self, tile_kind))
-    }
-}
-
-impl Bipai<FourPlayer, QipaiCompleted> {
     #[cfg_attr(
         not(test),
         expect(
@@ -158,6 +146,18 @@ impl Bipai<FourPlayer, QipaiCompleted> {
         Ok(self)
     }
 
+    pub fn zimo(mut self) -> Result<(Self, TileKind), BipaiError> {
+        if self.remaining_count() == 0 {
+            return Err(BipaiError::LiveWallExhausted);
+        }
+        let tile_kind = self.tiles.as_ref()[self.cursor];
+        self.remaining_count -= 1;
+        self.cursor += 1;
+        Ok((self, tile_kind))
+    }
+}
+
+impl Bipai<FourPlayer, QipaiCompleted> {
     pub fn baopai_indicators(&self) -> impl ExactSizeIterator<Item = TileKind> + '_ {
         (0..self.baopai_indicator_count).map(|indicator_index| {
             self.tiles.as_ref()[FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX - indicator_index * 2]
