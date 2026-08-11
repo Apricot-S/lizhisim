@@ -198,6 +198,8 @@ impl Bipai<FourPlayer, QipaiCompleted> {
             .remaining_count
             .checked_sub(1)
             .ok_or(BipaiError::LiveWallExhausted)?;
+        // Replacement tiles move monotonically backward from the end of `tiles` instead of
+        // reproducing the top-bottom order of physical stacks. The resulting swap is intentional.
         let tile_kind =
             self.tiles.as_ref()[FOUR_PLAYER_FIRST_LINGSHANG_ZIMO_INDEX - self.lingshang_zimo_count];
         self.lingshang_zimo_count += 1;
@@ -212,6 +214,8 @@ impl Bipai<FourPlayer, QipaiCompleted> {
         )
     )]
     pub(crate) fn baopai_indicators(&self) -> impl ExactSizeIterator<Item = TileKind> + '_ {
+        // Baopai indicators move monotonically backward from the end of `tiles` instead of
+        // reproducing the top-bottom order of physical stacks. The resulting swap is intentional.
         (0..self.baopai_indicator_count).map(|indicator_index| {
             self.tiles.as_ref()[FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX - indicator_index * 2]
         })
@@ -225,6 +229,8 @@ impl Bipai<FourPlayer, QipaiCompleted> {
         )
     )]
     pub(crate) fn li_baopai_indicators(&self) -> impl ExactSizeIterator<Item = TileKind> + '_ {
+        // Li-baopai indicators move monotonically backward from the end of `tiles` instead of
+        // reproducing the top-bottom order of physical stacks. The resulting swap is intentional.
         (0..self.baopai_indicator_count).map(|indicator_index| {
             self.tiles.as_ref()
                 [FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX - indicator_index * 2 - 1]
