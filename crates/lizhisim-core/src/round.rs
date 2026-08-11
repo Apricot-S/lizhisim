@@ -7,38 +7,40 @@ use crate::player::Player;
 use crate::seat::FourPlayer;
 use crate::seat::Seat;
 
-pub struct Round<P: BipaiSpec> {
-    bipai: Bipai<P, QipaiPending>,
+pub struct Round<P, State> {
+    state: State,
     zhuangjia: Seat<P>,
 }
 
-pub struct ZimoPendingRound {
-    bipai: Bipai<FourPlayer, QipaiCompleted>,
-    players: [Player<FourPlayer>; 4],
-    zhuangjia: Seat<FourPlayer>,
+pub struct RoundQipaiPending<P: BipaiSpec> {
+    bipai: Bipai<P, QipaiPending>,
 }
 
-impl<P: BipaiSpec> Round<P> {
+pub struct FourPlayerZimoPending {
+    bipai: Bipai<FourPlayer, QipaiCompleted>,
+    players: [Player<FourPlayer>; 4],
+}
+
+impl<P: BipaiSpec> Round<P, RoundQipaiPending<P>> {
     #[cfg_attr(
         not(test),
         expect(dead_code, reason = "will be called by the Round creation boundary")
     )]
     pub(crate) fn new(bipai: Bipai<P, QipaiPending>, zhuangjia: Seat<P>) -> Self {
-        Self { bipai, zhuangjia }
+        Self {
+            state: RoundQipaiPending { bipai },
+            zhuangjia,
+        }
     }
 
     pub fn bipai(&self) -> &Bipai<P, QipaiPending> {
-        &self.bipai
-    }
-
-    pub fn zhuangjia(&self) -> &Seat<P> {
-        &self.zhuangjia
+        &self.state.bipai
     }
 }
 
-impl Round<FourPlayer> {
-    pub fn qipai(self) -> ZimoPendingRound {
-        let (bipai, [bingpai0, bingpai1, bingpai2, bingpai3]) = self.bipai.qipai();
+impl Round<FourPlayer, RoundQipaiPending<FourPlayer>> {
+    pub fn qipai(self) -> Round<FourPlayer, FourPlayerZimoPending> {
+        let (bipai, [bingpai0, bingpai1, bingpai2, bingpai3]) = self.state.bipai.qipai();
         let [seat0, seat1, seat2, seat3] = Seat::<FourPlayer>::ALL;
         let players = [
             Player::from_qipai(seat0, bingpai0),
@@ -47,24 +49,25 @@ impl Round<FourPlayer> {
             Player::from_qipai(seat3, bingpai3),
         ];
 
-        ZimoPendingRound {
-            bipai,
-            players,
+        Round {
+            state: FourPlayerZimoPending { bipai, players },
             zhuangjia: self.zhuangjia,
         }
     }
 }
 
-impl ZimoPendingRound {
+impl Round<FourPlayer, FourPlayerZimoPending> {
     pub fn bipai(&self) -> &Bipai<FourPlayer, QipaiCompleted> {
-        &self.bipai
+        &self.state.bipai
     }
 
     pub fn players(&self) -> &[Player<FourPlayer>; 4] {
-        &self.players
+        &self.state.players
     }
+}
 
-    pub fn zhuangjia(&self) -> &Seat<FourPlayer> {
+impl<P, State> Round<P, State> {
+    pub fn zhuangjia(&self) -> &Seat<P> {
         &self.zhuangjia
     }
 }
@@ -73,6 +76,7 @@ impl ZimoPendingRound {
 mod tests {
     use crate::bipai::Bipai;
     use crate::seat::FourPlayer;
+    use crate::seat::Seat;
     use crate::tile::TileKind;
     use crate::tile_set::TileSet;
 
@@ -113,7 +117,7 @@ mod tests {
         let zhuangjia = Seat::<FourPlayer>::ALL[2];
         let round = Round::new(bipai, zhuangjia);
 
-        let round: ZimoPendingRound = round.qipai();
+        let round: Round<FourPlayer, FourPlayerZimoPending> = round.qipai();
 
         assert_eq!(round.zhuangjia(), &zhuangjia);
     }

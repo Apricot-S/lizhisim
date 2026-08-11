@@ -96,6 +96,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: `qipai_pending_round_preserves_bipai_and_zhuangjia`を追加し、`Round`未定義のcompile errorをredとして確認した。`Round<P>`に`Bipai<P, QipaiPending>`と`Seat<P>`だけを持たせ、両方の保持を一assertionで確認してgreenにした。後続phaseの汎用化は先行実装していない。
 - 2026-08-12: 配牌前`Round`に通常`zimo`を提供しないことをAPI reviewで確認した。`Round<P>`自身に`zimo`はなく、保持する`Bipai<P, QipaiPending>`にも`zimo`が定義されていない。失敗理由を限定できない`compile_fail` testは追加せず、正の遷移testとして`qipai`を次に選択した。
 - 2026-08-12: `qipai_consumes_pending_round_and_returns_zimo_pending_round`を追加し、`ZimoPendingRound`と`Round::qipai`未定義のcompile errorをredとして確認した。`qipai(self)`が配牌済み`Bipai`、四人分の`Player`、親を失わずに別型へ移し、戻り型と親の保持を一assertionで確認してgreenにした。現在フェーズに合わせて四人用だけを実装した。
+- 2026-08-12: refactorとして`Round<P, State>`へ統一し、親を共通field、`RoundQipaiPending<P>`と`FourPlayerZimoPending`をphase固有payloadとした。field構成が変わらない`Bipai`のmarker typestateとは異なり、`Round`はpayloadによってphaseごとの必須dataだけを保持する。三人用player集合の抽象化は先行していない。
 
 ## Completion review
 
