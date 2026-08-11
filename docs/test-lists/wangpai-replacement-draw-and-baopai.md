@@ -73,8 +73,8 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [x] 初期表示commandを二回適用すると拒否する。
 - [x] 公開済みの初期表ドラ表示牌を複数回参照しても、毎回同じindex 131の`TileKind`を返す。
 - [x] 公開済み表ドラ表示牌の参照は公開枚数を変えない。
-- [ ] **Selected:** 公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない。
-- [ ] 公開済み表ドラ表示牌の参照は通常`zimo`位置を変えない。
+- [x] 公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない。
+- [ ] **Selected:** 公開済み表ドラ表示牌の参照は通常`zimo`位置を変えない。
 - [ ] 公開済み表ドラ表示牌の参照は`lingshang_zimo`位置を変えない。
 - [ ] `qipai`前の参照失敗後も`Bipai`の状態は変化しない。
 
@@ -180,12 +180,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: 公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない。
+- Selected: 公開済み表ドラ表示牌の参照は通常`zimo`位置を変えない。
 - Phase: Red
-- Why this is the smallest useful next test: 嶺上ツモの通常ツモへの影響を固定したため、表ドラ表示牌の非消費参照が通常ツモ可能枚数へ影響しないことを固定する。
+- Why this is the smallest useful next test: 表ドラ表示牌の参照が通常ツモ可能枚数を変えないことを固定したため、通常ツモcursorも変えないことを固定する。
 
 ## Cycle log
 
+- 2026-08-11: 「公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない」を選択した。公開済み表示牌をiteratorが尽きるまで参照した後の`remaining_count`を参照前と比較した。`baopai_indicators`は通常の内部可変性を持たない`Bipai`への`&self`だけを受け取り、`remaining_count`も通常fieldであるため、この変更単位で安全なruntime mutantを作れずredは省略した。共有借用による型上の不変性と公開操作後の回帰値を確認してgreenとした。
 - 2026-08-11: 「通常`zimo`は嶺上牌の取得位置を変えない」を選択した。通常ツモを1回挟んだ後も嶺上ツモ4回の列が`S0, P0, M0, Z7`となることを一assertionで検証した。通常ツモcursorを嶺上牌indexへ誤って反映するmutantで`P0, M0, Z7, Z7`となるredを確認し、嶺上取得回数だけを使う実装へ復元してgreenにした。三人用嶺上牌容量はPhase 4対象のため、次は現在の四人用実装だけで検証できる表ドラ表示牌参照の非消費性を選択した。
 - 2026-08-11: 「4回の`lingshang_zimo`後、通常`zimo`はindex 117までで終了する」を選択した。66回目の通常ツモをindex 117の`Z4`、その次を`LiveWallExhausted`として一assertionへ集約した。最初の嶺上ツモだけを減算するmutantで次の通常ツモがindex 118の`Z4`となるredを確認し、各成功取得で1減算する実装へ復元してgreenにした。
 - 2026-08-11: 「`lingshang_zimo`を1回行った後、通常`zimo`はindex 120までで終了する」を選択した。69回目の通常ツモをindex 120の`Z4`、その次を`LiveWallExhausted`として一assertionへ集約した。嶺上ツモの減算値を0にするmutantで次の通常ツモがindex 121の`Z5`となるredを確認し、1へ復元してgreenにした。
