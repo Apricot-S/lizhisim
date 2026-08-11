@@ -372,6 +372,26 @@ mod tests {
     }
 
     #[test]
+    fn lingshang_zimo_shortens_normal_zimo_through_index_120() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (mut bipai, _) = bipai.qipai();
+        (bipai, _) = bipai.lingshang_zimo().unwrap();
+
+        let mut last_zimopai = None;
+        for _ in 0..69 {
+            let (next_bipai, zimopai) = bipai.zimo().unwrap();
+            bipai = next_bipai;
+            last_zimopai = Some(zimopai);
+        }
+
+        assert_eq!(
+            (last_zimopai, bipai.zimo().map(|(_, zimopai)| zimopai)),
+            (Some(TileKind::Z4), Err(BipaiError::LiveWallExhausted)),
+        );
+    }
+
+    #[test]
     fn first_zimo_after_qipai_leaves_69_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
