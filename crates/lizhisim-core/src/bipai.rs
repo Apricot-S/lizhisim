@@ -109,17 +109,17 @@ impl Bipai<FourPlayer, QipaiPending> {
 
     pub fn qipai(self) -> (Bipai<FourPlayer, QipaiCompleted>, [Bingpai; 4]) {
         let tiles = self.tiles.as_ref();
-        let bingpai = core::array::from_fn(|seat_index| {
-            let seat_offset = seat_index * 4;
+        let bingpai = core::array::from_fn(|deal_index| {
+            let deal_offset = deal_index * 4;
             let mut counts = [0; 37];
 
             for batch_start in [0, 16, 32] {
-                for &tile_kind in &tiles[batch_start + seat_offset..batch_start + seat_offset + 4] {
+                for &tile_kind in &tiles[batch_start + deal_offset..batch_start + deal_offset + 4] {
                     counts[tile_kind.index()] += 1;
                 }
             }
 
-            let tile_kind = tiles[48 + seat_index];
+            let tile_kind = tiles[48 + deal_index];
             counts[tile_kind.index()] += 1;
 
             Bingpai::from_validated_counts(counts, self.tile_set.clone())
@@ -281,7 +281,7 @@ mod tests {
     }
 
     #[test]
-    fn qipai_deals_thirteen_expected_tiles_to_each_seat() {
+    fn qipai_deals_thirteen_expected_tiles_in_deal_order() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (_, actual): (_, [Bingpai; 4]) = bipai.qipai();

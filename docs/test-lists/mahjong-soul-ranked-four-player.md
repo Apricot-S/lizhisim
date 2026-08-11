@@ -91,8 +91,8 @@
 
 - [x] 検証済みの136枚の固定配列から四人用`Bipai`を構築できる。
 - [x] 構築直後の四人用`Bipai`の王牌を除いた残り枚数は122枚である。
-- [x] 配牌の3回の4枚取りでは、各seatが`i * 16 + seat_index * 4 + j`の牌を受け取る。
-- [x] 配牌の最後の1枚取りでは、各seatがindex `48 + seat_index`の牌を受け取る。
+- [x] 配牌の3回の4枚取りでは、親起点の各deal positionが`i * 16 + deal_index * 4 + j`の牌を受け取る。
+- [x] 配牌の最後の1枚取りでは、親起点の各deal positionがindex `48 + deal_index`の牌を受け取る。
 - [x] 四人全員への13枚配牌後の`Bipai`の王牌を除いた残り枚数は70枚である。
 - [x] 親のinitial deal由来の最初の`Zimo`はindex 52の牌を返す。
 - [x] 親のinitial deal由来の最初の`Zimo`後の`Bipai`の王牌を除いた残り枚数は69枚である。
@@ -161,14 +161,14 @@
 - 2026-08-12: 四人用`Bipai`の完了監査を行った。固定fixtureで`qipai`後の最初の`Zimo`がindex 52の`P5`となり、後続もindex 52以降の順序を保つ既存testにより、「固定した`Bipai`から正規化した最初の`Zimo`が一意に決まる」を完了とした。tile conservationは`Player` / `Round`が牌の所有先を持ってから検証する。
 - 2026-08-11: `Round`は`fulu`と`he`を含む`Player`の所有・遷移設計より先に固定しない方針へ修正し、直前に追加した`Round`、`Prepared`、`AwaitingDraw`実装を削除して対応test項目を未着手へ戻した。`Bipai`の牌列型だけを対応付けるsealed traitは、広いplayer set全体の仕様と誤解しないよう`PlayerSet`から`BipaiSpec`へ改名し、手牌集合のassociated typeを削除した。次は`Bipai`の王牌関連項目を優先する。
 - 2026-08-11: 「配牌完了後はツモ前typestateになる」を選択し、`Round`と`AwaitingDraw`未定義の型errorでredを確認した。sealed `PlayerSet`へ手牌集合のassociated typeを追加し、`Prepared<FourPlayer>`が配牌前`Bipai`と親seatを所有し、`qipai`で`AwaitingDraw<FourPlayer>`へ遷移する最小`Round<P, State>`を実装してgreenにした。次の遷移まで未読のstate fieldだけを理由付きdead code抑制とし、先行する公開accessorは追加していない。
-- 2026-08-11: 既存の`qipai_deals_thirteen_expected_tiles_to_each_seat`と戻り値型により、seat別固定counts、非`Result`、seat別multisetでのindex割当検証がgreenであることをreviewし、対応3項目を完了にした。「配牌完了後はツモ前typestateになり、この状態だけが通常`Zimo`へ進める」は独立して失敗し得るため、状態遷移とmethod可用性の2項目へ分割し、前者を次に選択した。
+- 2026-08-11: 既存の`qipai_deals_thirteen_expected_tiles_in_deal_order`と戻り値型により、deal position別固定counts、非`Result`、multisetでのindex割当検証がgreenであることをreviewし、対応3項目を完了にした。「配牌完了後はツモ前typestateになり、この状態だけが通常`Zimo`へ進める」は独立して失敗し得るため、状態遷移とmethod可用性の2項目へ分割し、前者を次に選択した。
 - 2026-08-11: `Bipai::try_new`は検証後に`TileSet`を保持するため、借用を受けて内部cloneするAPIから値を受け取るAPIへrefactorした。`TileSet`を引き続き必要とするか判断できる呼び出し側へcloneの責任を移し、現在の呼び出し箇所では後続利用がないためcloneせず所有権を移した。
-- 2026-08-11: `qipai`のseat別counts構築をrefactorした。`0..13`ごとの分岐、除算、剰余を使うfoldから、`seat_offset`を一度計算してbatch開始index `0, 16, 32`の各4枚を走査し、最後にindex `48 + seat_index`の1枚を加える手続きへ変更した。3回の4枚取りと最後の1枚取りをコード構造へ直接対応させ、公開挙動は変更していない。
+- 2026-08-11: `qipai`のdeal position別counts構築をrefactorした。`0..13`ごとの分岐、除算、剰余を使うfoldから、`deal_offset`を一度計算してbatch開始index `0, 16, 32`の各4枚を走査し、最後にindex `48 + deal_index`の1枚を加える手続きへ変更した。3回の4枚取りと最後の1枚取りをコード構造へ直接対応させ、公開挙動は変更していない。
 - 2026-08-11: 将来の`Player` / `Round`遷移から利用する`with_added`、`with_removed`と`BingpaiError`をproductionコードへ戻した。低水準操作は`pub(crate)`のまま、利用開始まで理由付き`expect(dead_code)`をproduction buildだけに適用する。`BingpaiError`は上位遷移errorの型付きsourceにできるようcrate rootから公開した。テスト専用constructorは空状態を明示する`empty`へ改名した。
 - 2026-08-11: `qipai`由来の`Bingpai`が元の`TileSet`上限を保持するtestを追加した。`with_added`が上限を1枚緩めるmutantでredを確認し、元の上限参照へ復元してgreenにした。その後、正規生成経路を`qipai`へ限定するため`Bingpai::new`、`with_added`、`with_removed`をcrate-privateへ変更した。既存unit testは同一crate内で低水準操作の境界を引き続き検証する。
-- 2026-08-11: 「`Bipai::qipai`は`[Bingpai; 4]`を返す」を選択し、戻り値型の不一致でredを確認した。`Bipai`へ検証済み`TileSet`を保持し、crate-privateな検証済みcounts constructorで四人分の`Bingpai`を構築した。配牌期待値は従来の`TileKind`配列から、index計算を再利用しないseat別固定countsへ変更してgreenにした。
+- 2026-08-11: 「`Bipai::qipai`は`[Bingpai; 4]`を返す」を選択し、戻り値型の不一致でredを確認した。`Bipai`へ検証済み`TileSet`を保持し、crate-privateな検証済みcounts constructorで四人分の`Bingpai`を構築した。配牌期待値は従来の`TileKind`配列から、index計算を再利用しないdeal position別固定countsへ変更してgreenにした。
 - 2026-08-11: `Bingpai`の任意変更を公開せず、配牌、通常ツモ、打牌、副露の検証済み`Round`遷移だけから更新する境界を追加した。`new`、`with_added`、`with_removed`相当は外部crateへ公開せず、種類別count操作としてcrate内に閉じる。進行phaseは`Bingpai`自身へ重ねず`Round`のtypestateで表し、ツモ前、ツモ後、チー・ポン後の打牌待ち、嶺上ツモ待ちを区別する。`zimopai`は既存方針どおり13枚以下の`Bingpai`と分離する。
-- 2026-08-11: `Bipai::qipai`が未検証の`[[TileKind; 13]; 4]`ではなく`[Bingpai; 4]`を返す契約を追加した。各seatの固定counts、元の`TileSet`上限の継承、検証済み牌山からの失敗しない内部変換、未検証countsを受け取る公開constructorを作らないことを独立項目として追跡する。配牌順は`Bingpai`内に保持せず、index割当から得られるseat別multisetを固定期待countsで検証する。
+- 2026-08-11: `Bipai::qipai`が未検証の`[[TileKind; 13]; 4]`ではなく`[Bingpai; 4]`を返す契約を追加した。各deal positionの固定counts、元の`TileSet`上限の継承、検証済み牌山からの失敗しない内部変換、未検証countsを受け取る公開constructorを作らないことを独立項目として追跡する。配牌順は`Bingpai`内に保持せず、index割当から得られるdeal position別multisetを固定期待countsで検証する。
 - 2026-08-11: `lingshang_zimo`でもlive wallだけを短縮できるよう、`remaining_count`をcursorからの都度計算ではなく`Bipai`の状態へrefactorした。constructorで122、`qipai`で52減算、通常`zimo`成功ごとに1減算し、公開挙動は維持した。
 - 2026-08-11: player set固有値に依存しない`remaining_count`と配牌完了後の`zimo`を`Bipai<P>`の共通implへ移した。136枚の検証と四人分の配牌を担う`try_new`、`qipai`は`FourPlayer`固有implに維持し、三人用の型や挙動は追加していない。
 - 2026-08-11: `Bipai::zimo`を`Option`から`Result`へ変更し、通常取得可能な牌がない理由を`BipaiError::LiveWallExhausted`として保持するようにした。`remaining_count`は末尾14枚の`wangpai`を除外し、構築直後122枚、`qipai`後70枚、最初の`zimo`後69枚を返す契約へ更新した。

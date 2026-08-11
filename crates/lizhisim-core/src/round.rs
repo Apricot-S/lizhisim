@@ -41,7 +41,9 @@ impl<P: BipaiSpec> Round<P, RoundQipaiPending<P>> {
 
 impl Round<FourPlayer, RoundQipaiPending<FourPlayer>> {
     pub fn qipai(self) -> Round<FourPlayer, FourPlayerZimoPending> {
-        let (bipai, [bingpai0, bingpai1, bingpai2, bingpai3]) = self.state.bipai.qipai();
+        let (bipai, mut bingpai) = self.state.bipai.qipai();
+        bingpai.rotate_right(self.zhuangjia.index());
+        let [bingpai0, bingpai1, bingpai2, bingpai3] = bingpai;
         let [seat0, seat1, seat2, seat3] = Seat::<FourPlayer>::ALL;
         let players = [
             Player::from_qipai(seat0, bingpai0),
@@ -151,5 +153,23 @@ mod tests {
         let round = Round::new(bipai, zhuangjia).qipai();
 
         assert_eq!(round.actor(), &zhuangjia);
+    }
+
+    #[test]
+    fn qipai_maps_deal_order_from_zhuangjia_to_fixed_seat_order() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2]).qipai();
+        let [seat0, seat1, seat2, seat3] = round.players();
+
+        assert_eq!(
+            [
+                seat0.bingpai().counts()[TileKind::M3.index()],
+                seat1.bingpai().counts()[TileKind::M4.index()],
+                seat2.bingpai().counts()[TileKind::M1.index()],
+                seat3.bingpai().counts()[TileKind::M2.index()],
+            ],
+            [4, 4, 4, 4]
+        );
     }
 }

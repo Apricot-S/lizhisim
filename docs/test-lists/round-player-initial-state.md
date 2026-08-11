@@ -30,6 +30,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 ## Responsibility boundary
 
 - `Player`は一つの`Seat`に属する永続状態を所有する。
+- `Seat`は`TableMatch`中の固定位置であり、`Round`をまたいでplayerとの対応を変えない。
+- `Bipai::qipai`の出力順は親を起点とする配牌順とし、`Round`が固定`Seat`順の`Player`へ対応付ける。
 - `Player`は現在の`Round` phaseや一時的な`zimopai`を所有しない。
 - `Round`は`Bipai`、四人分の`Player`、現在actor、phase固有データを所有する。
 - `Round`遷移は古い状態を消費し、次のtypestateを返す。
@@ -54,6 +56,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - [x] `qipai`は配牌前の`Round`を消費し、ツモ前typestateを返す。
 - [x] `qipai`後の`Round`は四人分の`Player`を所有する。
 - [x] `qipai`後の最初のactorは親である。
+- [x] 親がseat 2のとき、親起点の配牌順`0, 1, 2, 3`を固定seat順`2, 3, 0, 1`へ対応付ける。
 - [ ] **Selected:** `qipai`後の`Round`が所有する`Bipai`の`remaining_count`は70である。
 - [ ] Property: `qipai`後の四人分の`Player`と未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。
 
@@ -82,7 +85,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 - Selected: `qipai`後の`Round`が所有する`Bipai`の`remaining_count`は70である。
 - Phase: Not started
-- Why this is the smallest useful next test: 最初のactorを固定できたため、配牌による牌の移送後も`Round`が正しい通常ツモ可能枚数を保持することを次に確認する。
+- Why this is the smallest useful next test: 親起点の配牌順を固定seat順へ正しく対応付けられたため、牌の移送後に通常ツモ可能枚数が維持されることを次に確認する。
 
 ## Cycle log
 
@@ -99,6 +102,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: refactorとして`Round<P, State>`へ統一し、親を共通field、`RoundQipaiPending<P>`と`FourPlayerZimoPending`をphase固有payloadとした。field構成が変わらない`Bipai`のmarker typestateとは異なり、`Round`はpayloadによってphaseごとの必須dataだけを保持する。三人用player集合の抽象化は先行していない。
 - 2026-08-12: `qipai_round_preserves_four_players`を追加した。直前の`qipai`実装が配牌結果を失わないために四人分の`Player`を既に保持しており、追加時点からgreenだった。`Player::seat()`の配列と`Seat::<FourPlayer>::ALL`を一assertionで比較し、`Round`境界での保存を確認した。production変更はない。
 - 2026-08-12: `qipai_round_starts_with_zhuangjia_as_actor`を追加し、`FourPlayerZimoPending`にactorと参照APIがないcompile errorをredとして確認した。actorを共通fieldではなくツモ前phase payloadへ追加し、`qipai`時に親から初期化する最小実装でgreenにした。
+- 2026-08-12: `Seat`は`TableMatch`中の固定位置、`Bipai::qipai`の配列indexは親起点の配牌順であることを明確化した。親がseat 0以外でも配牌順をseat 0から割り当てていた不具合を修正するため、親seat 2の回帰testを選択した。
+- 2026-08-12: `qipai_maps_deal_order_from_zhuangjia_to_fixed_seat_order`を追加し、親seat 2で四人すべての固定期待countsが不一致になるredを確認した。親起点の配牌配列を親の固定seat indexだけ右回転してから`Seat::ALL`順の`Player`へ変換しgreenにした。`Bipai`内の`seat_index`は`deal_index`へ改名した。
 
 ## Completion review
 

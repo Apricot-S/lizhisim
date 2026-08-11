@@ -25,6 +25,10 @@ pub struct SeatIndexOutOfRange {
 impl Seat<FourPlayer> {
     pub const ALL: [Self; 4] = [Self::new(0), Self::new(1), Self::new(2), Self::new(3)];
 
+    pub(crate) const fn index(self) -> usize {
+        self.index as usize
+    }
+
     const fn new(index: u8) -> Self {
         Self {
             index,
