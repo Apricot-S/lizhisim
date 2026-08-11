@@ -73,7 +73,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [x] 初期表示commandを二回適用すると拒否する。
 - [x] 公開済みの初期表ドラ表示牌を複数回参照しても、毎回同じindex 131の`TileKind`を返す。
 - [x] 公開済み表ドラ表示牌の参照は公開枚数を変えない。
-- [ ] 公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない。
+- [ ] **Selected:** 公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない。
 - [ ] 公開済み表ドラ表示牌の参照は通常`zimo`位置を変えない。
 - [ ] 公開済み表ドラ表示牌の参照は`lingshang_zimo`位置を変えない。
 - [ ] `qipai`前の参照失敗後も`Bipai`の状態は変化しない。
@@ -97,7 +97,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [x] 4回の`lingshang_zimo`後は通常`zimo`の`remaining_count`が4減る。
 - [x] `lingshang_zimo`を1回行った後、通常`zimo`はindex 120までで終了し、補充対象となったindex 121を返さない。
 - [x] 4回の`lingshang_zimo`後、通常`zimo`はindex 117までで終了し、index 118〜121を返さない。
-- [ ] **Selected:** 通常`zimo`は嶺上牌の取得位置を変えない。
+- [x] 通常`zimo`は嶺上牌の取得位置を変えない。
 
 ### Three-player replacement draw capacity
 
@@ -180,12 +180,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: 通常`zimo`は嶺上牌の取得位置を変えない。
+- Selected: 公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない。
 - Phase: Red
-- Why this is the smallest useful next test: 通常ツモの短縮済み終端を固定したため、通常ツモと嶺上ツモの取得cursorが独立していることを固定する。
+- Why this is the smallest useful next test: 嶺上ツモの通常ツモへの影響を固定したため、表ドラ表示牌の非消費参照が通常ツモ可能枚数へ影響しないことを固定する。
 
 ## Cycle log
 
+- 2026-08-11: 「通常`zimo`は嶺上牌の取得位置を変えない」を選択した。通常ツモを1回挟んだ後も嶺上ツモ4回の列が`S0, P0, M0, Z7`となることを一assertionで検証した。通常ツモcursorを嶺上牌indexへ誤って反映するmutantで`P0, M0, Z7, Z7`となるredを確認し、嶺上取得回数だけを使う実装へ復元してgreenにした。三人用嶺上牌容量はPhase 4対象のため、次は現在の四人用実装だけで検証できる表ドラ表示牌参照の非消費性を選択した。
 - 2026-08-11: 「4回の`lingshang_zimo`後、通常`zimo`はindex 117までで終了する」を選択した。66回目の通常ツモをindex 117の`Z4`、その次を`LiveWallExhausted`として一assertionへ集約した。最初の嶺上ツモだけを減算するmutantで次の通常ツモがindex 118の`Z4`となるredを確認し、各成功取得で1減算する実装へ復元してgreenにした。
 - 2026-08-11: 「`lingshang_zimo`を1回行った後、通常`zimo`はindex 120までで終了する」を選択した。69回目の通常ツモをindex 120の`Z4`、その次を`LiveWallExhausted`として一assertionへ集約した。嶺上ツモの減算値を0にするmutantで次の通常ツモがindex 121の`Z5`となるredを確認し、1へ復元してgreenにした。
 - 2026-08-11: 「`lingshang_zimo`を1回行うと`remaining_count`も1減る」を選択した。減算値を0にするmutantで実際値70となるredを確認し、1へ復元してgreenにした。続く「4回後は4減る」は実装変更なしで進められたため、4回目以降に減算が欠けるmutantで実際値69となるredを確認し、各成功取得で1減算する実装へ復元してgreenにした。前者は最初の取得、後者は反復時の更新を別々に固定する。

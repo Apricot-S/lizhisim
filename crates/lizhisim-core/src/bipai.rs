@@ -414,6 +414,24 @@ mod tests {
     }
 
     #[test]
+    fn normal_zimo_does_not_change_lingshang_zimo_order() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let (bipai, _) = bipai.zimo().unwrap();
+
+        let (bipai, first) = bipai.lingshang_zimo().unwrap();
+        let (bipai, second) = bipai.lingshang_zimo().unwrap();
+        let (bipai, third) = bipai.lingshang_zimo().unwrap();
+        let (_, fourth) = bipai.lingshang_zimo().unwrap();
+
+        assert_eq!(
+            [first, second, third, fourth],
+            [TileKind::S0, TileKind::P0, TileKind::M0, TileKind::Z7],
+        );
+    }
+
+    #[test]
     fn first_zimo_after_qipai_leaves_69_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
