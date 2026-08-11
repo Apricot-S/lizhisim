@@ -96,6 +96,10 @@ index 52から最初の`Zimo`として正規化する。したがって通常の
 表ドラの有効・無効とcommand適用時点は`Bipai`で判断しない。rules crateはraw設定を検証してcore所有の
 小さなpolicy値へ変換し、coreの`Round`がpolicyから初期・追加表示を指示する。麻雀ruleの実行意味論を
 orchestration等の上位crateへ移さない。
+`Bipai`は表ドラと裏ドラを別々のcrate-private read-only iteratorとして提供する。どちらも同じ
+`baopai_indicator_count`から枚数を導出し、裏ドラ専用のcountやcursorは持たない。表ドラはindex 131、裏ドラは
+index 130から、それぞれ2ずつ戻る。取得時点と可視性は`Round`が管理し、通常observationでは表ドラだけを取得し、
+和了成立とrule上の裏ドラ適用資格を確定した場合だけ裏ドラを和了評価用viewへ含める。
 四人用のcrate-privateな`lingshang_zimo`は取得回数を状態として保持し、index 135から逆順に最大4枚を
 取得する。成功時には物理的な王牌補充を表すため通常ツモ可能な`remaining_count`も1減らす。槓・北抜きの
 合法性と一回分の取得許可は解釈せず、将来の`Round`遷移から検証済みcommandとして呼び出す。

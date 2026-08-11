@@ -204,9 +204,30 @@ impl Bipai<FourPlayer, QipaiCompleted> {
         Ok((self, tile_kind))
     }
 
-    pub fn baopai_indicators(&self) -> impl ExactSizeIterator<Item = TileKind> + '_ {
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "will be projected by the future Round public view"
+        )
+    )]
+    pub(crate) fn baopai_indicators(&self) -> impl ExactSizeIterator<Item = TileKind> + '_ {
         (0..self.baopai_indicator_count).map(|indicator_index| {
             self.tiles.as_ref()[FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX - indicator_index * 2]
+        })
+    }
+
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "will be projected by the future Round eligible-hule view"
+        )
+    )]
+    pub(crate) fn li_baopai_indicators(&self) -> impl ExactSizeIterator<Item = TileKind> + '_ {
+        (0..self.baopai_indicator_count).map(|indicator_index| {
+            self.tiles.as_ref()
+                [FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX - indicator_index * 2 - 1]
         })
     }
 }
@@ -461,6 +482,21 @@ mod tests {
                     TileKind::M2,
                 ],
             ],
+        );
+    }
+
+    #[test]
+    fn initial_li_baopai_indicator_uses_index_130() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles.swap(131, 133);
+        tiles.swap(130, 134);
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+
+        assert_eq!(
+            bipai.li_baopai_indicators().collect::<Vec<_>>(),
+            [TileKind::P0],
         );
     }
 
