@@ -43,8 +43,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - [x] `qipai`由来の`Bingpai`から作った`Player`は、その種類別countsを保持する。
 - [x] 四人分の`Player`はindex順に`Seat::<FourPlayer>::ALL`と対応する。
 - [x] 配牌直後の各`Player`の`he`は空である。
-- [ ] **Selected:** 配牌直後の`Player`は`zimopai`を所有しない。
-- [ ] 外部crateは任意の`Bingpai`、`fulu`、`he`を渡して`Player`を構築できない。
+- [x] 配牌直後の`Player`は`zimopai`を所有しない。実際の所有先は最初の`Zimo` transitionで検証する。
+- [ ] **Selected:** 外部crateは任意の`Bingpai`、`fulu`、`he`を渡して`Player`を構築できない。
 - [ ] 配牌直後の各`Player`の`fulu`は空である。
 
 ### `Round` qipai transition
@@ -80,9 +80,9 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: 配牌直後の`Player`は`zimopai`を所有しない。
+- Selected: 外部crateは任意の`Bingpai`、`fulu`、`he`を渡して`Player`を構築できない。
 - Phase: Not started
-- Why this is the smallest useful next test: `Player`の永続状態へ空の`He`を導入できたため、一時的なツモ牌を`Round` typestateへ置く所有権境界を次に固定する。
+- Why this is the smallest useful next test: `Player`のprivate fieldと生成境界を確認し、`Round`へ進む前に外部から不正なaggregateを作れないことを固定する。
 
 ## Cycle log
 
@@ -91,6 +91,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: `four_players_follow_seat_all_order`を追加し、`Player`がseatを受け取らず参照APIも持たないcompile errorをredとして確認した。`Player<P>`に`Seat<P>`を必須フィールドとして追加し、`Seat::<FourPlayer>::ALL`と配牌順をzipして構築することでgreenにした。三人用の振る舞いは先行実装していない。
 - 2026-08-12: `fulu`は北抜きと別管理して最大4要素、`He`は`Sipai { tile_kind, moqie }`のAoSを`heapless::Vec<Sipai, 27>`で保持する方針とした。`fulu`の構成要素が未確定のため、初期`he`を先に選択した。27要素上限の到達不能性は後続の`Round` property testへ残す。
 - 2026-08-12: `player_has_empty_he_after_qipai`を追加し、`Player::he`が存在しないcompile errorをredとして確認した。`heapless::Vec<Sipai, 27>`を内包する`He`を追加し、`Player::from_qipai`が空の`He`を必ず生成する最小実装でgreenにした。`Sipai`は`TileKind`と`moqie: bool`のAoSとした。
+- 2026-08-12: 「配牌直後の`Player`は`zimopai`を所有しない」はprivate layoutの不在を実行時testにすると実装詳細へ結合するため、構造reviewで完了とした。`Player`が`seat`、`bingpai`、`he`だけを所有することを確認し、正の実行時保証は後続の「ツモ後typestateは`Bingpai`と分離した`zimopai`を一枚だけ所有する」で行う。
 
 ## Completion review
 
