@@ -143,7 +143,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ### Li baopai indicators
 
-- [ ] 進行中または和了不成立時は裏ドラ表示牌を通常viewから取得できない。
+- [x] 進行中または和了不成立時は裏ドラ表示牌を通常viewから取得できない。
 - [ ] 和了成立後でも裏ドラ適用資格がなければ裏ドラ表示牌を取得できない。
 - [ ] 裏ドラ適用資格のある和了では、公開済み表ドラ表示牌と同数の裏ドラ表示牌を取得できる。
 - [ ] 初期表示だけの場合、裏ドラ表示牌はindex 130の`TileKind`一枚である。
@@ -180,12 +180,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: None
-- Phase: Awaiting `Round` design
-- Why this is the smallest useful next test: 追加表示の保留件数と権限は`Round`が所有するため、次は`Round` / `Player`の状態遷移設計を開始してから選択する。
+- Selected: 裏ドラ適用資格のある和了は、公開済み表ドラ表示牌と同数の裏ドラ表示牌を取得できる。
+- Phase: Awaiting `LiBaopai` capability design
+- Why this is the smallest useful next test: 通常viewに取得APIを置かない境界を確認したため、次は和了と裏ドラ適用資格を同時に表す最小のcapabilityを決める。
 
 ## Cycle log
 
+- 2026-08-11: 「進行中または和了不成立時は裏ドラ表示牌を通常viewから取得できない」を選択した。`Bipai<QipaiCompleted>`を含む公開APIに`li_baopai`取得操作が存在しないことをreviewし、進行中・和了不成立の通常viewからはコンパイル時に取得経路を作れないことを確認してgreenとした。現時点で和了・裏ドラ適用資格を表すdomain型は未導入のため、test専用constructorや無条件の取得APIを追加せず、次項目で最小のcapabilityを設計する。
 - 2026-08-11: 「公開済みの複数の表ドラ表示牌は何度参照しても同じ順序と内容を返す」を選択した。初期表示と追加表示4回後の5枚を二回収集し、同じ固定列として一assertionで比較した。`baopai_indicators(&self)`は内部可変性のない共有借用であり、2回目だけを壊す安全なruntime mutantを作れないため、この型不変条件をcycle logへ記録してgreenを確認した。「表ドラ表示牌一覧の参照は未処理の追加表示件数を消費しない」は、保留件数を所有する`Round orchestration`節へ移送した。
 - 2026-08-11: 「追加表示権限なしでは表ドラ表示牌を増やせない」と、同じ権限発行に依存する「一つの槓から二枚公開できない」「北抜き後に追加表示しない」を`Round orchestration`節へ移送した。`Bipai`は検証済みの一回分commandを消費して上限とindexを管理し、permitの生成は槓・北抜き・ruleを検証する`Round`の責務とする。`Round` / `Player`遷移の設計開始時に、非forgeableかつ一回消費のpermitを含むtestから再開する。
 - 2026-08-11: 「初期表示を含む5枚の表示後は追加表示を拒否する」を選択した。追加表示操作を`Result`へ変更し、5枚上限で`BaopaiIndicatorLimitReached`を返すようにした。上限比較を`>`へ緩めるmutantで6枚目が`Ok`となるredを確認し、`>=`へ復元してgreenにした。
