@@ -49,8 +49,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ### `Round` qipai transition
 
-- [ ] **Selected:** 配牌前の`Round`は`Bipai<FourPlayer, QipaiPending>`と親`Seat`を所有する。
-- [ ] 配牌前の`Round`には通常`zimo`操作を提供しない。
+- [x] 配牌前の`Round`は`Bipai<FourPlayer, QipaiPending>`と親`Seat`を所有する。
+- [ ] **Selected:** 配牌前の`Round`には通常`zimo`操作を提供しない。
 - [ ] `qipai`は配牌前の`Round`を消費し、ツモ前typestateを返す。
 - [ ] `qipai`後の`Round`は四人分の`Player`を所有する。
 - [ ] `qipai`後の最初のactorは親である。
@@ -80,9 +80,9 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: 配牌前の`Round`は`Bipai<FourPlayer, QipaiPending>`と親`Seat`を所有する。
+- Selected: 配牌前の`Round`には通常`zimo`操作を提供しない。
 - Phase: Not started
-- Why this is the smallest useful next test: 最小`Player`の生成境界を固定できたため、`Bipai`と親を失わずに保持する配牌前`Round`から最初の縦切りを開始する。
+- Why this is the smallest useful next test: 配牌前`Round`の所有状態を固定できたため、配牌を飛ばして通常ツモへ進めない型境界を次に確認する。
 
 ## Cycle log
 
@@ -93,6 +93,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: `player_has_empty_he_after_qipai`を追加し、`Player::he`が存在しないcompile errorをredとして確認した。`heapless::Vec<Sipai, 27>`を内包する`He`を追加し、`Player::from_qipai`が空の`He`を必ず生成する最小実装でgreenにした。`Sipai`は`TileKind`と`moqie: bool`のAoSとした。
 - 2026-08-12: 「配牌直後の`Player`は`zimopai`を所有しない」はprivate layoutの不在を実行時testにすると実装詳細へ結合するため、構造reviewで完了とした。`Player`が`seat`、`bingpai`、`he`だけを所有することを確認し、正の実行時保証は後続の「ツモ後typestateは`Bingpai`と分離した`zimopai`を一枚だけ所有する」で行う。
 - 2026-08-12: 外部crateからの不正な`Player`構築は、全fieldがprivateで唯一のconstructor `from_qipai`もcrate-privateであることを公開API reviewで確認した。失敗理由を限定できない`compile_fail` testは追加しない。`fulu`の初期状態は構成要素の型が決まるまでdeferし、配牌前`Round`を次に選択した。
+- 2026-08-12: `qipai_pending_round_preserves_bipai_and_zhuangjia`を追加し、`Round`未定義のcompile errorをredとして確認した。`Round<P>`に`Bipai<P, QipaiPending>`と`Seat<P>`だけを持たせ、両方の保持を一assertionで確認してgreenにした。後続phaseの汎用化は先行実装していない。
 
 ## Completion review
 
