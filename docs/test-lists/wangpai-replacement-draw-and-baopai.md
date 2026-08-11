@@ -5,7 +5,7 @@
 - Owner: project owner / implementer
 - Created: 2026-08-11
 - Updated: 2026-08-11
-- Status: Planned
+- Status: Active
 - Requirements: `CORE-002`, `CORE-003`, `CORE-005`, `CORE-006`, `CORE-007`, `NFR-001`, `RULE-001`, `RULE-002`, `RULE-010`
 - ADR / design: [domain model](../design/domain-model.md), [rules and presets](../design/rules-and-presets.md), [ADR-0013](../adr/0013-tile-kind-without-copy-identity.md)
 - Rule sources / clauses: [rule source ledger](../references/rule-sources.md)。service別の槓ドラ公開時点、北抜き、裏ドラ適用条件は実装選択前にsource mappingする。
@@ -59,15 +59,15 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ### Layout and construction
 
-- [ ] 四人用`Bipai`の末尾14枚を通常`zimo`可能枚数へ含めない。
+- [x] 四人用`Bipai`の末尾14枚を通常`zimo`可能枚数へ含めない。
 - [ ] 通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のindex集合は互いに重ならない。
 - [ ] Property: 136枚の各indexは、配牌、通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のいずれか一つにだけ分類される。
 
 ### Initial baopai indicator
 
 - [ ] `qipai`前は初期の表ドラ表示牌を取得できない。
-- [ ] `qipai`後の初回取得はindex 131の`TileKind`を返す。
-- [ ] 公開済みの初期表ドラ表示牌を複数回参照しても、毎回同じindex 131の`TileKind`を返す。
+- [x] `qipai`後の初回取得はindex 131の`TileKind`を返す。
+- [ ] **Selected:** 公開済みの初期表ドラ表示牌を複数回参照しても、毎回同じindex 131の`TileKind`を返す。
 - [ ] 公開済み表ドラ表示牌の参照は、公開枚数、通常`zimo`位置、`lingshang_zimo`位置を変えない。
 - [ ] `qipai`前の参照失敗後も`Bipai`の状態は変化しない。
 
@@ -170,11 +170,14 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: None
-- Why this is the smallest useful next test: service別source mappingと槓種別ごとの公開順序ruleを確定してから実装項目を一つ選ぶ。
+- Selected: 公開済みの初期表ドラ表示牌を複数回参照しても、毎回同じindex 131の`TileKind`を返す。
+- Phase: Red
+- Why this is the smallest useful next test: 表ドラ表示牌が消費物ではなくread-only viewであることを、追加表示APIより先に固定できる。
 
 ## Cycle log
 
+- 2026-08-11: 「`qipai`後の初回取得はindex 131」を選択し、`baopai_indicators`未定義のmethod errorでredを確認した。公開済み表示枚数をconstructorで0、`qipai`後に1として`Bipai`へ保持し、`QipaiCompleted`の四人用`Bipai`だけにread-only iteratorを実装した。fixtureのindex 131へ`M0`を固定してgreenにし、次は反復参照の非消費性を選択した。
+- 2026-08-11: 既存の構築直後122枚・`qipai`後70枚の`remaining_count` testにより、末尾14枚を通常`zimo`可能枚数へ含めない項目を完了とした。次に初期表ドラ表示牌のindex 131を選択し、将来の複数表示を同じAPIで扱える`baopai_indicators`から一枚を参照する方針とした。
 - 2026-08-11: 三人麻雀では北抜き有効時に嶺上牌8枚、無効時に4枚とする要件を追加した。容量と取得上限は`Bipai` / `Wangpai`、北抜きの合法性と一回分の取得権限発行は`Round`の責務として分離した。三人用実装はPhase 4まで行わない。
 
 ## Completion review

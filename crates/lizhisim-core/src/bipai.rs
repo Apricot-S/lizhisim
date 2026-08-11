@@ -13,6 +13,7 @@ use crate::tile_set::TileSet;
 
 const FOUR_PLAYER_QIPAI_TILE_COUNT: usize = 52;
 const FOUR_PLAYER_WANGPAI_TILE_COUNT: usize = 14;
+const FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX: usize = 131;
 
 mod private {
     pub trait Sealed {}
@@ -52,6 +53,7 @@ pub struct Bipai<P: BipaiSpec, QipaiState = QipaiPending> {
     tile_set: TileSet,
     remaining_count: usize,
     cursor: usize,
+    baopai_indicator_count: usize,
     qipai_state: PhantomData<fn() -> QipaiState>,
 }
 
@@ -89,6 +91,7 @@ impl Bipai<FourPlayer, QipaiPending> {
             tile_set,
             remaining_count,
             cursor: 0,
+            baopai_indicator_count: 0,
             qipai_state: PhantomData,
         })
     }
@@ -117,6 +120,7 @@ impl Bipai<FourPlayer, QipaiPending> {
                 tile_set: self.tile_set,
                 remaining_count: self.remaining_count - FOUR_PLAYER_QIPAI_TILE_COUNT,
                 cursor: FOUR_PLAYER_QIPAI_TILE_COUNT,
+                baopai_indicator_count: 1,
                 qipai_state: PhantomData,
             },
             bingpai,
@@ -133,6 +137,14 @@ impl<P: BipaiSpec> Bipai<P, QipaiCompleted> {
         self.remaining_count -= 1;
         self.cursor += 1;
         Ok((self, tile_kind))
+    }
+}
+
+impl Bipai<FourPlayer, QipaiCompleted> {
+    pub fn baopai_indicators(&self) -> impl ExactSizeIterator<Item = TileKind> + '_ {
+        (0..self.baopai_indicator_count).map(|indicator_index| {
+            self.tiles.as_ref()[FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX - indicator_index * 2]
+        })
     }
 }
 
@@ -228,6 +240,19 @@ mod tests {
                 tile_kind: TileKind::M5,
                 max_count: 3,
             }),
+        );
+    }
+
+    #[test]
+    fn first_baopai_indicator_after_qipai_returns_tile_at_index_131() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles.swap(131, 133);
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+
+        assert_eq!(
+            bipai.baopai_indicators().collect::<Vec<_>>(),
+            [TileKind::M0],
         );
     }
 

@@ -89,6 +89,9 @@ index 52から最初の`Zimo`として正規化する。したがって通常の
 尽きた時点で`LiveWallExhausted`を返す。`wangpai`からの取得は通常の`zimo`へ含めない。
 この値はcursorから都度導出せず`Bipai`の状態として保持し、`qipai`、通常`zimo`、将来の
 `lingshang_zimo`が消費した通常ツモ可能枚数に応じて減算する。
+公開済み表ドラ表示牌の枚数も`Bipai`の状態として保持する。四人用ではconstructorで0、`qipai`完了時に
+初期表示の1とし、`baopai_indicators`はindex 131から2ずつ戻る牌をread-only iteratorとして返す。
+表示牌の参照自体は公開枚数、通常ツモ位置、嶺上ツモ位置を変更しない。
 
 `xiangting`や`hule`が34種類のcount表現を要求する場合、adapter境界で赤牌を対応する通常の5へ射影する。34種類用の別domain識別子は、必要性が確認されるまで追加しない。
 
