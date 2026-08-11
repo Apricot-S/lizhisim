@@ -93,9 +93,9 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [x] 最初の嶺上ツモはindex 135の`TileKind`を返す。
 - [x] 連続する4回の嶺上ツモはindex `135, 134, 133, 132`の順を保つ。
 - [x] 4枚取得後は追加の嶺上ツモを拒否する。
-- [ ] **Selected:** `lingshang_zimo`を1回行うと通常`zimo`の`remaining_count`も1減る。
-- [ ] 4回の`lingshang_zimo`後は通常`zimo`の`remaining_count`が4減る。
-- [ ] `lingshang_zimo`を1回行った後、通常`zimo`はindex 120までで終了し、補充対象となったindex 121を返さない。
+- [x] `lingshang_zimo`を1回行うと通常`zimo`の`remaining_count`も1減る。
+- [x] 4回の`lingshang_zimo`後は通常`zimo`の`remaining_count`が4減る。
+- [ ] **Selected:** `lingshang_zimo`を1回行った後、通常`zimo`はindex 120までで終了し、補充対象となったindex 121を返さない。
 - [ ] 4回の`lingshang_zimo`後、通常`zimo`はindex 117までで終了し、index 118〜121を返さない。
 - [ ] 通常`zimo`は嶺上牌の取得位置を変えない。
 
@@ -180,12 +180,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: `lingshang_zimo`を1回行うと通常`zimo`の`remaining_count`も1減る。
+- Selected: `lingshang_zimo`を1回行った後、通常`zimo`はindex 120までで終了し、補充対象となったindex 121を返さない。
 - Phase: Red
-- Why this is the smallest useful next test: 4枚上限を固定したため、嶺上ツモ成功時のlive wall短縮を1回分だけ外部契約として固定する。
+- Why this is the smallest useful next test: 嶺上ツモ回数に対応する残り枚数を固定したため、短縮された通常ツモ可能範囲の終端を1回分だけ固定する。
 
 ## Cycle log
 
+- 2026-08-11: 「`lingshang_zimo`を1回行うと`remaining_count`も1減る」を選択した。減算値を0にするmutantで実際値70となるredを確認し、1へ復元してgreenにした。続く「4回後は4減る」は実装変更なしで進められたため、4回目以降に減算が欠けるmutantで実際値69となるredを確認し、各成功取得で1減算する実装へ復元してgreenにした。前者は最初の取得、後者は反復時の更新を別々に固定する。
 - 2026-08-11: 「4枚取得後は追加の`lingshang_zimo`を拒否する」を選択した。上限guardを`>`へ緩めるmutantで5回目が`Ok(..., Z7)`となるredを確認し、`>=`へ復元してgreenにした。4回の成功は取得順testで担保済みのため、このtestは5回目の`LingshangWallExhausted`だけを一assertionで検証する。
 - 2026-08-11: 「連続する4回の`lingshang_zimo`はindex 135, 134, 133, 132の順を保つ」を選択した。取得位置をindex 135へ固定するmutantで実際値が4枚とも`S0`となるredを確認し、取得回数に応じて減算する実装へ復元してgreenにした。4回の期待列に最初の1回も含まれるため、単独の「最初はindex 135」testは重複として削除し、test list上の両項目を一つのtestで担保する。
 - 2026-08-11: 「最初の`lingshang_zimo`はindex 135」を選択し、method未定義でredを確認した。四人用`Bipai`へcrate-privateな消費型操作と取得回数を追加し、index 135から逆順に取得する最小実装でgreenにした。安全境界として4枚上限を`LingshangWallExhausted`、live wall残数0を`LiveWallExhausted`で拒否し、成功時だけ`remaining_count`と取得回数を更新する。

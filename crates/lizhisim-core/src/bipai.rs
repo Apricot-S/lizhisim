@@ -350,6 +350,28 @@ mod tests {
     }
 
     #[test]
+    fn lingshang_zimo_decreases_remaining_count_by_one() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let (bipai, _) = bipai.lingshang_zimo().unwrap();
+
+        assert_eq!(bipai.remaining_count(), 69);
+    }
+
+    #[test]
+    fn four_lingshang_zimo_decrease_remaining_count_by_four() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (mut bipai, _) = bipai.qipai();
+        for _ in 0..4 {
+            (bipai, _) = bipai.lingshang_zimo().unwrap();
+        }
+
+        assert_eq!(bipai.remaining_count(), 66);
+    }
+
+    #[test]
     fn first_zimo_after_qipai_leaves_69_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
