@@ -212,8 +212,9 @@ mod tests {
     }
 
     #[test]
-    fn four_player_wangpai_index_sets_are_disjoint() {
-        let mut indices = (FOUR_PLAYER_QIPAI_TILE_COUNT..136 - FOUR_PLAYER_WANGPAI_TILE_COUNT)
+    fn four_player_index_layout_classifies_every_tile_once() {
+        let mut indices = (0..52)
+            .chain(FOUR_PLAYER_QIPAI_TILE_COUNT..136 - FOUR_PLAYER_WANGPAI_TILE_COUNT)
             .chain(
                 (0..FOUR_PLAYER_LINGSHANG_TILE_COUNT)
                     .map(|index| FOUR_PLAYER_FIRST_LINGSHANG_ZIMO_INDEX - index),
@@ -223,10 +224,7 @@ mod tests {
             .collect::<Vec<_>>();
         indices.sort_unstable();
 
-        assert_eq!(
-            indices,
-            (FOUR_PLAYER_QIPAI_TILE_COUNT..136).collect::<Vec<_>>()
-        );
+        assert_eq!(indices, (0..136).collect::<Vec<_>>());
     }
 
     #[test]

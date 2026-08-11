@@ -63,7 +63,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 - [x] 四人用`Bipai`の末尾14枚を通常`zimo`可能枚数へ含めない。
 - [x] 通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のindex集合は互いに重ならない。
-- [ ] **Selected:** Property: 136枚の各indexは、配牌、通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のいずれか一つにだけ分類される。
+- [x] Property: 136枚の各indexは、配牌、通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のいずれか一つにだけ分類される。
 
 ### Initial baopai indicator
 
@@ -111,7 +111,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ### Additional baopai indicators
 
-- [ ] 初期表示後、最初の追加表示はindex 129の`TileKind`を返す。
+- [ ] **Selected:** 初期表示後、最初の追加表示はindex 129の`TileKind`を返す。
 - [ ] 表ドラ表示牌はindex `131, 129, 127, 125, 123`の順を保つ。
 - [ ] 初期表示を含む5枚の表示後は追加表示を拒否する。
 - [ ] 追加表示権限なしでは表ドラ表示牌を増やせない。
@@ -180,12 +180,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: Property: 136枚の各indexは、配牌、通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のいずれか一つにだけ分類される。
+- Selected: 初期表示後、最初の追加表示はindex 129の`TileKind`を返す。
 - Phase: Red
-- Why this is the smallest useful next test: 王牌内の各用途が別々のindexを使うことを固定したため、配牌を含む136枚全体が一意に分類されることを確認する。
+- Why this is the smallest useful next test: 136枚全体のindex分類を固定したため、初期表示後に追加の表ドラ表示牌を一枚増やす最小の状態遷移を確認する。
 
 ## Cycle log
 
+- 2026-08-11: 136枚全体の分類propertyを追加した。配牌`0..=51`、通常ツモ、嶺上牌、表ドラ、裏ドラの各indexをソートして`0..=135`と比較し、各indexをちょうど一つの用途に分類することを一assertionで検証した。このtestは先行した王牌内4領域の非重複testを完全に包含するため置き換えた。配牌枚数を48へ変えるmutantで48〜51の重複が生じるredを確認し、52へ復元してgreenにした。
 - 2026-08-11: 「通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のindex集合は互いに重ならない」を選択した。4集合をソートしてindex `52..=135`の連続列と比較し、非重複だけでなく王牌領域全体を漏れなく覆うことを一assertionで検証した。嶺上牌開始indexを131へ変えるmutantで128〜131の重複と132〜135の欠番が生じるredを確認し、135へ復元してgreenにした。
 - 2026-08-11: 「`qipai`前の参照失敗後も`Bipai`の状態は変化しない」は、配牌前の`Bipai`に表示牌参照APIが存在しないtypestateと整合しないruntime failure表現だったため、「`qipai`前に表ドラ表示牌の参照APIを提供しない」へ正規化した。`baopai_indicators`は`Bipai<FourPlayer, QipaiCompleted>`だけのimplにあり、`QipaiPending`にはmethodが存在しないことをreviewして完了とした。外部compile-fail testを必要とする公開APIではないため、新dependencyは追加しない。
 - 2026-08-11: 「`qipai`前は初期表示commandを適用できない」を選択した。`reveal_initial_baopai_indicator`は`Bipai<P, QipaiCompleted>`だけのimplにあり、`QipaiPending`にはmethodが存在しないことをreviewして完了とした。commandは`pub(crate)`でもあるため、外部integration testでは可視性errorとtypestate errorを分離できず、compile-fail test基盤のない現時点で新dependencyを増やす価値はない。将来commandを外部公開する場合は、外部crateからのcompile-fail testを追加する。
