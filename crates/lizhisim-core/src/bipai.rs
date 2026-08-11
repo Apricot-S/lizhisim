@@ -486,17 +486,30 @@ mod tests {
     }
 
     #[test]
-    fn initial_li_baopai_indicator_uses_index_130() {
+    fn li_baopai_indicators_preserve_reverse_order_from_index_130() {
         let (mut tiles, tile_set) = red_three_tiles();
-        tiles.swap(131, 133);
-        tiles.swap(130, 134);
+        tiles.swap(130, 133);
+        tiles.swap(128, 134);
+        tiles.swap(126, 135);
+        tiles.swap(124, 0);
+        tiles.swap(122, 4);
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (bipai, _) = bipai.qipai();
         let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+        let mut bipai = bipai;
+        for _ in 0..4 {
+            bipai = bipai.reveal_additional_baopai_indicator().unwrap();
+        }
 
         assert_eq!(
             bipai.li_baopai_indicators().collect::<Vec<_>>(),
-            [TileKind::P0],
+            [
+                TileKind::M0,
+                TileKind::P0,
+                TileKind::S0,
+                TileKind::M1,
+                TileKind::M2,
+            ],
         );
     }
 
