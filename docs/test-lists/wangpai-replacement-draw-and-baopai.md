@@ -67,7 +67,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ### Initial baopai indicator
 
-- [ ] `qipai`前は初期表示commandを適用できない。
+- [ ] **Selected:** `qipai`前は初期表示commandを適用できない。
 - [x] `qipai`直後の公開済み表ドラ表示牌は0枚である。
 - [x] 初期表示commandを適用すると、公開済み表ドラ表示牌はindex 131の`TileKind`一枚になる。
 - [x] 初期表示commandを二回適用すると拒否する。
@@ -75,7 +75,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [x] 公開済み表ドラ表示牌の参照は公開枚数を変えない。
 - [x] 公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない。
 - [x] 公開済み表ドラ表示牌の参照は通常`zimo`位置を変えない。
-- [ ] **Selected:** 公開済み表ドラ表示牌の参照は`lingshang_zimo`位置を変えない。
+- [x] 公開済み表ドラ表示牌の参照は`lingshang_zimo`位置を変えない。
 - [ ] `qipai`前の参照失敗後も`Bipai`の状態は変化しない。
 
 ### Replacement draw authorization
@@ -180,12 +180,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: 公開済み表ドラ表示牌の参照は`lingshang_zimo`位置を変えない。
+- Selected: `qipai`前は初期表示commandを適用できない。
 - Phase: Red
-- Why this is the smallest useful next test: 表ドラ表示牌の参照が通常ツモcursorを変えないことを固定したため、嶺上ツモ位置も変えないことを固定する。
+- Why this is the smallest useful next test: 表ドラ表示牌参照の非消費性を固定したため、配牌前には初期表示commandを提供しないtypestate境界を確認する。
 
 ## Cycle log
 
+- 2026-08-11: 「公開済み表ドラ表示牌の参照は`lingshang_zimo`位置を変えない」を選択した。公開済み表示牌をiteratorが尽きるまで参照した後の嶺上ツモ4回が`S0, P0, M0, Z7`となることを検証した。表示牌参照は内部可変性を持たない`Bipai`への`&self`だけを受け取り、嶺上ツモの取得回数も通常fieldであるため、前2項目と同じ理由で安全なruntime mutantを作れずredは省略した。共有借用による型上の不変性と後続取得の回帰値を確認してgreenとした。
 - 2026-08-11: 「公開済み表ドラ表示牌の参照は通常`zimo`位置を変えない」を選択した。公開済み表示牌をiteratorが尽きるまで参照した後の最初の通常ツモがindex 52の`P5`となることを検証した。表示牌参照は内部可変性を持たない`Bipai`への`&self`だけを受け取り、通常ツモcursorも通常fieldであるため、前項目と同じ理由で安全なruntime mutantを作れずredは省略した。共有借用による型上の不変性と後続取得の回帰値を確認してgreenとした。
 - 2026-08-11: 「公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない」を選択した。公開済み表示牌をiteratorが尽きるまで参照した後の`remaining_count`を参照前と比較した。`baopai_indicators`は通常の内部可変性を持たない`Bipai`への`&self`だけを受け取り、`remaining_count`も通常fieldであるため、この変更単位で安全なruntime mutantを作れずredは省略した。共有借用による型上の不変性と公開操作後の回帰値を確認してgreenとした。
 - 2026-08-11: 「通常`zimo`は嶺上牌の取得位置を変えない」を選択した。通常ツモを1回挟んだ後も嶺上ツモ4回の列が`S0, P0, M0, Z7`となることを一assertionで検証した。通常ツモcursorを嶺上牌indexへ誤って反映するmutantで`P0, M0, Z7, Z7`となるredを確認し、嶺上取得回数だけを使う実装へ復元してgreenにした。三人用嶺上牌容量はPhase 4対象のため、次は現在の四人用実装だけで検証できる表ドラ表示牌参照の非消費性を選択した。

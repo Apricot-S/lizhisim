@@ -344,6 +344,25 @@ mod tests {
     }
 
     #[test]
+    fn baopai_indicator_read_does_not_change_lingshang_zimo_order() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+
+        let _ = bipai.baopai_indicators().collect::<Vec<_>>();
+        let (bipai, first) = bipai.lingshang_zimo().unwrap();
+        let (bipai, second) = bipai.lingshang_zimo().unwrap();
+        let (bipai, third) = bipai.lingshang_zimo().unwrap();
+        let (_, fourth) = bipai.lingshang_zimo().unwrap();
+
+        assert_eq!(
+            [first, second, third, fourth],
+            [TileKind::S0, TileKind::P0, TileKind::M0, TileKind::Z7],
+        );
+    }
+
+    #[test]
     fn four_lingshang_zimo_preserve_reverse_order_from_index_135() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
