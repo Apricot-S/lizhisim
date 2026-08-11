@@ -25,4 +25,5 @@ tag-prefix = ""
 lizhisim-core = { path = "crates/lizhisim-core", version = "0.0.1" }
 lizhisim-rules = { path = "crates/lizhisim-rules", version = "0.0.1" }
 
+heapless = "0.9.3"
 thiserror = "2.0.20"
