@@ -88,7 +88,7 @@
 
 ### Conservation consumers
 
-- [ ] 配牌前の`Bipai` multisetは`TileSet`と一致する。
+- [x] 配牌前の`Bipai` multisetは`TileSet`と一致する。
 - [ ] 配牌後の全`bingpai`、未読`Bipai`、最初の`zimopai`の合計は`TileSet`と一致する。
 - [ ] replayの各公開check pointで全領域のcount合計が`TileSet`と一致する。
 
@@ -102,11 +102,12 @@
 ## Current
 
 - Selected: None
-- Phase: Awaiting next selection
-- Why: 赤牌0枚の`RuleSpec`を通常5 4枚・赤牌0枚の`TileSet`へ解決できたため。
+- Phase: Awaiting `Player` / `Round` consumers
+- Why: `TileSet`、`Bingpai`、四人用`Bipai`の直接契約は完了した。残るconservationは牌の所有先を持つ`Player` / `Round`実装後に選択する。
 
 ## Cycle log
 
+- 2026-08-12: 四人用`Bipai`の完了監査を行った。`Bipai::try_new`が37種類の実countを`TileSet`と完全一致で検証し、不足・過剰を拒否する既存testにより、配牌前multiset一致を完了とした。配牌後とreplay checkpointのconservationは、牌の所有先となる`Player` / `Round`実装後に検証する。
 - 2026-08-11: Four-player `Bipai` integration のテストを完了。one-more fixture は M1 を4枚のまま赤牌設定を変更し、シャッフルで赤牌と通常5の順序が変わっても同じ multiset として受理する test へ修正した。workspace 46 core tests + 11 rules tests、Clippy、format、`git diff --check` が成功した。
 - 2026-08-10: 「赤牌0枚を通常5が4枚、赤牌が0枚の`TileSet`へ解決する」を選択し、M/P/S各0枚の解決結果を一assertionで検証する。既存の`RuleSpec::resolve_tile_set`がすでに契約を満たしていたため、redなしでgreenを確認した。
 - 2026-08-10: M/P/Sの赤牌と通常5のcountをまとめて比較する回帰testを追加した。
@@ -185,9 +186,9 @@
 
 ## Completion review
 
-- [ ] coreとrulesの依存方向がADR-0015に一致する。
-- [ ] `TileSet`を`Bingpai`と`Bipai`が共通利用する。
-- [ ] 赤牌0、1、4枚の境界を確認した。
-- [ ] errorと失敗時不変性を確認した。
-- [ ] 四人用牌山の完全multisetを確認した。
-- [ ] 三人麻雀固有項目を後続listへ移送した。
+- [x] coreとrulesの依存方向がADR-0015に一致する。
+- [x] `TileSet`を`Bingpai`と`Bipai`が共通利用する。
+- [x] 赤牌0、1、4枚の境界を確認した。
+- [x] errorと失敗時不変性を確認した。
+- [x] 四人用牌山の完全multisetを確認した。
+- [x] 三人麻雀固有項目を後続listへ移送した。

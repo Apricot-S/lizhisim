@@ -107,7 +107,7 @@
 - [x] 検証済み`Bipai`からの配牌は失敗しない変換であり、`qipai`の戻り値を`Result`にしない。
 - [x] `qipai`用の変換経路から、任意の未検証countsを持つ`Bingpai`を公開APIで構築できない。
 - [x] 配牌indexの割当規則は、順序を保持しない`Bingpai`の内部表現ではなく、各seatの固定期待countsで検証する。
-- [ ] `Bipai`の順序を固定すると、14枚配牌を正規化した最初の`Zimo`が一意に決まる。
+- [x] `Bipai`の順序を固定すると、14枚配牌を正規化した最初の`Zimo`が一意に決まる。
 - [ ] Property: 配牌、`bingpai`、`Bipai`の間でtile conservationが保たれる。
 
 ### Typed suspension
@@ -153,11 +153,12 @@
 ## Current
 
 - Selected: None
-- Phase: Awaiting next selection
-- Why: `Round`は`Player`が`Bingpai`、`fulu`、`he`を所有する設計まで保留し、先に`Bipai`の王牌・嶺上ツモ・宝牌表示を進める。
+- Phase: Awaiting `Player` / `Round` design
+- Why: 現在フェーズの四人用`Bipai`単体機能は完了した。次は`Round`が所有する最小の`Player` aggregateを先に定義し、その直後に最初の`Round`遷移へ接続する。
 
 ## Cycle log
 
+- 2026-08-12: 四人用`Bipai`の完了監査を行った。固定fixtureで`qipai`後の最初の`Zimo`がindex 52の`P5`となり、後続もindex 52以降の順序を保つ既存testにより、「固定した`Bipai`から正規化した最初の`Zimo`が一意に決まる」を完了とした。tile conservationは`Player` / `Round`が牌の所有先を持ってから検証する。
 - 2026-08-11: `Round`は`fulu`と`he`を含む`Player`の所有・遷移設計より先に固定しない方針へ修正し、直前に追加した`Round`、`Prepared`、`AwaitingDraw`実装を削除して対応test項目を未着手へ戻した。`Bipai`の牌列型だけを対応付けるsealed traitは、広いplayer set全体の仕様と誤解しないよう`PlayerSet`から`BipaiSpec`へ改名し、手牌集合のassociated typeを削除した。次は`Bipai`の王牌関連項目を優先する。
 - 2026-08-11: 「配牌完了後はツモ前typestateになる」を選択し、`Round`と`AwaitingDraw`未定義の型errorでredを確認した。sealed `PlayerSet`へ手牌集合のassociated typeを追加し、`Prepared<FourPlayer>`が配牌前`Bipai`と親seatを所有し、`qipai`で`AwaitingDraw<FourPlayer>`へ遷移する最小`Round<P, State>`を実装してgreenにした。次の遷移まで未読のstate fieldだけを理由付きdead code抑制とし、先行する公開accessorは追加していない。
 - 2026-08-11: 既存の`qipai_deals_thirteen_expected_tiles_to_each_seat`と戻り値型により、seat別固定counts、非`Result`、seat別multisetでのindex割当検証がgreenであることをreviewし、対応3項目を完了にした。「配牌完了後はツモ前typestateになり、この状態だけが通常`Zimo`へ進める」は独立して失敗し得るため、状態遷移とmethod可用性の2項目へ分割し、前者を次に選択した。
