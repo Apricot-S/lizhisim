@@ -19,6 +19,7 @@ pub struct RoundQipaiPending<P: BipaiSpec> {
 pub struct FourPlayerZimoPending {
     bipai: Bipai<FourPlayer, QipaiCompleted>,
     players: [Player<FourPlayer>; 4],
+    actor: Seat<FourPlayer>,
 }
 
 impl<P: BipaiSpec> Round<P, RoundQipaiPending<P>> {
@@ -50,7 +51,11 @@ impl Round<FourPlayer, RoundQipaiPending<FourPlayer>> {
         ];
 
         Round {
-            state: FourPlayerZimoPending { bipai, players },
+            state: FourPlayerZimoPending {
+                bipai,
+                players,
+                actor: self.zhuangjia,
+            },
             zhuangjia: self.zhuangjia,
         }
     }
@@ -63,6 +68,10 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
 
     pub fn players(&self) -> &[Player<FourPlayer>; 4] {
         &self.state.players
+    }
+
+    pub fn actor(&self) -> &Seat<FourPlayer> {
+        &self.state.actor
     }
 }
 
@@ -132,5 +141,15 @@ mod tests {
             round.players().each_ref().map(Player::seat),
             Seat::<FourPlayer>::ALL.each_ref()
         );
+    }
+
+    #[test]
+    fn qipai_round_starts_with_zhuangjia_as_actor() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let zhuangjia = Seat::<FourPlayer>::ALL[2];
+        let round = Round::new(bipai, zhuangjia).qipai();
+
+        assert_eq!(round.actor(), &zhuangjia);
     }
 }
