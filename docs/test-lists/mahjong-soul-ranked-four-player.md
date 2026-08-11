@@ -102,17 +102,18 @@
 #### Dealing and conservation
 
 - [x] `Bipai::qipai`は四人分の未検証な`TileKind`配列ではなく、`[Bingpai; 4]`を返す。
-- [ ] 固定した`Bipai`を`qipai`すると、各seatの`Bingpai::counts()`が固定した期待値と一致する。
+- [x] 固定した`Bipai`を`qipai`すると、各seatの`Bingpai::counts()`が固定した期待値と一致する。
 - [x] `qipai`が返す各`Bingpai`は、元の`Bipai`を検証した`TileSet`と同じ種類別上限を適用する。
-- [ ] 検証済み`Bipai`からの配牌は失敗しない変換であり、`qipai`の戻り値を`Result`にしない。
+- [x] 検証済み`Bipai`からの配牌は失敗しない変換であり、`qipai`の戻り値を`Result`にしない。
 - [x] `qipai`用の変換経路から、任意の未検証countsを持つ`Bingpai`を公開APIで構築できない。
-- [ ] 配牌indexの割当規則は、順序を保持しない`Bingpai`の内部表現ではなく、各seatの固定期待countsで検証する。
+- [x] 配牌indexの割当規則は、順序を保持しない`Bingpai`の内部表現ではなく、各seatの固定期待countsで検証する。
 - [ ] `Bipai`の順序を固定すると、14枚配牌を正規化した最初の`Zimo`が一意に決まる。
 - [ ] Property: 配牌、`bingpai`、`Bipai`の間でtile conservationが保たれる。
 
 ### Typed suspension
 
-- [ ] 配牌完了後はツモ前typestateになり、この状態だけが通常`Zimo`へ進める。
+- [x] 配牌完了後はツモ前typestateになる。
+- [ ] **Selected:** 通常`Zimo`はツモ前typestateにだけ提供する。
 - [ ] 通常`Zimo`はツモ前typestateを消費し、13枚以下の`Bingpai`と分離した`zimopai`を持つツモ後typestateを返す。
 - [ ] ツモ後typestateから通常`Zimo`を連続して行えない。
 - [ ] ツモ前typestateから`Dapai`を行えない。
@@ -151,12 +152,14 @@
 
 ## Current
 
-- Selected: None
-- Phase: Awaiting next selection
-- Why: 配牌からの`Bingpai`生成と低水準変更APIのcrate-private化を完了した。次は`Round`の最小typestateを一項目ずつ実装する。
+- Selected: 通常`Zimo`はツモ前typestateにだけ提供する。
+- Phase: Red
+- Why: 配牌済み`Round`から通常ツモへ進む操作を`AwaitingDraw`だけへ追加する。
 
 ## Cycle log
 
+- 2026-08-11: 「配牌完了後はツモ前typestateになる」を選択し、`Round`と`AwaitingDraw`未定義の型errorでredを確認した。sealed `PlayerSet`へ手牌集合のassociated typeを追加し、`Prepared<FourPlayer>`が配牌前`Bipai`と親seatを所有し、`qipai`で`AwaitingDraw<FourPlayer>`へ遷移する最小`Round<P, State>`を実装してgreenにした。次の遷移まで未読のstate fieldだけを理由付きdead code抑制とし、先行する公開accessorは追加していない。
+- 2026-08-11: 既存の`qipai_deals_thirteen_expected_tiles_to_each_seat`と戻り値型により、seat別固定counts、非`Result`、seat別multisetでのindex割当検証がgreenであることをreviewし、対応3項目を完了にした。「配牌完了後はツモ前typestateになり、この状態だけが通常`Zimo`へ進める」は独立して失敗し得るため、状態遷移とmethod可用性の2項目へ分割し、前者を次に選択した。
 - 2026-08-11: `Bipai::try_new`は検証後に`TileSet`を保持するため、借用を受けて内部cloneするAPIから値を受け取るAPIへrefactorした。`TileSet`を引き続き必要とするか判断できる呼び出し側へcloneの責任を移し、現在の呼び出し箇所では後続利用がないためcloneせず所有権を移した。
 - 2026-08-11: `qipai`のseat別counts構築をrefactorした。`0..13`ごとの分岐、除算、剰余を使うfoldから、`seat_offset`を一度計算してbatch開始index `0, 16, 32`の各4枚を走査し、最後にindex `48 + seat_index`の1枚を加える手続きへ変更した。3回の4枚取りと最後の1枚取りをコード構造へ直接対応させ、公開挙動は変更していない。
 - 2026-08-11: 将来の`Player` / `Round`遷移から利用する`with_added`、`with_removed`と`BingpaiError`をproductionコードへ戻した。低水準操作は`pub(crate)`のまま、利用開始まで理由付き`expect(dead_code)`をproduction buildだけに適用する。`BingpaiError`は上位遷移errorの型付きsourceにできるようcrate rootから公開した。テスト専用constructorは空状態を明示する`empty`へ改名した。

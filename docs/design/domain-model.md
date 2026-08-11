@@ -139,6 +139,9 @@ stateDiagram-v2
 識別子が未確定の槓・北抜き等の中間状態は、glossary の決定後に命名する。
 
 各状態は可能な操作だけを公開する。たとえば `AwaitingDraw` に discard を受ける関数は存在しない。
+四人用の最初の実装では、`Round<FourPlayer, Prepared<FourPlayer>>`が配牌前`Bipai`と親seatを
+所有し、`qipai`がこの状態を消費して`Round<FourPlayer, AwaitingDraw<FourPlayer>>`を返す。
+`AwaitingDraw`は配牌後`Bipai`、四人分の`Bingpai`、最初にツモする親seatを所有する。
 
 ## 6. 所有権を用いた遷移
 

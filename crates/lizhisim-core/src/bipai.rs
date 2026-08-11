@@ -20,12 +20,14 @@ mod private {
 
 pub trait PlayerSet: private::Sealed {
     type BipaiTiles: AsRef<[TileKind]>;
+    type BingpaiSet;
 }
 
 impl private::Sealed for FourPlayer {}
 
 impl PlayerSet for FourPlayer {
     type BipaiTiles = [TileKind; 136];
+    type BingpaiSet = [Bingpai; 4];
 }
 
 #[derive(Debug, Error, PartialEq)]
