@@ -52,8 +52,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - [x] 配牌前の`Round`は`Bipai<FourPlayer, QipaiPending>`と親`Seat`を所有する。
 - [x] 配牌前の`Round`には通常`zimo`操作を提供しない。
 - [x] `qipai`は配牌前の`Round`を消費し、ツモ前typestateを返す。
-- [ ] **Selected:** `qipai`後の`Round`は四人分の`Player`を所有する。
-- [ ] `qipai`後の最初のactorは親である。
+- [x] `qipai`後の`Round`は四人分の`Player`を所有する。
+- [ ] **Selected:** `qipai`後の最初のactorは親である。
 - [ ] `qipai`後の`Round`が所有する`Bipai`の`remaining_count`は70である。
 - [ ] Property: `qipai`後の四人分の`Player`と未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。
 
@@ -80,9 +80,9 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: `qipai`後の`Round`は四人分の`Player`を所有する。
+- Selected: `qipai`後の最初のactorは親である。
 - Phase: Not started
-- Why this is the smallest useful next test: `qipai`の消費型遷移を導入できたため、遷移時に生成した四人分の永続状態が新しい`Round`に保存されることを次に確認する。
+- Why this is the smallest useful next test: 四人分の`Player`が新しい状態へ保存されることを確認できたため、最初の通常ツモを行うseatを次に固定する。
 
 ## Cycle log
 
@@ -97,6 +97,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: 配牌前`Round`に通常`zimo`を提供しないことをAPI reviewで確認した。`Round<P>`自身に`zimo`はなく、保持する`Bipai<P, QipaiPending>`にも`zimo`が定義されていない。失敗理由を限定できない`compile_fail` testは追加せず、正の遷移testとして`qipai`を次に選択した。
 - 2026-08-12: `qipai_consumes_pending_round_and_returns_zimo_pending_round`を追加し、`ZimoPendingRound`と`Round::qipai`未定義のcompile errorをredとして確認した。`qipai(self)`が配牌済み`Bipai`、四人分の`Player`、親を失わずに別型へ移し、戻り型と親の保持を一assertionで確認してgreenにした。現在フェーズに合わせて四人用だけを実装した。
 - 2026-08-12: refactorとして`Round<P, State>`へ統一し、親を共通field、`RoundQipaiPending<P>`と`FourPlayerZimoPending`をphase固有payloadとした。field構成が変わらない`Bipai`のmarker typestateとは異なり、`Round`はpayloadによってphaseごとの必須dataだけを保持する。三人用player集合の抽象化は先行していない。
+- 2026-08-12: `qipai_round_preserves_four_players`を追加した。直前の`qipai`実装が配牌結果を失わないために四人分の`Player`を既に保持しており、追加時点からgreenだった。`Player::seat()`の配列と`Seat::<FourPlayer>::ALL`を一assertionで比較し、`Round`境界での保存を確認した。production変更はない。
 
 ## Completion review
 

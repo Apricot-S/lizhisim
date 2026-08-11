@@ -121,4 +121,16 @@ mod tests {
 
         assert_eq!(round.zhuangjia(), &zhuangjia);
     }
+
+    #[test]
+    fn qipai_round_preserves_four_players() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[0]).qipai();
+
+        assert_eq!(
+            round.players().each_ref().map(Player::seat),
+            Seat::<FourPlayer>::ALL.each_ref()
+        );
+    }
 }
