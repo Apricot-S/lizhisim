@@ -108,7 +108,8 @@ index 52から最初の`Zimo`として正規化する。したがって通常の
 `Bingpai`の任意countsを作るconstructorと、牌種を直接追加・除去する低水準操作はcrate内に閉じる。
 公開された手牌更新は、検証済み`Bipai`からの`qipai`と、現在phaseを消費する`Round`のツモ、
 打牌、副露遷移だけから行う。進行phaseは`Bingpai`自体のtypestateへ重ねず、合法actionを判断する
-`Round`のtypestateで表す。
+`Round`のtypestateで表す。低水準操作の失敗型`BingpaiError`は、将来の`Player` / `Round`遷移errorが
+型付きsourceとして保持できるよう公開するが、低水準操作自体は公開しない。
 
 ## 5. Typestate
 

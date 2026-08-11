@@ -8,7 +8,7 @@ mod seat;
 mod tile;
 mod tile_set;
 
-pub use bingpai::Bingpai;
+pub use bingpai::{Bingpai, BingpaiError};
 pub use bipai::{Bipai, BipaiError, PlayerSet, QipaiCompleted, QipaiPending};
 pub use seat::{FourPlayer, Seat, SeatIndexOutOfRange};
 pub use tile::TileKind;

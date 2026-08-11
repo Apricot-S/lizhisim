@@ -2,14 +2,11 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-#[cfg(test)]
 use thiserror::Error;
 
-#[cfg(test)]
 use crate::tile::TileKind;
 use crate::tile_set::TileSet;
 
-#[cfg(test)]
 #[derive(Debug, Error, PartialEq)]
 pub enum BingpaiError {
     #[error("tile kind is not present in bingpai: {tile_kind:?}")]
@@ -38,14 +35,20 @@ impl Bingpai {
     }
 
     #[cfg(test)]
-    pub(crate) const fn new(tile_set: TileSet) -> Self {
+    pub(crate) const fn empty(tile_set: TileSet) -> Self {
         Self {
             counts: [0; 37],
             tile_set,
         }
     }
 
-    #[cfg(test)]
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "will be used by Player and Round hand transitions"
+        )
+    )]
     pub(crate) fn with_added(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
         let count = &mut self.counts[tile_kind.index()];
         let max_count = self.tile_set.max_count(tile_kind);
@@ -59,7 +62,13 @@ impl Bingpai {
         Ok(self)
     }
 
-    #[cfg(test)]
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "will be used by Player and Round hand transitions"
+        )
+    )]
     pub(crate) fn with_removed(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
         self.counts[tile_kind.index()] = self.counts[tile_kind.index()]
             .checked_sub(1)
@@ -281,7 +290,7 @@ mod tests {
     fn adding_fifth_copy_of_tile_kind_reports_count_exceeded() {
         let mut counts = [0; 37];
         counts[TileKind::M1.index()] = 4;
-        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap())
+        let bingpai = Bingpai::empty(TileSet::try_from_counts(counts).unwrap())
             .with_added(TileKind::M1)
             .unwrap()
             .with_added(TileKind::M1)
@@ -304,7 +313,7 @@ mod tests {
     fn adding_beyond_tile_set_limit_reports_configured_max_count() {
         let mut counts = [0; 37];
         counts[TileKind::M1.index()] = 1;
-        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap())
+        let bingpai = Bingpai::empty(TileSet::try_from_counts(counts).unwrap())
             .with_added(TileKind::M1)
             .unwrap();
 
@@ -323,7 +332,7 @@ mod tests {
         let tile_set = TileSet::try_from_counts(counts).unwrap();
 
         assert_eq!(
-            Bingpai::new(tile_set).with_added(TileKind::M1),
+            Bingpai::empty(tile_set).with_added(TileKind::M1),
             Err(BingpaiError::TileCountExceeded {
                 tile_kind: TileKind::M1,
                 max_count: 0,
@@ -335,7 +344,7 @@ mod tests {
     fn adding_red_tile_with_one_copy_tile_set_limit_allows_one_copy() {
         let mut counts = [0; 37];
         counts[TileKind::M0.index()] = 1;
-        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap())
+        let bingpai = Bingpai::empty(TileSet::try_from_counts(counts).unwrap())
             .with_added(TileKind::M0)
             .unwrap();
 
@@ -347,7 +356,7 @@ mod tests {
         let mut counts = [0; 37];
         counts[TileKind::M0.index()] = 1;
         counts[TileKind::M5.index()] = 3;
-        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap())
+        let bingpai = Bingpai::empty(TileSet::try_from_counts(counts).unwrap())
             .with_added(TileKind::M5)
             .unwrap()
             .with_added(TileKind::M5)
@@ -362,7 +371,7 @@ mod tests {
     fn adding_base_five_with_four_red_tiles_is_rejected() {
         let mut counts = [0; 37];
         counts[TileKind::M0.index()] = 4;
-        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap());
+        let bingpai = Bingpai::empty(TileSet::try_from_counts(counts).unwrap());
 
         assert_eq!(
             bingpai.with_added(TileKind::M5),
@@ -377,7 +386,7 @@ mod tests {
     fn failed_addition_does_not_change_original_bingpai() {
         let mut counts = [0; 37];
         counts[TileKind::M1.index()] = 1;
-        let bingpai = Bingpai::new(TileSet::try_from_counts(counts).unwrap())
+        let bingpai = Bingpai::empty(TileSet::try_from_counts(counts).unwrap())
             .with_added(TileKind::M1)
             .unwrap();
         let original = bingpai.clone();

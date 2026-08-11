@@ -157,6 +157,7 @@
 
 ## Cycle log
 
+- 2026-08-11: 将来の`Player` / `Round`遷移から利用する`with_added`、`with_removed`と`BingpaiError`をproductionコードへ戻した。低水準操作は`pub(crate)`のまま、利用開始まで理由付き`expect(dead_code)`をproduction buildだけに適用する。`BingpaiError`は上位遷移errorの型付きsourceにできるようcrate rootから公開した。テスト専用constructorは空状態を明示する`empty`へ改名した。
 - 2026-08-11: `qipai`由来の`Bingpai`が元の`TileSet`上限を保持するtestを追加した。`with_added`が上限を1枚緩めるmutantでredを確認し、元の上限参照へ復元してgreenにした。その後、正規生成経路を`qipai`へ限定するため`Bingpai::new`、`with_added`、`with_removed`をcrate-privateへ変更した。既存unit testは同一crate内で低水準操作の境界を引き続き検証する。
 - 2026-08-11: 「`Bipai::qipai`は`[Bingpai; 4]`を返す」を選択し、戻り値型の不一致でredを確認した。`Bipai`へ検証済み`TileSet`を保持し、crate-privateな検証済みcounts constructorで四人分の`Bingpai`を構築した。配牌期待値は従来の`TileKind`配列から、index計算を再利用しないseat別固定countsへ変更してgreenにした。
 - 2026-08-11: `Bingpai`の任意変更を公開せず、配牌、通常ツモ、打牌、副露の検証済み`Round`遷移だけから更新する境界を追加した。`new`、`with_added`、`with_removed`相当は外部crateへ公開せず、種類別count操作としてcrate内に閉じる。進行phaseは`Bingpai`自身へ重ねず`Round`のtypestateで表し、ツモ前、ツモ後、チー・ポン後の打牌待ち、嶺上ツモ待ちを区別する。`zimopai`は既存方針どおり13枚以下の`Bingpai`と分離する。
