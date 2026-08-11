@@ -14,6 +14,8 @@ use crate::tile_set::TileSet;
 const FOUR_PLAYER_QIPAI_TILE_COUNT: usize = 52;
 const FOUR_PLAYER_WANGPAI_TILE_COUNT: usize = 14;
 const FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX: usize = 131;
+const FOUR_PLAYER_FIRST_LINGSHANG_ZIMO_INDEX: usize = 135;
+const FOUR_PLAYER_LINGSHANG_TILE_COUNT: usize = 4;
 
 mod private {
     pub trait Sealed {}
@@ -41,6 +43,8 @@ pub enum BipaiError {
     LiveWallExhausted,
     #[error("initial baopai indicator is already revealed")]
     InitialBaopaiIndicatorAlreadyRevealed,
+    #[error("no tile remains in the lingshang wall")]
+    LingshangWallExhausted,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -56,6 +60,7 @@ pub struct Bipai<P: BipaiSpec, QipaiState = QipaiPending> {
     remaining_count: usize,
     cursor: usize,
     baopai_indicator_count: usize,
+    lingshang_zimo_count: usize,
     qipai_state: PhantomData<fn() -> QipaiState>,
 }
 
@@ -94,6 +99,7 @@ impl Bipai<FourPlayer, QipaiPending> {
             remaining_count,
             cursor: 0,
             baopai_indicator_count: 0,
+            lingshang_zimo_count: 0,
             qipai_state: PhantomData,
         })
     }
@@ -123,6 +129,7 @@ impl Bipai<FourPlayer, QipaiPending> {
                 remaining_count: self.remaining_count - FOUR_PLAYER_QIPAI_TILE_COUNT,
                 cursor: FOUR_PLAYER_QIPAI_TILE_COUNT,
                 baopai_indicator_count: 0,
+                lingshang_zimo_count: self.lingshang_zimo_count,
                 qipai_state: PhantomData,
             },
             bingpai,
@@ -158,6 +165,27 @@ impl<P: BipaiSpec> Bipai<P, QipaiCompleted> {
 }
 
 impl Bipai<FourPlayer, QipaiCompleted> {
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "will be called by the Round replacement draw transition"
+        )
+    )]
+    pub(crate) fn lingshang_zimo(mut self) -> Result<(Self, TileKind), BipaiError> {
+        if self.lingshang_zimo_count >= FOUR_PLAYER_LINGSHANG_TILE_COUNT {
+            return Err(BipaiError::LingshangWallExhausted);
+        }
+        self.remaining_count = self
+            .remaining_count
+            .checked_sub(1)
+            .ok_or(BipaiError::LiveWallExhausted)?;
+        let tile_kind =
+            self.tiles.as_ref()[FOUR_PLAYER_FIRST_LINGSHANG_ZIMO_INDEX - self.lingshang_zimo_count];
+        self.lingshang_zimo_count += 1;
+        Ok((self, tile_kind))
+    }
+
     pub fn baopai_indicators(&self) -> impl ExactSizeIterator<Item = TileKind> + '_ {
         (0..self.baopai_indicator_count).map(|indicator_index| {
             self.tiles.as_ref()[FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX - indicator_index * 2]
@@ -308,6 +336,18 @@ mod tests {
         let second = bipai.baopai_indicators().collect::<Vec<_>>();
 
         assert_eq!([first, second], [vec![TileKind::M0], vec![TileKind::M0]]);
+    }
+
+    #[test]
+    fn first_lingshang_zimo_returns_tile_at_index_135() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles.swap(133, 135);
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+
+        let (_, tile_kind) = bipai.lingshang_zimo().unwrap();
+
+        assert_eq!(tile_kind, TileKind::M0);
     }
 
     #[test]

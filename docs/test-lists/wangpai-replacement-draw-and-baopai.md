@@ -72,7 +72,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [x] 初期表示commandを適用すると、公開済み表ドラ表示牌はindex 131の`TileKind`一枚になる。
 - [x] 初期表示commandを二回適用すると拒否する。
 - [x] 公開済みの初期表ドラ表示牌を複数回参照しても、毎回同じindex 131の`TileKind`を返す。
-- [ ] **Selected:** 公開済み表ドラ表示牌の参照は公開枚数を変えない。
+- [x] 公開済み表ドラ表示牌の参照は公開枚数を変えない。
 - [ ] 公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない。
 - [ ] 公開済み表ドラ表示牌の参照は通常`zimo`位置を変えない。
 - [ ] 公開済み表ドラ表示牌の参照は`lingshang_zimo`位置を変えない。
@@ -90,8 +90,8 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ### Replacement draw order and limits
 
-- [ ] 最初の嶺上ツモはindex 135の`TileKind`を返す。
-- [ ] 連続する4回の嶺上ツモはindex `135, 134, 133, 132`の順を保つ。
+- [x] 最初の嶺上ツモはindex 135の`TileKind`を返す。
+- [ ] **Selected:** 連続する4回の嶺上ツモはindex `135, 134, 133, 132`の順を保つ。
 - [ ] 4枚取得後は追加の嶺上ツモを拒否する。
 - [ ] `lingshang_zimo`を1回行うと通常`zimo`の`remaining_count`も1減る。
 - [ ] 4回の`lingshang_zimo`後は通常`zimo`の`remaining_count`が4減る。
@@ -180,12 +180,14 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: 公開済み表ドラ表示牌の参照は公開枚数を変えない。
+- Selected: 連続する4回の嶺上ツモはindex `135, 134, 133, 132`の順を保つ。
 - Phase: Red
-- Why this is the smallest useful next test: read-only参照の非消費性を公開枚数、通常ツモ枚数、各取得位置へ分割して一観点ずつ検証する。
+- Why this is the smallest useful next test: 最初の取得で導入した物理cursorが四人用4枚全体で逆順を保つことを固定する。
 
 ## Cycle log
 
+- 2026-08-11: 「最初の`lingshang_zimo`はindex 135」を選択し、method未定義でredを確認した。四人用`Bipai`へcrate-privateな消費型操作と取得回数を追加し、index 135から逆順に取得する最小実装でgreenにした。安全境界として4枚上限を`LingshangWallExhausted`、live wall残数0を`LiveWallExhausted`で拒否し、成功時だけ`remaining_count`と取得回数を更新する。
+- 2026-08-11: 反復参照testが2回とも一枚の一覧を返すため、「参照は公開枚数を変えない」を完了とした。`reveal_initial_baopai_indicator`の`BipaiSpec`共通implへの移動も確認した。次は上位rule判断と分離できる最初の`lingshang_zimo` index 135を選択した。
 - 2026-08-11: 「公開済み初期表ドラ表示牌を複数回参照できる」を選択し、iteratorを空にするmutantで2回とも空になるredを確認して復元後greenにした。2回の参照結果を一配列へ集約して一assertionで比較した。後続の非消費性項目は、公開枚数、通常`zimo`枚数、通常`zimo`位置、`lingshang_zimo`位置という独立して失敗し得る4観点へ分割した。
 - 2026-08-11: 「初期表示commandを二回適用すると拒否する」を追加した。guardを外すmutantで二回目が`Ok`となるredを確認し、`InitialBaopaiIndicatorAlreadyRevealed`を返すguardへ復元してgreenにした。
 - 2026-08-11: 「初期表示command後はindex 131の一枚」を選択し、command method未定義でredを確認した。`QipaiCompleted`の四人用`Bipai`にcrate-privateな消費型commandを追加し、公開枚数を0から1へ変更してindex 131の`M0`でgreenにした。`Bipai`へrule値は渡していない。
