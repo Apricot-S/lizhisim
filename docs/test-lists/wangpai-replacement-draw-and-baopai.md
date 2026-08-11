@@ -96,8 +96,8 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [x] `lingshang_zimo`を1回行うと通常`zimo`の`remaining_count`も1減る。
 - [x] 4回の`lingshang_zimo`後は通常`zimo`の`remaining_count`が4減る。
 - [x] `lingshang_zimo`を1回行った後、通常`zimo`はindex 120までで終了し、補充対象となったindex 121を返さない。
-- [ ] **Selected:** 4回の`lingshang_zimo`後、通常`zimo`はindex 117までで終了し、index 118〜121を返さない。
-- [ ] 通常`zimo`は嶺上牌の取得位置を変えない。
+- [x] 4回の`lingshang_zimo`後、通常`zimo`はindex 117までで終了し、index 118〜121を返さない。
+- [ ] **Selected:** 通常`zimo`は嶺上牌の取得位置を変えない。
 
 ### Three-player replacement draw capacity
 
@@ -180,12 +180,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: 4回の`lingshang_zimo`後、通常`zimo`はindex 117までで終了し、index 118〜121を返さない。
+- Selected: 通常`zimo`は嶺上牌の取得位置を変えない。
 - Phase: Red
-- Why this is the smallest useful next test: 1回分の通常ツモ終端を固定したため、4回の嶺上ツモが通常ツモ範囲を累積で4枚短縮することを固定する。
+- Why this is the smallest useful next test: 通常ツモの短縮済み終端を固定したため、通常ツモと嶺上ツモの取得cursorが独立していることを固定する。
 
 ## Cycle log
 
+- 2026-08-11: 「4回の`lingshang_zimo`後、通常`zimo`はindex 117までで終了する」を選択した。66回目の通常ツモをindex 117の`Z4`、その次を`LiveWallExhausted`として一assertionへ集約した。最初の嶺上ツモだけを減算するmutantで次の通常ツモがindex 118の`Z4`となるredを確認し、各成功取得で1減算する実装へ復元してgreenにした。
 - 2026-08-11: 「`lingshang_zimo`を1回行った後、通常`zimo`はindex 120までで終了する」を選択した。69回目の通常ツモをindex 120の`Z4`、その次を`LiveWallExhausted`として一assertionへ集約した。嶺上ツモの減算値を0にするmutantで次の通常ツモがindex 121の`Z5`となるredを確認し、1へ復元してgreenにした。
 - 2026-08-11: 「`lingshang_zimo`を1回行うと`remaining_count`も1減る」を選択した。減算値を0にするmutantで実際値70となるredを確認し、1へ復元してgreenにした。続く「4回後は4減る」は実装変更なしで進められたため、4回目以降に減算が欠けるmutantで実際値69となるredを確認し、各成功取得で1減算する実装へ復元してgreenにした。前者は最初の取得、後者は反復時の更新を別々に固定する。
 - 2026-08-11: 「4枚取得後は追加の`lingshang_zimo`を拒否する」を選択した。上限guardを`>`へ緩めるmutantで5回目が`Ok(..., Z7)`となるredを確認し、`>=`へ復元してgreenにした。4回の成功は取得順testで担保済みのため、このtestは5回目の`LingshangWallExhausted`だけを一assertionで検証する。
