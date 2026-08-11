@@ -425,6 +425,46 @@ mod tests {
     }
 
     #[test]
+    fn multiple_baopai_indicators_can_be_read_repeatedly() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles.swap(131, 133);
+        tiles.swap(129, 134);
+        tiles.swap(127, 135);
+        tiles.swap(125, 0);
+        tiles.swap(123, 4);
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+        let mut bipai = bipai;
+        for _ in 0..4 {
+            bipai = bipai.reveal_additional_baopai_indicator().unwrap();
+        }
+
+        let first = bipai.baopai_indicators().collect::<Vec<_>>();
+        let second = bipai.baopai_indicators().collect::<Vec<_>>();
+
+        assert_eq!(
+            [first, second],
+            [
+                vec![
+                    TileKind::M0,
+                    TileKind::P0,
+                    TileKind::S0,
+                    TileKind::M1,
+                    TileKind::M2,
+                ],
+                vec![
+                    TileKind::M0,
+                    TileKind::P0,
+                    TileKind::S0,
+                    TileKind::M1,
+                    TileKind::M2,
+                ],
+            ],
+        );
+    }
+
+    #[test]
     fn sixth_baopai_indicator_is_rejected() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
