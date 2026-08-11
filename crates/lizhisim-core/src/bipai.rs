@@ -96,18 +96,18 @@ impl Bipai<FourPlayer, QipaiPending> {
     pub fn qipai(self) -> (Bipai<FourPlayer, QipaiCompleted>, [Bingpai; 4]) {
         let tiles = self.tiles.as_ref();
         let bingpai = core::array::from_fn(|seat_index| {
-            let counts = (0..13).fold([0; 37], |mut counts, hand_index| {
-                if hand_index < 12 {
-                    let batch_index = hand_index / 4;
-                    let index_in_batch = hand_index % 4;
-                    let tile_kind = tiles[batch_index * 16 + seat_index * 4 + index_in_batch];
-                    counts[tile_kind.index()] += 1;
-                } else {
-                    let tile_kind = tiles[48 + seat_index];
+            let seat_offset = seat_index * 4;
+            let mut counts = [0; 37];
+
+            for batch_start in [0, 16, 32] {
+                for &tile_kind in &tiles[batch_start + seat_offset..batch_start + seat_offset + 4] {
                     counts[tile_kind.index()] += 1;
                 }
-                counts
-            });
+            }
+
+            let tile_kind = tiles[48 + seat_index];
+            counts[tile_kind.index()] += 1;
+
             Bingpai::from_validated_counts(counts, self.tile_set.clone())
         });
 
