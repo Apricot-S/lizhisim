@@ -148,9 +148,9 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 - [x] 最大4回の追加表示後、裏ドラ表示牌はindex `130, 128, 126, 124, 122`の順を保つ。
 - [x] 裏ドラ表示牌の取得は表ドラ表示枚数を変えない。
-- [ ] **Selected:** 裏ドラ表示牌の取得は嶺上牌位置を変えない。
-- [ ] 裏ドラ表示牌の取得は通常`zimo`可能枚数を変えない。
-- [ ] 裏ドラ表示牌を複数回参照しても、同じ順序と内容を返す。
+- [x] 裏ドラ表示牌の取得は嶺上牌位置を変えない。
+- [x] 裏ドラ表示牌の取得は通常`zimo`可能枚数を変えない。
+- [x] 裏ドラ表示牌を複数回参照しても、同じ順序と内容を返す。
 
 ### Conservation, visibility, and replay
 
@@ -181,12 +181,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: 裏ドラ表示牌の取得は嶺上牌位置を変えない。
-- Phase: Not started
-- Why this is the smallest useful next test: 表ドラ表示枚数を消費しないことを固定したため、次は嶺上牌の取得位置も変えないことを固定する。
+- Selected: None
+- Phase: Awaiting `Round` / `Player` design
+- Why this is the smallest useful next test: `Bipai`だけで検証できる裏ドラのindex・非消費性・反復参照を完了した。次の可視性、資格、conservationは`Round`と牌を所有する`Player`の状態遷移を設計してから選択する。
 
 ## Cycle log
 
+- 2026-08-12: 裏ドラ表示牌の残るread-only項目を順に完了した。嶺上牌位置は参照後の4回の`lingshang_zimo`列、通常`zimo`可能枚数は参照前後の`remaining_count`、反復参照は5枚の固定列を2回収集して、それぞれ一assertionで比較した。いずれも`li_baopai_indicators(&self)`の内部可変性がない共有借用による不変性のため、安全なruntime mutantは作れない。これで`Bipai`だけで検証できる裏ドラ項目は完了し、可視性・資格・牌の所有量は`Round` / `Player`設計へ委ねる。
 - 2026-08-12: 「裏ドラ表示牌の取得は表ドラ表示枚数、嶺上牌位置、通常`zimo`可能枚数を変えない」を、独立して失敗し得る3項目へ分割した。最初に表ドラ表示枚数を選択し、裏ドラiteratorを尽くした後の表ドラiterator長を参照前と一assertionで比較してgreenにした。`li_baopai_indicators(&self)`は内部可変性のない共有借用であり、表ドラ表示枚数だけを壊す安全なruntime mutantを作れないため、型上の不変性を確認した。
 - 2026-08-11: 「最大4回の追加表示後、裏ドラ表示牌はindex 130, 128, 126, 124, 122の順を保つ」を選択した。各indexへ異なる`TileKind`を配置し、初期表示と追加表示4回後の固定列を一assertionで比較した。index間隔を2から1へ変えるmutantで`M0, Z7, P0, Z6, S0`となるredを確認し、2へ復元してgreenにした。この5枚列の先頭が初期表示だけの場合のindex 130も包含するため、単独testと個別項目は削除した。
 - 2026-08-11: 表ドラは対局中の通常observation、裏ドラは資格のある和了評価時だけ取得するため、単一のpair APIと`LiBaopaiAccess`を撤回した。`Bipai`は同じ`baopai_indicator_count`から表ドラ・裏ドラを導出する別々のcrate-private read-only iteratorを提供し、独立した裏ドラ用countやcursorは持たない。取得時点とviewへの可視性は将来の`Round` typestateへ移し、先に完了扱いした資格・可視性の3項目を`Round orchestration`節の未完了項目へ戻した。「初期表示だけの場合、裏ドラ表示牌はindex 130」を選択し、method未定義のred後、index 130から2ずつ戻るiteratorでgreenにした。

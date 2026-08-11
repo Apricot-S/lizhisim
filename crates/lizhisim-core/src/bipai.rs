@@ -514,6 +514,46 @@ mod tests {
     }
 
     #[test]
+    fn li_baopai_indicators_can_be_read_repeatedly() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles.swap(130, 133);
+        tiles.swap(128, 134);
+        tiles.swap(126, 135);
+        tiles.swap(124, 0);
+        tiles.swap(122, 4);
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+        let mut bipai = bipai;
+        for _ in 0..4 {
+            bipai = bipai.reveal_additional_baopai_indicator().unwrap();
+        }
+
+        let first = bipai.li_baopai_indicators().collect::<Vec<_>>();
+        let second = bipai.li_baopai_indicators().collect::<Vec<_>>();
+
+        assert_eq!(
+            [first, second],
+            [
+                vec![
+                    TileKind::M0,
+                    TileKind::P0,
+                    TileKind::S0,
+                    TileKind::M1,
+                    TileKind::M2,
+                ],
+                vec![
+                    TileKind::M0,
+                    TileKind::P0,
+                    TileKind::S0,
+                    TileKind::M1,
+                    TileKind::M2,
+                ],
+            ],
+        );
+    }
+
+    #[test]
     fn li_baopai_indicator_read_does_not_change_baopai_indicator_count() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
@@ -524,6 +564,38 @@ mod tests {
         let _ = bipai.li_baopai_indicators().collect::<Vec<_>>();
 
         assert_eq!(bipai.baopai_indicators().len(), baopai_indicator_count);
+    }
+
+    #[test]
+    fn li_baopai_indicator_read_does_not_change_lingshang_zimo_order() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+
+        let _ = bipai.li_baopai_indicators().collect::<Vec<_>>();
+        let (bipai, first) = bipai.lingshang_zimo().unwrap();
+        let (bipai, second) = bipai.lingshang_zimo().unwrap();
+        let (bipai, third) = bipai.lingshang_zimo().unwrap();
+        let (_, fourth) = bipai.lingshang_zimo().unwrap();
+
+        assert_eq!(
+            [first, second, third, fourth],
+            [TileKind::S0, TileKind::P0, TileKind::M0, TileKind::Z7],
+        );
+    }
+
+    #[test]
+    fn li_baopai_indicator_read_does_not_change_remaining_count() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+        let remaining_count = bipai.remaining_count();
+
+        let _ = bipai.li_baopai_indicators().collect::<Vec<_>>();
+
+        assert_eq!(bipai.remaining_count(), remaining_count);
     }
 
     #[test]
