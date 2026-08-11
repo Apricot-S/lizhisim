@@ -114,14 +114,14 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [x] 初期表示後、最初の追加表示はindex 129の`TileKind`を返す。
 - [x] 表ドラ表示牌はindex `131, 129, 127, 125, 123`の順を保つ。
 - [x] 初期表示を含む5枚の表示後は追加表示を拒否する。
-- [ ] **Selected:** 追加表示権限なしでは表ドラ表示牌を増やせない。
-- [ ] 一つの槓成立から追加の表ドラ表示牌を二枚公開できない。
-- [ ] 北抜き後は表ドラ表示枚数が増えず、追加表示権限も発行しない。
 - [ ] 公開済みの複数の表ドラ表示牌は何度参照しても同じ順序と内容を返す。
 - [ ] 表ドラ表示牌一覧の参照は未処理の追加表示件数を消費しない。
 
 ### Round orchestration and rule-dependent reveal timing
 
+- [ ] `Round`は検証済みの追加表示権限なしに表ドラ表示牌を増やせない。
+- [ ] `Round`は一つの槓成立から追加の表ドラ表示牌を二枚公開できない。
+- [ ] `Round`は北抜き後に表ドラ表示枚数を増やさず、追加表示権限も発行しない。
 - [ ] 表ドラ無効ruleでは、`Round`は`qipai`後に初期表示commandを適用しない。
 - [ ] 表ドラ有効ruleでは、`Round`は`qipai`後に初期表示commandを一回適用する。
 - [ ] `Round`はservice名ではなく、rules crateから渡されたcore所有の解決済み表ドラpolicyだけを参照する。
@@ -180,12 +180,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: 追加表示権限なしでは表ドラ表示牌を増やせない。
-- Phase: Red
-- Why this is the smallest useful next test: 6枚目を拒否する上限を固定したため、追加表示の許可を上位遷移の一回分commandに限定する境界を検討する。
+- Selected: None
+- Phase: Awaiting `Round` design
+- Why: 追加表ドラ表示のpermitは、槓・北抜き・ruleを検証する`Round`だけが発行できる。`Bipai`単独では権限なしの操作を区別できない。
 
 ## Cycle log
 
+- 2026-08-11: 「追加表示権限なしでは表ドラ表示牌を増やせない」と、同じ権限発行に依存する「一つの槓から二枚公開できない」「北抜き後に追加表示しない」を`Round orchestration`節へ移送した。`Bipai`は検証済みの一回分commandを消費して上限とindexを管理し、permitの生成は槓・北抜き・ruleを検証する`Round`の責務とする。`Round` / `Player`遷移の設計開始時に、非forgeableかつ一回消費のpermitを含むtestから再開する。
 - 2026-08-11: 「初期表示を含む5枚の表示後は追加表示を拒否する」を選択した。追加表示操作を`Result`へ変更し、5枚上限で`BaopaiIndicatorLimitReached`を返すようにした。上限比較を`>`へ緩めるmutantで6枚目が`Ok`となるredを確認し、`>=`へ復元してgreenにした。
 - 2026-08-11: 「表ドラ表示牌はindex 131, 129, 127, 125, 123の順を保つ」を選択した。初期表示と追加表示4回後の一覧を、各indexへ配置した異なる`TileKind`の固定列として比較した。これにより最初の追加表示index 129のtestを包含するため、単独testはこの5枚列testへ置き換えた。indicator間隔を2から1へ変えるmutantで`M0, Z7, P0, Z6, S0`となるredを確認し、2へ復元してgreenにした。
 - 2026-08-11: 「初期表示後、最初の追加表示はindex 129」を選択した。`Bipai<QipaiCompleted>`へcrate-privateな`reveal_additional_baopai_indicator`を追加し、上位の`Round`が発行する一回分commandとして公開枚数を1だけ進める最小実装にした。index 129へ`M0`を固定し、初期表示を除く一覧を一assertionで比較した。追加枚数を2にするmutantでindex 127の牌まで公開されるredを確認し、1へ復元してgreenにした。上限、権限、初期表示前の追加表示は後続項目として分離する。
