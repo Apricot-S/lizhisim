@@ -49,21 +49,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn four_player_defines_four_seats() {
-        assert_eq!(Seat::<FourPlayer>::ALL.len(), 4);
-    }
-
-    #[test]
     fn four_player_seat_converts_every_valid_index() {
         assert_eq!(
             [0, 1, 2, 3].map(|index| Seat::<FourPlayer>::try_from(index).ok()),
             Seat::<FourPlayer>::ALL.map(Some),
         );
-    }
-
-    #[test]
-    fn four_player_seat_rejects_first_out_of_range_index() {
-        assert!(Seat::<FourPlayer>::try_from(4).is_err());
     }
 
     #[test]

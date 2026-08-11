@@ -62,11 +62,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn tile_kind_defines_thirty_seven_kinds() {
-        assert_eq!(TileKind::ALL.len(), 37);
-    }
-
-    #[test]
     #[rustfmt::skip]
     fn tile_kind_orders_base_kinds_before_red_kinds() {
         assert_eq!(TileKind::ALL, [
