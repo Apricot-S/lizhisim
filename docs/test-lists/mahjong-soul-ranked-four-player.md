@@ -112,8 +112,8 @@
 
 ### Typed suspension
 
-- [x] 配牌完了後はツモ前typestateになる。
-- [ ] **Selected:** 通常`Zimo`はツモ前typestateにだけ提供する。
+- [ ] 配牌完了後はツモ前typestateになる。
+- [ ] 通常`Zimo`はツモ前typestateにだけ提供する。
 - [ ] 通常`Zimo`はツモ前typestateを消費し、13枚以下の`Bingpai`と分離した`zimopai`を持つツモ後typestateを返す。
 - [ ] ツモ後typestateから通常`Zimo`を連続して行えない。
 - [ ] ツモ前typestateから`Dapai`を行えない。
@@ -152,12 +152,13 @@
 
 ## Current
 
-- Selected: 通常`Zimo`はツモ前typestateにだけ提供する。
-- Phase: Red
-- Why: 配牌済み`Round`から通常ツモへ進む操作を`AwaitingDraw`だけへ追加する。
+- Selected: None
+- Phase: Awaiting next selection
+- Why: `Round`は`Player`が`Bingpai`、`fulu`、`he`を所有する設計まで保留し、先に`Bipai`の王牌・嶺上ツモ・宝牌表示を進める。
 
 ## Cycle log
 
+- 2026-08-11: `Round`は`fulu`と`he`を含む`Player`の所有・遷移設計より先に固定しない方針へ修正し、直前に追加した`Round`、`Prepared`、`AwaitingDraw`実装を削除して対応test項目を未着手へ戻した。`Bipai`の牌列型だけを対応付けるsealed traitは、広いplayer set全体の仕様と誤解しないよう`PlayerSet`から`BipaiSpec`へ改名し、手牌集合のassociated typeを削除した。次は`Bipai`の王牌関連項目を優先する。
 - 2026-08-11: 「配牌完了後はツモ前typestateになる」を選択し、`Round`と`AwaitingDraw`未定義の型errorでredを確認した。sealed `PlayerSet`へ手牌集合のassociated typeを追加し、`Prepared<FourPlayer>`が配牌前`Bipai`と親seatを所有し、`qipai`で`AwaitingDraw<FourPlayer>`へ遷移する最小`Round<P, State>`を実装してgreenにした。次の遷移まで未読のstate fieldだけを理由付きdead code抑制とし、先行する公開accessorは追加していない。
 - 2026-08-11: 既存の`qipai_deals_thirteen_expected_tiles_to_each_seat`と戻り値型により、seat別固定counts、非`Result`、seat別multisetでのindex割当検証がgreenであることをreviewし、対応3項目を完了にした。「配牌完了後はツモ前typestateになり、この状態だけが通常`Zimo`へ進める」は独立して失敗し得るため、状態遷移とmethod可用性の2項目へ分割し、前者を次に選択した。
 - 2026-08-11: `Bipai::try_new`は検証後に`TileSet`を保持するため、借用を受けて内部cloneするAPIから値を受け取るAPIへrefactorした。`TileSet`を引き続き必要とするか判断できる呼び出し側へcloneの責任を移し、現在の呼び出し箇所では後続利用がないためcloneせず所有権を移した。

@@ -139,9 +139,7 @@ stateDiagram-v2
 識別子が未確定の槓・北抜き等の中間状態は、glossary の決定後に命名する。
 
 各状態は可能な操作だけを公開する。たとえば `AwaitingDraw` に discard を受ける関数は存在しない。
-四人用の最初の実装では、`Round<FourPlayer, Prepared<FourPlayer>>`が配牌前`Bipai`と親seatを
-所有し、`qipai`がこの状態を消費して`Round<FourPlayer, AwaitingDraw<FourPlayer>>`を返す。
-`AwaitingDraw`は配牌後`Bipai`、四人分の`Bingpai`、最初にツモする親seatを所有する。
+`Round`の実装開始は、`Bingpai`、`fulu`、`he`を所有する`Player`の状態と遷移を設計してからとする。
 
 ## 6. 所有権を用いた遷移
 
@@ -260,7 +258,7 @@ command/response と event を区別する。event は起きた事実を過去�
 
 ### `Bipai`の固定配列とplayer set
 
-`Bipai<P>`は既存のplayer set markerをgeneric parameterに使い、牌列の固定配列型をsealed `PlayerSet` traitのassociated typeで決める。四人用`FourPlayer`は`[TileKind; 136]`を使う。これにより`Bipai<P, const N: usize>`のようにplayer setと牌数を別々に指定せず、矛盾する組合せを型として作れない。
+`Bipai<P>`は既存のplayer set markerをgeneric parameterに使い、牌列の固定配列型をsealed `BipaiSpec` traitのassociated typeで決める。四人用`FourPlayer`は`[TileKind; 136]`を使う。これにより`Bipai<P, const N: usize>`のようにplayer setと牌数を別々に指定せず、矛盾する組合せを型として作れない。
 
 `remaining_count`と配牌完了後の`zimo`はplayer set固有の定数や配牌形式に依存しないため、
 `Bipai<P>`の共通操作とする。固定配列の検証と初期値を決めるconstructor、および配牌形式を

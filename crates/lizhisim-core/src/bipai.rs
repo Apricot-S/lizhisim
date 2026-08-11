@@ -18,16 +18,14 @@ mod private {
     pub trait Sealed {}
 }
 
-pub trait PlayerSet: private::Sealed {
+pub trait BipaiSpec: private::Sealed {
     type BipaiTiles: AsRef<[TileKind]>;
-    type BingpaiSet;
 }
 
 impl private::Sealed for FourPlayer {}
 
-impl PlayerSet for FourPlayer {
+impl BipaiSpec for FourPlayer {
     type BipaiTiles = [TileKind; 136];
-    type BingpaiSet = [Bingpai; 4];
 }
 
 #[derive(Debug, Error, PartialEq)]
@@ -49,7 +47,7 @@ pub struct QipaiPending;
 pub struct QipaiCompleted;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Bipai<P: PlayerSet, QipaiState = QipaiPending> {
+pub struct Bipai<P: BipaiSpec, QipaiState = QipaiPending> {
     tiles: P::BipaiTiles,
     tile_set: TileSet,
     remaining_count: usize,
@@ -57,7 +55,7 @@ pub struct Bipai<P: PlayerSet, QipaiState = QipaiPending> {
     qipai_state: PhantomData<fn() -> QipaiState>,
 }
 
-impl<P: PlayerSet, QipaiState> Bipai<P, QipaiState> {
+impl<P: BipaiSpec, QipaiState> Bipai<P, QipaiState> {
     pub fn remaining_count(&self) -> usize {
         self.remaining_count
     }
@@ -126,7 +124,7 @@ impl Bipai<FourPlayer, QipaiPending> {
     }
 }
 
-impl<P: PlayerSet> Bipai<P, QipaiCompleted> {
+impl<P: BipaiSpec> Bipai<P, QipaiCompleted> {
     pub fn zimo(mut self) -> Result<(Self, TileKind), BipaiError> {
         if self.remaining_count() == 0 {
             return Err(BipaiError::LiveWallExhausted);
