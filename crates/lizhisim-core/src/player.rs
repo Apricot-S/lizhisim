@@ -45,7 +45,7 @@ mod tests {
     use crate::tile::TileKind;
     use crate::tile_set::TileSet;
 
-    use super::Player;
+    use super::*;
 
     fn red_three_tiles() -> ([TileKind; 136], TileSet) {
         let tile_set = TileSet::red_three_four_player();
