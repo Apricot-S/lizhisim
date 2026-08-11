@@ -103,7 +103,7 @@
 
 - Selected: None
 - Phase: Awaiting `Player` / `Round` consumers
-- Why: `TileSet`、`Bingpai`、四人用`Bipai`の直接契約は完了した。残るconservationは牌の所有先を持つ`Player` / `Round`実装後に選択する。
+- Why: `TileSet`、`Bingpai`、四人用`Bipai`の直接契約は完了した。残るconservationは[最小`Player` aggregateと`Round`初期遷移](round-player-initial-state.md)で牌の所有先を実装後に選択する。
 
 ## Cycle log
 

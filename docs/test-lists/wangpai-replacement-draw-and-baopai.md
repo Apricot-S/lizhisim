@@ -183,7 +183,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 - Selected: None
 - Phase: Awaiting `Round` / `Player` design
-- Why this is the smallest useful next test: `Bipai`だけで検証できる裏ドラのindex・非消費性・反復参照を完了した。次の可視性、資格、conservationは`Round`と牌を所有する`Player`の状態遷移を設計してから選択する。
+- Why this is the smallest useful next test: `Bipai`だけで検証できる裏ドラのindex・非消費性・反復参照を完了した。次の可視性、資格、conservationは[最小`Player` aggregateと`Round`初期遷移](round-player-initial-state.md)の後に選択する。
 
 ## Cycle log
 

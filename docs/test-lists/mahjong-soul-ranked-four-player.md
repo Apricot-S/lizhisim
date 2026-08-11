@@ -154,7 +154,7 @@
 
 - Selected: None
 - Phase: Awaiting `Player` / `Round` design
-- Why: 現在フェーズの四人用`Bipai`単体機能は完了した。次は`Round`が所有する最小の`Player` aggregateを先に定義し、その直後に最初の`Round`遷移へ接続する。
+- Why: 現在フェーズの四人用`Bipai`単体機能は完了した。次は[最小`Player` aggregateと`Round`初期遷移](round-player-initial-state.md)で、`Round`が所有する最小の`Player`を先に定義する。
 
 ## Cycle log
 
