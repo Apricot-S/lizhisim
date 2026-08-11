@@ -335,6 +335,21 @@ mod tests {
     }
 
     #[test]
+    fn fifth_lingshang_zimo_is_rejected() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (mut bipai, _) = bipai.qipai();
+        for _ in 0..4 {
+            (bipai, _) = bipai.lingshang_zimo().unwrap();
+        }
+
+        assert_eq!(
+            bipai.lingshang_zimo(),
+            Err(BipaiError::LingshangWallExhausted)
+        );
+    }
+
+    #[test]
     fn first_zimo_after_qipai_leaves_69_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
