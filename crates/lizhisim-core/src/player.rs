@@ -3,11 +3,13 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 use crate::bingpai::Bingpai;
+use crate::he::He;
 use crate::seat::Seat;
 
 pub struct Player<P> {
     seat: Seat<P>,
     bingpai: Bingpai,
+    he: He,
 }
 
 impl<P> Player<P> {
@@ -16,7 +18,11 @@ impl<P> Player<P> {
         expect(dead_code, reason = "will be used by the Round qipai transition")
     )]
     pub(crate) fn from_qipai(seat: Seat<P>, bingpai: Bingpai) -> Self {
-        Self { seat, bingpai }
+        Self {
+            seat,
+            bingpai,
+            he: He::new(),
+        }
     }
 
     pub fn seat(&self) -> &Seat<P> {
@@ -25,6 +31,10 @@ impl<P> Player<P> {
 
     pub fn bingpai(&self) -> &Bingpai {
         &self.bingpai
+    }
+
+    pub fn he(&self) -> &He {
+        &self.he
     }
 }
 
@@ -81,5 +91,18 @@ mod tests {
             players.iter().map(Player::seat).collect::<Vec<_>>(),
             Seat::<FourPlayer>::ALL.iter().collect::<Vec<_>>()
         );
+    }
+
+    #[test]
+    fn player_has_empty_he_after_qipai() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (_, bingpai) = bipai.qipai();
+        let player = Player::from_qipai(
+            Seat::<FourPlayer>::ALL[0],
+            bingpai.into_iter().next().unwrap(),
+        );
+
+        assert!(player.he().is_empty());
     }
 }

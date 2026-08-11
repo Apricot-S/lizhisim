@@ -20,6 +20,9 @@
 未初期化を表す`Option`にはしない。`zimopai`、現在actor、進行phaseは`Player`へ置かず、
 `Round`のtypestateが所有する。
 
+`He`は`TileKind`と`moqie: bool`を一組にした`Sipai`をAoSとして保持し、
+`heapless::Vec<Sipai, 27>`で上限を表す。`fulu`は北抜きと別に管理し、最大4要素とする。
+
 このlistでは`Dapai`、副露、槓、北抜き、立直、和了、鳴き窓、意思決定の型付き中断、
 observation、event、replayを実装しない。それらは最初のツモ後状態がgreenになってから、
 関連listの項目を一つずつ選択する。
@@ -39,10 +42,10 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 - [x] `qipai`由来の`Bingpai`から作った`Player`は、その種類別countsを保持する。
 - [x] 四人分の`Player`はindex順に`Seat::<FourPlayer>::ALL`と対応する。
-- [ ] **Selected:** 配牌直後の各`Player`の`fulu`は空である。
-- [ ] 配牌直後の各`Player`の`he`は空である。
-- [ ] 配牌直後の`Player`は`zimopai`を所有しない。
+- [x] 配牌直後の各`Player`の`he`は空である。
+- [ ] **Selected:** 配牌直後の`Player`は`zimopai`を所有しない。
 - [ ] 外部crateは任意の`Bingpai`、`fulu`、`he`を渡して`Player`を構築できない。
+- [ ] 配牌直後の各`Player`の`fulu`は空である。
 
 ### `Round` qipai transition
 
@@ -68,6 +71,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 ## Later listsへ残す項目
 
 - [ ] `Dapai`による`Bingpai`、`zimopai`、`he`の原子的な更新。
+- [ ] Property: 合法な四人用`Round`遷移では`He`の27要素上限を超えない。
 - [ ] `Chi`、`Peng`、`Daminggang`による`fulu`と`Bingpai`の更新。
 - [ ] `Angang`、`Jiagang`、嶺上ツモ、追加表ドラ表示の順序と権限。
 - [ ] 合法action集合、型付き中断、応答検証、continuationの一回消費。
@@ -76,15 +80,17 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: 配牌直後の各`Player`の`fulu`は空である。
+- Selected: 配牌直後の`Player`は`zimopai`を所有しない。
 - Phase: Not started
-- Why this is the smallest useful next test: 四人分のseat対応を固定できたため、`Player`が所有する次の永続状態を空の有効値として一つずつ導入する。
+- Why this is the smallest useful next test: `Player`の永続状態へ空の`He`を導入できたため、一時的なツモ牌を`Round` typestateへ置く所有権境界を次に固定する。
 
 ## Cycle log
 
 - 2026-08-12: 現在フェーズの四人用`Bipai`単体機能完了後の次listとして作成した。`Player`を単独で完成させず、最初の`Round`縦切りに必要な永続状態だけを先に定義する。`Round`のphase差はtypestate、seat固有の永続状態は`Player`、一時的な`zimopai`はツモ後`Round`状態へ置く。
 - 2026-08-12: `player_preserves_qipai_bingpai_counts`を追加し、`Player`未定義によるcompile errorをredとして確認した。`Player`には配牌済み`Bingpai`だけを保持させ、crate-privateな`from_qipai`と読み取り用`bingpai`を追加してgreenにした。seat、`fulu`、`he`は後続testまで先行実装しない。
 - 2026-08-12: `four_players_follow_seat_all_order`を追加し、`Player`がseatを受け取らず参照APIも持たないcompile errorをredとして確認した。`Player<P>`に`Seat<P>`を必須フィールドとして追加し、`Seat::<FourPlayer>::ALL`と配牌順をzipして構築することでgreenにした。三人用の振る舞いは先行実装していない。
+- 2026-08-12: `fulu`は北抜きと別管理して最大4要素、`He`は`Sipai { tile_kind, moqie }`のAoSを`heapless::Vec<Sipai, 27>`で保持する方針とした。`fulu`の構成要素が未確定のため、初期`he`を先に選択した。27要素上限の到達不能性は後続の`Round` property testへ残す。
+- 2026-08-12: `player_has_empty_he_after_qipai`を追加し、`Player::he`が存在しないcompile errorをredとして確認した。`heapless::Vec<Sipai, 27>`を内包する`He`を追加し、`Player::from_qipai`が空の`He`を必ず生成する最小実装でgreenにした。`Sipai`は`TileKind`と`moqie: bool`のAoSとした。
 
 ## Completion review
 

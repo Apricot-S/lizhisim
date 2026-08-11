@@ -12,4 +12,5 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
+heapless.workspace = true
 thiserror.workspace = true
