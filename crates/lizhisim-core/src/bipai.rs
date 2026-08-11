@@ -39,6 +39,8 @@ pub enum BipaiError {
     },
     #[error("no tile remains in the live wall")]
     LiveWallExhausted,
+    #[error("initial baopai indicator is already revealed")]
+    InitialBaopaiIndicatorAlreadyRevealed,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -120,7 +122,7 @@ impl Bipai<FourPlayer, QipaiPending> {
                 tile_set: self.tile_set,
                 remaining_count: self.remaining_count - FOUR_PLAYER_QIPAI_TILE_COUNT,
                 cursor: FOUR_PLAYER_QIPAI_TILE_COUNT,
-                baopai_indicator_count: 1,
+                baopai_indicator_count: 0,
                 qipai_state: PhantomData,
             },
             bingpai,
@@ -141,6 +143,21 @@ impl<P: BipaiSpec> Bipai<P, QipaiCompleted> {
 }
 
 impl Bipai<FourPlayer, QipaiCompleted> {
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "will be called by the Round baopai policy transition"
+        )
+    )]
+    pub(crate) fn reveal_initial_baopai_indicator(mut self) -> Result<Self, BipaiError> {
+        if self.baopai_indicator_count != 0 {
+            return Err(BipaiError::InitialBaopaiIndicatorAlreadyRevealed);
+        }
+        self.baopai_indicator_count = 1;
+        Ok(self)
+    }
+
     pub fn baopai_indicators(&self) -> impl ExactSizeIterator<Item = TileKind> + '_ {
         (0..self.baopai_indicator_count).map(|indicator_index| {
             self.tiles.as_ref()[FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX - indicator_index * 2]
@@ -244,16 +261,53 @@ mod tests {
     }
 
     #[test]
-    fn first_baopai_indicator_after_qipai_returns_tile_at_index_131() {
+    fn initial_baopai_indicator_command_reveals_tile_at_index_131() {
         let (mut tiles, tile_set) = red_three_tiles();
         tiles.swap(131, 133);
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
 
         assert_eq!(
             bipai.baopai_indicators().collect::<Vec<_>>(),
             [TileKind::M0],
         );
+    }
+
+    #[test]
+    fn qipai_does_not_reveal_baopai_indicator() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+
+        assert_eq!(bipai.baopai_indicators().len(), 0);
+    }
+
+    #[test]
+    fn initial_baopai_indicator_cannot_be_revealed_twice() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+
+        assert_eq!(
+            bipai.reveal_initial_baopai_indicator(),
+            Err(BipaiError::InitialBaopaiIndicatorAlreadyRevealed),
+        );
+    }
+
+    #[test]
+    fn revealed_initial_baopai_indicator_can_be_read_repeatedly() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles.swap(131, 133);
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+
+        let first = bipai.baopai_indicators().collect::<Vec<_>>();
+        let second = bipai.baopai_indicators().collect::<Vec<_>>();
+
+        assert_eq!([first, second], [vec![TileKind::M0], vec![TileKind::M0]]);
     }
 
     #[test]

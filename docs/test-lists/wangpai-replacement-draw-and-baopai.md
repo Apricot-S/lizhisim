@@ -26,7 +26,8 @@
 - 四人用の嶺上牌は`135, 134, 133, 132`の順とする。
 - 表ドラ表示牌は`131, 129, 127, 125, 123`の順とし、最初の1枚と最大4回の追加表示を表す。
 - 裏ドラ表示牌は`130, 128, 126, 124, 122`の順とし、対応する表ドラ表示牌と同数だけ取得する。
-- 初期の表ドラ表示牌は`qipai`完了後にだけ取得可能とする。配牌前から常時取得できる公開APIは作らない。
+- `qipai`自体は初期の表ドラ表示牌を公開しない。上位の`Round`が解決済みpolicyを参照し、表ドラ有効時だけ`qipai`完了後に初期表示commandを適用する。
+- 表ドラ無効ruleでは初期表示commandを適用せず、公開済み表ドラ表示牌を0枚のまま保つ。
 - 裏ドラ表示牌は和了成立と裏ドラ適用資格の確定後、点数評価に必要な境界でだけ取得可能とする。進行中の通常viewへ公開しない。
 - 公開済みの表裏ドラ表示牌は`wangpai`内の牌へのread-only viewであり、何度参照しても公開枚数や取得位置を変えない。
 - 追加の表ドラ表示時点は、上位の`Round`遷移が槓種別とruleから決める。`wangpai`は槓種別やruleを解釈しない。
@@ -38,6 +39,7 @@
 ## Responsibility boundary
 
 - `Bipai` / `Wangpai`は、通常`zimo`位置、`lingshang_zimo`位置、公開済み表ドラ枚数、各領域の上限と非重複を管理する。
+- `Bipai` / `Wangpai`は表ドラの有効・無効を判断せず、上位から渡された初期表示commandを一度だけ適用する。
 - 公開済みの表裏ドラ表示牌一覧は何度でも参照でき、参照操作は状態を変更しない。
 - `Round`は、`Angang`、`Jiagang`、`Daminggang`、`Babei`の成立、rule、現在phaseから、次に許可する公開・`lingshang_zimo`を決める。
 - 三人用`Bipai` / `Wangpai`は解決済みruleから嶺上牌容量を構成するが、個々の北抜きが合法かどうかは判定しない。
@@ -65,10 +67,15 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ### Initial baopai indicator
 
-- [ ] `qipai`前は初期の表ドラ表示牌を取得できない。
-- [x] `qipai`後の初回取得はindex 131の`TileKind`を返す。
-- [ ] **Selected:** 公開済みの初期表ドラ表示牌を複数回参照しても、毎回同じindex 131の`TileKind`を返す。
-- [ ] 公開済み表ドラ表示牌の参照は、公開枚数、通常`zimo`位置、`lingshang_zimo`位置を変えない。
+- [ ] `qipai`前は初期表示commandを適用できない。
+- [x] `qipai`直後の公開済み表ドラ表示牌は0枚である。
+- [x] 初期表示commandを適用すると、公開済み表ドラ表示牌はindex 131の`TileKind`一枚になる。
+- [x] 初期表示commandを二回適用すると拒否する。
+- [x] 公開済みの初期表ドラ表示牌を複数回参照しても、毎回同じindex 131の`TileKind`を返す。
+- [ ] **Selected:** 公開済み表ドラ表示牌の参照は公開枚数を変えない。
+- [ ] 公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない。
+- [ ] 公開済み表ドラ表示牌の参照は通常`zimo`位置を変えない。
+- [ ] 公開済み表ドラ表示牌の参照は`lingshang_zimo`位置を変えない。
 - [ ] `qipai`前の参照失敗後も`Bipai`の状態は変化しない。
 
 ### Replacement draw authorization
@@ -115,6 +122,9 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ### Round orchestration and rule-dependent reveal timing
 
+- [ ] 表ドラ無効ruleでは、`Round`は`qipai`後に初期表示commandを適用しない。
+- [ ] 表ドラ有効ruleでは、`Round`は`qipai`後に初期表示commandを一回適用する。
+- [ ] `Round`はservice名ではなく、rules crateから渡されたcore所有の解決済み表ドラpolicyだけを参照する。
 - [ ] `Round`は槓種別とruleから、追加表示と`lingshang_zimo`のどちらを先に行うか決定する。
 - [ ] `Angang`用のrule順序を`Jiagang`または`Daminggang`へ暗黙に流用しない。
 - [ ] 「嶺上ツモ前」になる槓種別・ruleでは、追加表示を完了するまで`lingshang_zimo`へ進めない。
@@ -170,12 +180,17 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: 公開済みの初期表ドラ表示牌を複数回参照しても、毎回同じindex 131の`TileKind`を返す。
+- Selected: 公開済み表ドラ表示牌の参照は公開枚数を変えない。
 - Phase: Red
-- Why this is the smallest useful next test: 表ドラ表示牌が消費物ではなくread-only viewであることを、追加表示APIより先に固定できる。
+- Why this is the smallest useful next test: read-only参照の非消費性を公開枚数、通常ツモ枚数、各取得位置へ分割して一観点ずつ検証する。
 
 ## Cycle log
 
+- 2026-08-11: 「公開済み初期表ドラ表示牌を複数回参照できる」を選択し、iteratorを空にするmutantで2回とも空になるredを確認して復元後greenにした。2回の参照結果を一配列へ集約して一assertionで比較した。後続の非消費性項目は、公開枚数、通常`zimo`枚数、通常`zimo`位置、`lingshang_zimo`位置という独立して失敗し得る4観点へ分割した。
+- 2026-08-11: 「初期表示commandを二回適用すると拒否する」を追加した。guardを外すmutantで二回目が`Ok`となるredを確認し、`InitialBaopaiIndicatorAlreadyRevealed`を返すguardへ復元してgreenにした。
+- 2026-08-11: 「初期表示command後はindex 131の一枚」を選択し、command method未定義でredを確認した。`QipaiCompleted`の四人用`Bipai`にcrate-privateな消費型commandを追加し、公開枚数を0から1へ変更してindex 131の`M0`でgreenにした。`Bipai`へrule値は渡していない。
+- 2026-08-11: 「`qipai`直後の公開済み表ドラ表示牌は0枚」を選択し、実際値1とのassertion failureでredを確認した。`qipai`が公開枚数を0のまま引き継ぐよう変更してgreenにし、表ドラ無効ruleを表現できる状態にした。
+- 2026-08-11: 表ドラ無効ruleを扱うため、`qipai`が初期表示を自動公開する方針を撤回した。`Bipai`は公開済み枚数とindex上限だけを管理し、`Round`がrules crateから変換されたcore所有policyを参照して、表ドラ有効時だけ初期表示commandを適用する責務分担へ更新した。`Bipai`では`qipai`直後0枚、初期表示command後index 131、二重適用拒否、反復参照を順に検証する。
 - 2026-08-11: 「`qipai`後の初回取得はindex 131」を選択し、`baopai_indicators`未定義のmethod errorでredを確認した。公開済み表示枚数をconstructorで0、`qipai`後に1として`Bipai`へ保持し、`QipaiCompleted`の四人用`Bipai`だけにread-only iteratorを実装した。fixtureのindex 131へ`M0`を固定してgreenにし、次は反復参照の非消費性を選択した。
 - 2026-08-11: 既存の構築直後122枚・`qipai`後70枚の`remaining_count` testにより、末尾14枚を通常`zimo`可能枚数へ含めない項目を完了とした。次に初期表ドラ表示牌のindex 131を選択し、将来の複数表示を同じAPIで扱える`baopai_indicators`から一枚を参照する方針とした。
 - 2026-08-11: 三人麻雀では北抜き有効時に嶺上牌8枚、無効時に4枚とする要件を追加した。容量と取得上限は`Bipai` / `Wangpai`、北抜きの合法性と一回分の取得権限発行は`Round`の責務として分離した。三人用実装はPhase 4まで行わない。

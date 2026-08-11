@@ -89,9 +89,13 @@ index 52から最初の`Zimo`として正規化する。したがって通常の
 尽きた時点で`LiveWallExhausted`を返す。`wangpai`からの取得は通常の`zimo`へ含めない。
 この値はcursorから都度導出せず`Bipai`の状態として保持し、`qipai`、通常`zimo`、将来の
 `lingshang_zimo`が消費した通常ツモ可能枚数に応じて減算する。
-公開済み表ドラ表示牌の枚数も`Bipai`の状態として保持する。四人用ではconstructorで0、`qipai`完了時に
-初期表示の1とし、`baopai_indicators`はindex 131から2ずつ戻る牌をread-only iteratorとして返す。
+公開済み表ドラ表示牌の枚数も`Bipai`の状態として保持する。四人用ではconstructorと`qipai`完了直後を
+0とし、上位遷移から初期表示commandを適用した場合だけ1にする。`baopai_indicators`はindex 131から
+2ずつ戻る牌をread-only iteratorとして返す。
 表示牌の参照自体は公開枚数、通常ツモ位置、嶺上ツモ位置を変更しない。
+表ドラの有効・無効とcommand適用時点は`Bipai`で判断しない。rules crateはraw設定を検証してcore所有の
+小さなpolicy値へ変換し、coreの`Round`がpolicyから初期・追加表示を指示する。麻雀ruleの実行意味論を
+orchestration等の上位crateへ移さない。
 
 `xiangting`や`hule`が34種類のcount表現を要求する場合、adapter境界で赤牌を対応する通常の5へ射影する。34種類用の別domain識別子は、必要性が確認されるまで追加しない。
 
