@@ -84,6 +84,8 @@
 - 一つのtestは一つの観点だけを検証する。`正常系と異常系`、`個数と変換`のような独立して失敗し得る観点を同じtestへ混在させない。
 - One assertion per testを原則とし、一つのtest functionではassertion macroを一回だけ使う。複数入力を同じ性質として検証する場合は結果を一つの値へ集約し、一回のassertionで比較する。
 - 複数assertionが不可分だと判断した例外は、分割できない理由をtest listのcycle logへ記録してreviewする。fixture/setup確認をassertion数の例外にしない。
+- refactorではproduction codeだけでなくtest suiteも見直す。より強いtestが同じ契約を包含し、削除しても独立した振る舞い、境界、error、分岐の検証を失わないtestは、不要になった時点で削除する。`len`、`is_ok`、`is_err`、列の先頭だけの検証を、全要素、具体的な値、具体的なerror、列全体の検証が包含する場合が該当する。
+- 同じproduction経路を通るだけでは重複とみなさない。異なる境界値、enum分岐、状態、error payload、rule variationを検証するtestは維持する。testは開発履歴として保存せず、履歴はtest listのcycle logへ記録する。
 
 ## 8. 検証方針
 

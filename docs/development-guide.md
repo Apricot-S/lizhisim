@@ -102,6 +102,15 @@ test list はテストコードの一覧ではなく、振る舞いの仮説と�
 
 refactor で新しい振る舞いを追加しない。必要なら test list へ戻り、新しい red から始める。
 
+test codeもrefactor対象であり、testを追加し続けるだけの履歴置き場にしない。Kent Beck『Test-Driven Development: By Example』第11章の「不要になったら消す」という考え方を、次の具体的な規則として適用する。
+
+- 後から追加した強いtestが既存testの契約を完全に包含するなら、既存testを削除する。
+- 全要素の固定期待値は同じcollectionの`len`だけの検証を、具体的な`Err`値は`is_err()`だけの検証を、複数回の固定列は同じ列の先頭だけの検証を通常包含する。
+- 同じfixtureを正常に構築して後続の振る舞いを検証するtestがあれば、同じfixtureに対する`is_ok()`だけのsmoke testは通常不要である。
+- testを削除しても、test listの完了済み項目は戻さない。どの強いtestが契約を引き継いだかをcycle logへ記録する。
+
+ただし、見た目が似ていることだけを理由に削除しない。入力境界、状態、rule variation、処理分岐、error payloadが独立して壊れ得るなら別のtestとして維持する。包含関係が不明な場合は、候補testを一時的に削除するだけで判断せず、production codeへ最小のmutantを入れて残るtestが意図した不具合を検出するか確認する。
+
 ### 3.6 記録して繰り返す
 
 対象項目を完了し、気づいた項目を追加する。未完了一覧がゼロになっても、要求・property・integration の観点で漏れを review してから topic を完了する。
@@ -280,6 +289,7 @@ correctness test と分ける。固定 workload と環境 metadata を持ち、�
 - test list の一項目から始めたか。
 - red を意図した理由で確認したか。
 - green の最小性を保ったか。
+- より強いtestに包含され、独立した契約を持たなくなったtestを削除したか。
 - refactor 後に全 suite が green か。
 
 ## 11. Git と変更単位
