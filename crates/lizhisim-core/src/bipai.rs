@@ -62,7 +62,7 @@ impl<P: PlayerSet, QipaiState> Bipai<P, QipaiState> {
 }
 
 impl Bipai<FourPlayer, QipaiPending> {
-    pub fn try_new(tiles: [TileKind; 136], tile_set: &TileSet) -> Result<Self, BipaiError> {
+    pub fn try_new(tiles: [TileKind; 136], tile_set: TileSet) -> Result<Self, BipaiError> {
         let actual_counts = tiles.iter().fold([0usize; 37], |mut counts, tile_kind| {
             counts[tile_kind.index()] += 1;
             counts
@@ -86,7 +86,7 @@ impl Bipai<FourPlayer, QipaiPending> {
         let remaining_count = tiles.len() - FOUR_PLAYER_WANGPAI_TILE_COUNT;
         Ok(Self {
             tiles,
-            tile_set: tile_set.clone(),
+            tile_set,
             remaining_count,
             cursor: 0,
             qipai_state: PhantomData,
@@ -158,13 +158,13 @@ mod tests {
     fn four_player_bipai_accepts_tiles_matching_tile_set() {
         let (tiles, tile_set) = red_three_tiles();
 
-        assert!(Bipai::<FourPlayer>::try_new(tiles, &tile_set).is_ok());
+        assert!(Bipai::<FourPlayer>::try_new(tiles, tile_set).is_ok());
     }
 
     #[test]
     fn newly_constructed_four_player_bipai_has_122_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
 
         assert_eq!(bipai.remaining_count(), 122);
     }
@@ -172,7 +172,7 @@ mod tests {
     #[test]
     fn qipai_deals_thirteen_expected_tiles_to_each_seat() {
         let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (_, actual): (_, [Bingpai; 4]) = bipai.qipai();
 
         let mut expected = [[0; 37]; 4];
@@ -210,7 +210,7 @@ mod tests {
     #[test]
     fn qipai_leaves_70_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (bipai, _) = bipai.qipai();
 
         assert_eq!(bipai.remaining_count(), 70);
@@ -219,7 +219,7 @@ mod tests {
     #[test]
     fn qipai_bingpai_preserves_tile_set_limit() {
         let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (_, bingpai) = bipai.qipai();
 
         assert_eq!(
@@ -234,7 +234,7 @@ mod tests {
     #[test]
     fn first_zimo_after_qipai_returns_tile_at_index_52() {
         let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (bipai, _) = bipai.qipai();
         let (_, zimopai) = bipai.zimo().unwrap();
 
@@ -244,7 +244,7 @@ mod tests {
     #[test]
     fn first_zimo_after_qipai_leaves_69_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (bipai, _) = bipai.qipai();
         let (bipai, _) = bipai.zimo().unwrap();
 
@@ -254,7 +254,7 @@ mod tests {
     #[test]
     fn consecutive_zimo_after_qipai_preserves_wall_order() {
         let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (bipai, _) = bipai.qipai();
         let (bipai, first) = bipai.zimo().unwrap();
         let (bipai, second) = bipai.zimo().unwrap();
@@ -270,7 +270,7 @@ mod tests {
     #[test]
     fn zimo_rejects_draw_after_live_wall_is_exhausted() {
         let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (mut bipai, _) = bipai.qipai();
         for _ in 0..70 {
             (bipai, _) = bipai.zimo().unwrap();
@@ -293,7 +293,7 @@ mod tests {
         let tile_set = TileSet::try_from_counts(counts).unwrap();
 
         assert_eq!(
-            Bipai::<FourPlayer>::try_new(tiles, &tile_set),
+            Bipai::<FourPlayer>::try_new(tiles, tile_set),
             Err(BipaiError::TileSetMismatch {
                 tile_kind: TileKind::M1,
                 actual_count: 4,
@@ -315,7 +315,7 @@ mod tests {
         let tile_set = TileSet::try_from_counts(counts).unwrap();
 
         assert_eq!(
-            Bipai::<FourPlayer>::try_new(tiles, &tile_set),
+            Bipai::<FourPlayer>::try_new(tiles, tile_set),
             Err(BipaiError::TileSetMismatch {
                 tile_kind: TileKind::M5,
                 actual_count: 3,
@@ -330,7 +330,7 @@ mod tests {
         tiles[0] = TileKind::M2;
 
         assert_eq!(
-            Bipai::<FourPlayer>::try_new(tiles, &tile_set),
+            Bipai::<FourPlayer>::try_new(tiles, tile_set),
             Err(BipaiError::TileSetMismatch {
                 tile_kind: TileKind::M1,
                 actual_count: 3,
@@ -345,7 +345,7 @@ mod tests {
         tiles[4] = TileKind::M1;
 
         assert_eq!(
-            Bipai::<FourPlayer>::try_new(tiles, &tile_set),
+            Bipai::<FourPlayer>::try_new(tiles, tile_set),
             Err(BipaiError::TileSetMismatch {
                 tile_kind: TileKind::M1,
                 actual_count: 5,
@@ -367,6 +367,6 @@ mod tests {
             .unwrap();
         tiles.swap(red_index, base_index);
 
-        assert!(Bipai::<FourPlayer>::try_new(tiles, &tile_set).is_ok());
+        assert!(Bipai::<FourPlayer>::try_new(tiles, tile_set).is_ok());
     }
 }

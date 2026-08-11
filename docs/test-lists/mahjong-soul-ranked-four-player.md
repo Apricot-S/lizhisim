@@ -157,6 +157,7 @@
 
 ## Cycle log
 
+- 2026-08-11: `Bipai::try_new`は検証後に`TileSet`を保持するため、借用を受けて内部cloneするAPIから値を受け取るAPIへrefactorした。`TileSet`を引き続き必要とするか判断できる呼び出し側へcloneの責任を移し、現在の呼び出し箇所では後続利用がないためcloneせず所有権を移した。
 - 2026-08-11: `qipai`のseat別counts構築をrefactorした。`0..13`ごとの分岐、除算、剰余を使うfoldから、`seat_offset`を一度計算してbatch開始index `0, 16, 32`の各4枚を走査し、最後にindex `48 + seat_index`の1枚を加える手続きへ変更した。3回の4枚取りと最後の1枚取りをコード構造へ直接対応させ、公開挙動は変更していない。
 - 2026-08-11: 将来の`Player` / `Round`遷移から利用する`with_added`、`with_removed`と`BingpaiError`をproductionコードへ戻した。低水準操作は`pub(crate)`のまま、利用開始まで理由付き`expect(dead_code)`をproduction buildだけに適用する。`BingpaiError`は上位遷移errorの型付きsourceにできるようcrate rootから公開した。テスト専用constructorは空状態を明示する`empty`へ改名した。
 - 2026-08-11: `qipai`由来の`Bingpai`が元の`TileSet`上限を保持するtestを追加した。`with_added`が上限を1枚緩めるmutantでredを確認し、元の上限参照へ復元してgreenにした。その後、正規生成経路を`qipai`へ限定するため`Bingpai::new`、`with_added`、`with_removed`をcrate-privateへ変更した。既存unit testは同一crate内で低水準操作の境界を引き続き検証する。
