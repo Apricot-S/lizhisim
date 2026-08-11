@@ -514,6 +514,19 @@ mod tests {
     }
 
     #[test]
+    fn li_baopai_indicator_read_does_not_change_baopai_indicator_count() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+        let baopai_indicator_count = bipai.baopai_indicators().len();
+
+        let _ = bipai.li_baopai_indicators().collect::<Vec<_>>();
+
+        assert_eq!(bipai.baopai_indicators().len(), baopai_indicator_count);
+    }
+
+    #[test]
     fn sixth_baopai_indicator_is_rejected() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
