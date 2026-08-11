@@ -5,7 +5,7 @@
 - Owner: project owner / implementer
 - Created: 2026-08-12
 - Updated: 2026-08-12
-- Status: Planned
+- Status: Active
 - Requirements: `CORE-001`, `CORE-002`, `CORE-006`, `CORE-007`, `CORE-008`, `NFR-001`
 - ADR / design: [ADR-0001](../adr/0001-event-driven-typed-continuations.md)、[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)、[domain model](../design/domain-model.md)
 - Related lists: [雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md)、[TileSetと牌構成rule](tile-set-and-rule-tile-config.md)、[王牌・嶺上ツモ・宝牌表示](wangpai-replacement-draw-and-baopai.md)
@@ -37,8 +37,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ### Initial `Player` aggregate
 
-- [ ] `qipai`由来の`Bingpai`から作った`Player`は、その種類別countsを保持する。
-- [ ] 四人分の`Player`はindex順に`Seat::<FourPlayer>::ALL`と対応する。
+- [x] `qipai`由来の`Bingpai`から作った`Player`は、その種類別countsを保持する。
+- [ ] **Selected:** 四人分の`Player`はindex順に`Seat::<FourPlayer>::ALL`と対応する。
 - [ ] 配牌直後の各`Player`の`fulu`は空である。
 - [ ] 配牌直後の各`Player`の`he`は空である。
 - [ ] 配牌直後の`Player`は`zimopai`を所有しない。
@@ -76,13 +76,14 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: None
-- Phase: Awaiting implementation selection
-- Why this is the smallest useful next test: 最初に`qipai`由来の`Bingpai`を保持する一人分の`Player`だけを固定し、その後に四人集合と`Round`へ広げる。
+- Selected: 四人分の`Player`はindex順に`Seat::<FourPlayer>::ALL`と対応する。
+- Phase: Not started
+- Why this is the smallest useful next test: 一人分の永続状態を保持できたため、`Round`を導入する前に四人分の`Player`とseatの対応だけを固定する。
 
 ## Cycle log
 
 - 2026-08-12: 現在フェーズの四人用`Bipai`単体機能完了後の次listとして作成した。`Player`を単独で完成させず、最初の`Round`縦切りに必要な永続状態だけを先に定義する。`Round`のphase差はtypestate、seat固有の永続状態は`Player`、一時的な`zimopai`はツモ後`Round`状態へ置く。
+- 2026-08-12: `player_preserves_qipai_bingpai_counts`を追加し、`Player`未定義によるcompile errorをredとして確認した。`Player`には配牌済み`Bingpai`だけを保持させ、crate-privateな`from_qipai`と読み取り用`bingpai`を追加してgreenにした。seat、`fulu`、`he`は後続testまで先行実装しない。
 
 ## Completion review
 

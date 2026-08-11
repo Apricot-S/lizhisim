@@ -4,12 +4,14 @@
 
 mod bingpai;
 mod bipai;
+mod player;
 mod seat;
 mod tile;
 mod tile_set;
 
 pub use bingpai::{Bingpai, BingpaiError};
 pub use bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
+pub use player::Player;
 pub use seat::{FourPlayer, Seat, SeatIndexOutOfRange};
 pub use tile::TileKind;
 pub use tile_set::{TileSet, TileSetError};
