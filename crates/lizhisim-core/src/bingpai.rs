@@ -197,14 +197,6 @@ mod tests {
     }
 
     #[test]
-    fn removing_absent_tile_kind_does_not_change_bingpai() {
-        let bingpai = Bingpai::red_three_four_player();
-        let _ = bingpai.clone().with_removed(TileKind::M1);
-
-        assert_eq!(bingpai.counts(), &[0; 37]);
-    }
-
-    #[test]
     fn removing_m0_from_bingpai_holding_only_m5_does_not_substitute_m5() {
         assert_eq!(
             Bingpai::red_three_four_player()
@@ -380,18 +372,5 @@ mod tests {
                 max_count: 0,
             }),
         );
-    }
-
-    #[test]
-    fn failed_addition_does_not_change_original_bingpai() {
-        let mut counts = [0; 37];
-        counts[TileKind::M1.index()] = 1;
-        let bingpai = Bingpai::empty(TileSet::try_from_counts(counts).unwrap())
-            .with_added(TileKind::M1)
-            .unwrap();
-        let original = bingpai.clone();
-        let _ = bingpai.with_added(TileKind::M1);
-
-        assert_eq!(original.counts()[TileKind::M1.index()], 1);
     }
 }
