@@ -62,8 +62,8 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 ### Layout and construction
 
 - [x] 四人用`Bipai`の末尾14枚を通常`zimo`可能枚数へ含めない。
-- [ ] 通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のindex集合は互いに重ならない。
-- [ ] Property: 136枚の各indexは、配牌、通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のいずれか一つにだけ分類される。
+- [x] 通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のindex集合は互いに重ならない。
+- [ ] **Selected:** Property: 136枚の各indexは、配牌、通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のいずれか一つにだけ分類される。
 
 ### Initial baopai indicator
 
@@ -76,7 +76,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [x] 公開済み表ドラ表示牌の参照は通常`zimo`の`remaining_count`を変えない。
 - [x] 公開済み表ドラ表示牌の参照は通常`zimo`位置を変えない。
 - [x] 公開済み表ドラ表示牌の参照は`lingshang_zimo`位置を変えない。
-- [ ] **Selected:** `qipai`前の参照失敗後も`Bipai`の状態は変化しない。
+- [x] `qipai`前に表ドラ表示牌の参照APIを提供しない。
 
 ### Replacement draw authorization
 
@@ -180,12 +180,14 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: `qipai`前の参照失敗後も`Bipai`の状態は変化しない。
+- Selected: Property: 136枚の各indexは、配牌、通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のいずれか一つにだけ分類される。
 - Phase: Red
-- Why this is the smallest useful next test: 初期表示commandのtypestate境界を確認したため、同じく配牌前に提供しない表示牌参照の境界を確認する。
+- Why this is the smallest useful next test: 王牌内の各用途が別々のindexを使うことを固定したため、配牌を含む136枚全体が一意に分類されることを確認する。
 
 ## Cycle log
 
+- 2026-08-11: 「通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のindex集合は互いに重ならない」を選択した。4集合をソートしてindex `52..=135`の連続列と比較し、非重複だけでなく王牌領域全体を漏れなく覆うことを一assertionで検証した。嶺上牌開始indexを131へ変えるmutantで128〜131の重複と132〜135の欠番が生じるredを確認し、135へ復元してgreenにした。
+- 2026-08-11: 「`qipai`前の参照失敗後も`Bipai`の状態は変化しない」は、配牌前の`Bipai`に表示牌参照APIが存在しないtypestateと整合しないruntime failure表現だったため、「`qipai`前に表ドラ表示牌の参照APIを提供しない」へ正規化した。`baopai_indicators`は`Bipai<FourPlayer, QipaiCompleted>`だけのimplにあり、`QipaiPending`にはmethodが存在しないことをreviewして完了とした。外部compile-fail testを必要とする公開APIではないため、新dependencyは追加しない。
 - 2026-08-11: 「`qipai`前は初期表示commandを適用できない」を選択した。`reveal_initial_baopai_indicator`は`Bipai<P, QipaiCompleted>`だけのimplにあり、`QipaiPending`にはmethodが存在しないことをreviewして完了とした。commandは`pub(crate)`でもあるため、外部integration testでは可視性errorとtypestate errorを分離できず、compile-fail test基盤のない現時点で新dependencyを増やす価値はない。将来commandを外部公開する場合は、外部crateからのcompile-fail testを追加する。
 - 2026-08-11: 「公開済み表ドラ表示牌の参照は`lingshang_zimo`位置を変えない」を選択した。公開済み表示牌をiteratorが尽きるまで参照した後の嶺上ツモ4回が`S0, P0, M0, Z7`となることを検証した。表示牌参照は内部可変性を持たない`Bipai`への`&self`だけを受け取り、嶺上ツモの取得回数も通常fieldであるため、前2項目と同じ理由で安全なruntime mutantを作れずredは省略した。共有借用による型上の不変性と後続取得の回帰値を確認してgreenとした。
 - 2026-08-11: 「公開済み表ドラ表示牌の参照は通常`zimo`位置を変えない」を選択した。公開済み表示牌をiteratorが尽きるまで参照した後の最初の通常ツモがindex 52の`P5`となることを検証した。表示牌参照は内部可変性を持たない`Bipai`への`&self`だけを受け取り、通常ツモcursorも通常fieldであるため、前項目と同じ理由で安全なruntime mutantを作れずredは省略した。共有借用による型上の不変性と後続取得の回帰値を確認してgreenとした。

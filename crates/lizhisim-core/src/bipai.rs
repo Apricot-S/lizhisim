@@ -212,6 +212,24 @@ mod tests {
     }
 
     #[test]
+    fn four_player_wangpai_index_sets_are_disjoint() {
+        let mut indices = (FOUR_PLAYER_QIPAI_TILE_COUNT..136 - FOUR_PLAYER_WANGPAI_TILE_COUNT)
+            .chain(
+                (0..FOUR_PLAYER_LINGSHANG_TILE_COUNT)
+                    .map(|index| FOUR_PLAYER_FIRST_LINGSHANG_ZIMO_INDEX - index),
+            )
+            .chain((0..5).map(|index| FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX - index * 2))
+            .chain((0..5).map(|index| FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX - index * 2 - 1))
+            .collect::<Vec<_>>();
+        indices.sort_unstable();
+
+        assert_eq!(
+            indices,
+            (FOUR_PLAYER_QIPAI_TILE_COUNT..136).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
     fn newly_constructed_four_player_bipai_has_122_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
