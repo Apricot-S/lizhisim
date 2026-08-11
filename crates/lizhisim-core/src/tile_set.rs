@@ -151,7 +151,7 @@ mod tests {
     }
 
     #[test]
-    fn tile_set_construction_failure_does_not_return_partial_tile_set() {
+    fn tile_set_rejects_kind_count_above_four_at_last_index() {
         let mut counts = [0; 37];
         counts[TileKind::M1.index()] = 4;
         counts[TileKind::Z7.index()] = 5;
