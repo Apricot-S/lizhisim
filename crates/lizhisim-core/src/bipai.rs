@@ -14,6 +14,7 @@ use crate::tile_set::TileSet;
 const FOUR_PLAYER_QIPAI_TILE_COUNT: usize = 52;
 const FOUR_PLAYER_WANGPAI_TILE_COUNT: usize = 14;
 const FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX: usize = 131;
+const FOUR_PLAYER_MAX_BAOPAI_INDICATOR_COUNT: usize = 5;
 const FOUR_PLAYER_FIRST_LINGSHANG_ZIMO_INDEX: usize = 135;
 const FOUR_PLAYER_LINGSHANG_TILE_COUNT: usize = 4;
 
@@ -43,6 +44,8 @@ pub enum BipaiError {
     LiveWallExhausted,
     #[error("initial baopai indicator is already revealed")]
     InitialBaopaiIndicatorAlreadyRevealed,
+    #[error("no additional baopai indicator can be revealed")]
+    BaopaiIndicatorLimitReached,
     #[error("no tile remains in the lingshang wall")]
     LingshangWallExhausted,
 }
@@ -160,9 +163,12 @@ impl<P: BipaiSpec> Bipai<P, QipaiCompleted> {
             reason = "will be called by the Round additional baopai policy transition"
         )
     )]
-    pub(crate) fn reveal_additional_baopai_indicator(mut self) -> Self {
+    pub(crate) fn reveal_additional_baopai_indicator(mut self) -> Result<Self, BipaiError> {
+        if self.baopai_indicator_count >= FOUR_PLAYER_MAX_BAOPAI_INDICATOR_COUNT {
+            return Err(BipaiError::BaopaiIndicatorLimitReached);
+        }
         self.baopai_indicator_count += 1;
-        self
+        Ok(self)
     }
 
     pub fn zimo(mut self) -> Result<(Self, TileKind), BipaiError> {
@@ -403,7 +409,7 @@ mod tests {
         let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
         let mut bipai = bipai;
         for _ in 0..4 {
-            bipai = bipai.reveal_additional_baopai_indicator();
+            bipai = bipai.reveal_additional_baopai_indicator().unwrap();
         }
 
         assert_eq!(
@@ -415,6 +421,23 @@ mod tests {
                 TileKind::M1,
                 TileKind::M2,
             ],
+        );
+    }
+
+    #[test]
+    fn sixth_baopai_indicator_is_rejected() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+        let mut bipai = bipai;
+        for _ in 0..4 {
+            bipai = bipai.reveal_additional_baopai_indicator().unwrap();
+        }
+
+        assert_eq!(
+            bipai.reveal_additional_baopai_indicator(),
+            Err(BipaiError::BaopaiIndicatorLimitReached),
         );
     }
 
