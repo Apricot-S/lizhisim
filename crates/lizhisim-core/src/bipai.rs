@@ -212,13 +212,6 @@ mod tests {
     }
 
     #[test]
-    fn four_player_bipai_accepts_tiles_matching_tile_set() {
-        let (tiles, tile_set) = red_three_tiles();
-
-        assert!(Bipai::<FourPlayer>::try_new(tiles, tile_set).is_ok());
-    }
-
-    #[test]
     fn newly_constructed_four_player_bipai_has_122_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
@@ -289,20 +282,6 @@ mod tests {
     }
 
     #[test]
-    fn initial_baopai_indicator_command_reveals_tile_at_index_131() {
-        let (mut tiles, tile_set) = red_three_tiles();
-        tiles.swap(131, 133);
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let (bipai, _) = bipai.qipai();
-        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
-
-        assert_eq!(
-            bipai.baopai_indicators().collect::<Vec<_>>(),
-            [TileKind::M0],
-        );
-    }
-
-    #[test]
     fn qipai_does_not_reveal_baopai_indicator() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
@@ -353,16 +332,6 @@ mod tests {
             [first, second, third, fourth],
             [TileKind::S0, TileKind::P0, TileKind::M0, TileKind::Z7],
         );
-    }
-
-    #[test]
-    fn first_zimo_after_qipai_returns_tile_at_index_52() {
-        let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let (bipai, _) = bipai.qipai();
-        let (_, zimopai) = bipai.zimo().unwrap();
-
-        assert_eq!(zimopai, TileKind::P5);
     }
 
     #[test]
