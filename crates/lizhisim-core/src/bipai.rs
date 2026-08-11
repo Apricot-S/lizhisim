@@ -6,6 +6,7 @@ use core::marker::PhantomData;
 
 use thiserror::Error;
 
+use crate::bingpai::Bingpai;
 use crate::seat::FourPlayer;
 use crate::tile::TileKind;
 use crate::tile_set::TileSet;
@@ -48,6 +49,7 @@ pub struct QipaiCompleted;
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Bipai<P: PlayerSet, QipaiState = QipaiPending> {
     tiles: P::BipaiTiles,
+    tile_set: TileSet,
     remaining_count: usize,
     cursor: usize,
     qipai_state: PhantomData<fn() -> QipaiState>,
@@ -84,29 +86,35 @@ impl Bipai<FourPlayer, QipaiPending> {
         let remaining_count = tiles.len() - FOUR_PLAYER_WANGPAI_TILE_COUNT;
         Ok(Self {
             tiles,
+            tile_set: tile_set.clone(),
             remaining_count,
             cursor: 0,
             qipai_state: PhantomData,
         })
     }
 
-    pub fn qipai(self) -> (Bipai<FourPlayer, QipaiCompleted>, [[TileKind; 13]; 4]) {
+    pub fn qipai(self) -> (Bipai<FourPlayer, QipaiCompleted>, [Bingpai; 4]) {
         let tiles = self.tiles.as_ref();
         let bingpai = core::array::from_fn(|seat_index| {
-            core::array::from_fn(|hand_index| {
+            let counts = (0..13).fold([0; 37], |mut counts, hand_index| {
                 if hand_index < 12 {
                     let batch_index = hand_index / 4;
                     let index_in_batch = hand_index % 4;
-                    tiles[batch_index * 16 + seat_index * 4 + index_in_batch]
+                    let tile_kind = tiles[batch_index * 16 + seat_index * 4 + index_in_batch];
+                    counts[tile_kind.index()] += 1;
                 } else {
-                    tiles[48 + seat_index]
+                    let tile_kind = tiles[48 + seat_index];
+                    counts[tile_kind.index()] += 1;
                 }
-            })
+                counts
+            });
+            Bingpai::from_validated_counts(counts, self.tile_set.clone())
         });
 
         (
             Bipai {
                 tiles: self.tiles,
+                tile_set: self.tile_set,
                 remaining_count: self.remaining_count - FOUR_PLAYER_QIPAI_TILE_COUNT,
                 cursor: FOUR_PLAYER_QIPAI_TILE_COUNT,
                 qipai_state: PhantomData,
@@ -165,73 +173,38 @@ mod tests {
     fn qipai_deals_thirteen_expected_tiles_to_each_seat() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
-        let (_, actual) = bipai.qipai();
+        let (_, actual): (_, [Bingpai; 4]) = bipai.qipai();
 
-        assert_eq!(
-            actual,
-            [
-                [
-                    TileKind::M1,
-                    TileKind::M1,
-                    TileKind::M1,
-                    TileKind::M1,
-                    TileKind::M5,
-                    TileKind::M5,
-                    TileKind::M5,
-                    TileKind::M6,
-                    TileKind::M9,
-                    TileKind::M9,
-                    TileKind::M9,
-                    TileKind::P1,
-                    TileKind::P4,
-                ],
-                [
-                    TileKind::M2,
-                    TileKind::M2,
-                    TileKind::M2,
-                    TileKind::M2,
-                    TileKind::M6,
-                    TileKind::M6,
-                    TileKind::M6,
-                    TileKind::M7,
-                    TileKind::P1,
-                    TileKind::P1,
-                    TileKind::P1,
-                    TileKind::P2,
-                    TileKind::P4,
-                ],
-                [
-                    TileKind::M3,
-                    TileKind::M3,
-                    TileKind::M3,
-                    TileKind::M3,
-                    TileKind::M7,
-                    TileKind::M7,
-                    TileKind::M7,
-                    TileKind::M8,
-                    TileKind::P2,
-                    TileKind::P2,
-                    TileKind::P2,
-                    TileKind::P3,
-                    TileKind::P4,
-                ],
-                [
-                    TileKind::M4,
-                    TileKind::M4,
-                    TileKind::M4,
-                    TileKind::M4,
-                    TileKind::M8,
-                    TileKind::M8,
-                    TileKind::M8,
-                    TileKind::M9,
-                    TileKind::P3,
-                    TileKind::P3,
-                    TileKind::P3,
-                    TileKind::P4,
-                    TileKind::P5,
-                ],
-            ]
-        );
+        let mut expected = [[0; 37]; 4];
+        expected[0][TileKind::M1.index()] = 4;
+        expected[0][TileKind::M5.index()] = 3;
+        expected[0][TileKind::M6.index()] = 1;
+        expected[0][TileKind::M9.index()] = 3;
+        expected[0][TileKind::P1.index()] = 1;
+        expected[0][TileKind::P4.index()] = 1;
+
+        expected[1][TileKind::M2.index()] = 4;
+        expected[1][TileKind::M6.index()] = 3;
+        expected[1][TileKind::M7.index()] = 1;
+        expected[1][TileKind::P1.index()] = 3;
+        expected[1][TileKind::P2.index()] = 1;
+        expected[1][TileKind::P4.index()] = 1;
+
+        expected[2][TileKind::M3.index()] = 4;
+        expected[2][TileKind::M7.index()] = 3;
+        expected[2][TileKind::M8.index()] = 1;
+        expected[2][TileKind::P2.index()] = 3;
+        expected[2][TileKind::P3.index()] = 1;
+        expected[2][TileKind::P4.index()] = 1;
+
+        expected[3][TileKind::M4.index()] = 4;
+        expected[3][TileKind::M8.index()] = 3;
+        expected[3][TileKind::M9.index()] = 1;
+        expected[3][TileKind::P3.index()] = 3;
+        expected[3][TileKind::P4.index()] = 1;
+        expected[3][TileKind::P5.index()] = 1;
+
+        assert_eq!(actual.map(|bingpai| *bingpai.counts()), expected);
     }
 
     #[test]
@@ -241,6 +214,21 @@ mod tests {
         let (bipai, _) = bipai.qipai();
 
         assert_eq!(bipai.remaining_count(), 70);
+    }
+
+    #[test]
+    fn qipai_bingpai_preserves_tile_set_limit() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, &tile_set).unwrap();
+        let (_, bingpai) = bipai.qipai();
+
+        assert_eq!(
+            bingpai[0].clone().with_added(TileKind::M5),
+            Err(crate::bingpai::BingpaiError::TileCountExceeded {
+                tile_kind: TileKind::M5,
+                max_count: 3,
+            }),
+        );
     }
 
     #[test]

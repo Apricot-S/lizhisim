@@ -64,12 +64,12 @@
 
 #### `Bingpai` mutation boundary
 
-- [ ] 外部crateは任意の空`Bingpai`を公開constructorから構築できない。
-- [ ] 外部crateは`with_added`または同等の低水準追加操作を直接呼び出せない。
-- [ ] 外部crateは`with_removed`または同等の低水準除去操作を直接呼び出せない。
-- [ ] 配牌による`Bingpai`生成は、検証済み`Bipai::qipai`からだけ行える。
+- [x] 外部crateは任意の空`Bingpai`を公開constructorから構築できない。
+- [x] 外部crateは`with_added`または同等の低水準追加操作を直接呼び出せない。
+- [x] 外部crateは`with_removed`または同等の低水準除去操作を直接呼び出せない。
+- [x] 配牌による`Bingpai`生成は、検証済み`Bipai::qipai`からだけ行える。
 - [ ] 通常ツモに続く打牌、および副露による`Bingpai`更新は、対応する検証済み`Round`遷移からだけ行える。
-- [ ] 低水準の追加・除去操作はcrate-privateとし、`Round`遷移のunit testから種類別上限と未所持牌除去を引き続き検証できる。
+- [x] 低水準の追加・除去操作はcrate-privateとし、`Round`遷移のunit testから種類別上限と未所持牌除去を引き続き検証できる。
 - [ ] Property: 公開された配牌、通常ツモ、打牌、副露の任意の合法遷移列から、phaseと`fulu`数に矛盾する`Bingpai`枚数を作れない。
 
 #### Mahjong Soul four-player tile composition
@@ -101,11 +101,11 @@
 
 #### Dealing and conservation
 
-- [ ] `Bipai::qipai`は四人分の未検証な`TileKind`配列ではなく、`[Bingpai; 4]`を返す。
+- [x] `Bipai::qipai`は四人分の未検証な`TileKind`配列ではなく、`[Bingpai; 4]`を返す。
 - [ ] 固定した`Bipai`を`qipai`すると、各seatの`Bingpai::counts()`が固定した期待値と一致する。
-- [ ] `qipai`が返す各`Bingpai`は、元の`Bipai`を検証した`TileSet`と同じ種類別上限を適用する。
+- [x] `qipai`が返す各`Bingpai`は、元の`Bipai`を検証した`TileSet`と同じ種類別上限を適用する。
 - [ ] 検証済み`Bipai`からの配牌は失敗しない変換であり、`qipai`の戻り値を`Result`にしない。
-- [ ] `qipai`用の変換経路から、任意の未検証countsを持つ`Bingpai`を公開APIで構築できない。
+- [x] `qipai`用の変換経路から、任意の未検証countsを持つ`Bingpai`を公開APIで構築できない。
 - [ ] 配牌indexの割当規則は、順序を保持しない`Bingpai`の内部表現ではなく、各seatの固定期待countsで検証する。
 - [ ] `Bipai`の順序を固定すると、14枚配牌を正規化した最初の`Zimo`が一意に決まる。
 - [ ] Property: 配牌、`bingpai`、`Bipai`の間でtile conservationが保たれる。
@@ -153,10 +153,12 @@
 
 - Selected: None
 - Phase: Awaiting next selection
-- Why: 配牌後cursor、initial deal由来の最初と連続する`Zimo`、未読枚数を確認したため。
+- Why: 配牌からの`Bingpai`生成と低水準変更APIのcrate-private化を完了した。次は`Round`の最小typestateを一項目ずつ実装する。
 
 ## Cycle log
 
+- 2026-08-11: `qipai`由来の`Bingpai`が元の`TileSet`上限を保持するtestを追加した。`with_added`が上限を1枚緩めるmutantでredを確認し、元の上限参照へ復元してgreenにした。その後、正規生成経路を`qipai`へ限定するため`Bingpai::new`、`with_added`、`with_removed`をcrate-privateへ変更した。既存unit testは同一crate内で低水準操作の境界を引き続き検証する。
+- 2026-08-11: 「`Bipai::qipai`は`[Bingpai; 4]`を返す」を選択し、戻り値型の不一致でredを確認した。`Bipai`へ検証済み`TileSet`を保持し、crate-privateな検証済みcounts constructorで四人分の`Bingpai`を構築した。配牌期待値は従来の`TileKind`配列から、index計算を再利用しないseat別固定countsへ変更してgreenにした。
 - 2026-08-11: `Bingpai`の任意変更を公開せず、配牌、通常ツモ、打牌、副露の検証済み`Round`遷移だけから更新する境界を追加した。`new`、`with_added`、`with_removed`相当は外部crateへ公開せず、種類別count操作としてcrate内に閉じる。進行phaseは`Bingpai`自身へ重ねず`Round`のtypestateで表し、ツモ前、ツモ後、チー・ポン後の打牌待ち、嶺上ツモ待ちを区別する。`zimopai`は既存方針どおり13枚以下の`Bingpai`と分離する。
 - 2026-08-11: `Bipai::qipai`が未検証の`[[TileKind; 13]; 4]`ではなく`[Bingpai; 4]`を返す契約を追加した。各seatの固定counts、元の`TileSet`上限の継承、検証済み牌山からの失敗しない内部変換、未検証countsを受け取る公開constructorを作らないことを独立項目として追跡する。配牌順は`Bingpai`内に保持せず、index割当から得られるseat別multisetを固定期待countsで検証する。
 - 2026-08-11: `lingshang_zimo`でもlive wallだけを短縮できるよう、`remaining_count`をcursorからの都度計算ではなく`Bipai`の状態へrefactorした。constructorで122、`qipai`で52減算、通常`zimo`成功ごとに1減算し、公開挙動は維持した。

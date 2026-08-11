@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
+#[cfg(test)]
 use thiserror::Error;
 
+#[cfg(test)]
 use crate::tile::TileKind;
 use crate::tile_set::TileSet;
 
+#[cfg(test)]
 #[derive(Debug, Error, PartialEq)]
 pub enum BingpaiError {
     #[error("tile kind is not present in bingpai: {tile_kind:?}")]
@@ -22,6 +25,10 @@ pub struct Bingpai {
 }
 
 impl Bingpai {
+    pub(crate) const fn from_validated_counts(counts: [u8; 37], tile_set: TileSet) -> Self {
+        Self { counts, tile_set }
+    }
+
     #[cfg(test)]
     pub(crate) const fn red_three_four_player() -> Self {
         Self {
@@ -30,14 +37,16 @@ impl Bingpai {
         }
     }
 
-    pub const fn new(tile_set: TileSet) -> Self {
+    #[cfg(test)]
+    pub(crate) const fn new(tile_set: TileSet) -> Self {
         Self {
             counts: [0; 37],
             tile_set,
         }
     }
 
-    pub fn with_added(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
+    #[cfg(test)]
+    pub(crate) fn with_added(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
         let count = &mut self.counts[tile_kind.index()];
         let max_count = self.tile_set.max_count(tile_kind);
         if *count >= max_count {
@@ -50,7 +59,8 @@ impl Bingpai {
         Ok(self)
     }
 
-    pub fn with_removed(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
+    #[cfg(test)]
+    pub(crate) fn with_removed(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
         self.counts[tile_kind.index()] = self.counts[tile_kind.index()]
             .checked_sub(1)
             .ok_or(BingpaiError::TileNotPresent { tile_kind })?;

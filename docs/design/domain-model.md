@@ -81,7 +81,7 @@ source projectorがtrace用metadataとして保持できるが、canonical state
 1枚を受け取る。配牌後のcursorは52とし、親のinitial deal由来の14枚目を
 index 52から最初の`Zimo`として正規化する。したがって通常の`Zimo`をindex 0から
 開始しない。
-配牌は`Bipai::qipai`が状態を消費して4人分の固定長13枚配列と配牌後の`Bipai`を
+配牌は`Bipai::qipai`が状態を消費して4人分の`Bingpai`と配牌後の`Bipai`を
 一括で返す。外部へ任意indexの取得APIを公開せず、部分配牌やcursorとの不整合を作れないようにする。
 `Bipai`は`QipaiPending`と`QipaiCompleted`のtypestateを持ち、`zimo`は`QipaiCompleted`にだけ
 提供する。これにより配牌前の牌山から通常の`zimo`を行う状態を表現不能にする。
@@ -104,6 +104,11 @@ index 52から最初の`Zimo`として正規化する。したがって通常の
 牌山生成はadapterの責務だが、生成後の牌山は`TileKind`の完全な列としてcoreに渡す。seedのみの保存はRNG実装版が固定されている場合に限る。
 
 親へ14枚を配るruleも、親へ13枚を配って第一`Zimo`を行うruleも、coreでは`bingpai`最大13枚と分離した`zimopai`へ正規化する。initial deal由来の14枚目はcanonical event上の最初の`Zimo`にするが、その直後に同じ牌を`Dapai`してもlive wall由来の`zimopai`を捨てたとは扱わない。詳細は[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)に従う。
+
+`Bingpai`の任意countsを作るconstructorと、牌種を直接追加・除去する低水準操作はcrate内に閉じる。
+公開された手牌更新は、検証済み`Bipai`からの`qipai`と、現在phaseを消費する`Round`のツモ、
+打牌、副露遷移だけから行う。進行phaseは`Bingpai`自体のtypestateへ重ねず、合法actionを判断する
+`Round`のtypestateで表す。
 
 ## 5. Typestate
 
