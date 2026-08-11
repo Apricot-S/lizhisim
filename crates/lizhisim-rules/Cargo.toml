@@ -12,5 +12,6 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
-lizhisim-core.workspace = true
 thiserror.workspace = true
+
+lizhisim-core.workspace = true
