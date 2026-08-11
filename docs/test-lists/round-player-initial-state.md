@@ -38,8 +38,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 ### Initial `Player` aggregate
 
 - [x] `qipai`由来の`Bingpai`から作った`Player`は、その種類別countsを保持する。
-- [ ] **Selected:** 四人分の`Player`はindex順に`Seat::<FourPlayer>::ALL`と対応する。
-- [ ] 配牌直後の各`Player`の`fulu`は空である。
+- [x] 四人分の`Player`はindex順に`Seat::<FourPlayer>::ALL`と対応する。
+- [ ] **Selected:** 配牌直後の各`Player`の`fulu`は空である。
 - [ ] 配牌直後の各`Player`の`he`は空である。
 - [ ] 配牌直後の`Player`は`zimopai`を所有しない。
 - [ ] 外部crateは任意の`Bingpai`、`fulu`、`he`を渡して`Player`を構築できない。
@@ -76,14 +76,15 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: 四人分の`Player`はindex順に`Seat::<FourPlayer>::ALL`と対応する。
+- Selected: 配牌直後の各`Player`の`fulu`は空である。
 - Phase: Not started
-- Why this is the smallest useful next test: 一人分の永続状態を保持できたため、`Round`を導入する前に四人分の`Player`とseatの対応だけを固定する。
+- Why this is the smallest useful next test: 四人分のseat対応を固定できたため、`Player`が所有する次の永続状態を空の有効値として一つずつ導入する。
 
 ## Cycle log
 
 - 2026-08-12: 現在フェーズの四人用`Bipai`単体機能完了後の次listとして作成した。`Player`を単独で完成させず、最初の`Round`縦切りに必要な永続状態だけを先に定義する。`Round`のphase差はtypestate、seat固有の永続状態は`Player`、一時的な`zimopai`はツモ後`Round`状態へ置く。
 - 2026-08-12: `player_preserves_qipai_bingpai_counts`を追加し、`Player`未定義によるcompile errorをredとして確認した。`Player`には配牌済み`Bingpai`だけを保持させ、crate-privateな`from_qipai`と読み取り用`bingpai`を追加してgreenにした。seat、`fulu`、`he`は後続testまで先行実装しない。
+- 2026-08-12: `four_players_follow_seat_all_order`を追加し、`Player`がseatを受け取らず参照APIも持たないcompile errorをredとして確認した。`Player<P>`に`Seat<P>`を必須フィールドとして追加し、`Seat::<FourPlayer>::ALL`と配牌順をzipして構築することでgreenにした。三人用の振る舞いは先行実装していない。
 
 ## Completion review
 

@@ -3,18 +3,24 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 use crate::bingpai::Bingpai;
+use crate::seat::Seat;
 
-pub struct Player {
+pub struct Player<P> {
+    seat: Seat<P>,
     bingpai: Bingpai,
 }
 
-impl Player {
+impl<P> Player<P> {
     #[cfg_attr(
         not(test),
         expect(dead_code, reason = "will be used by the Round qipai transition")
     )]
-    pub(crate) fn from_qipai(bingpai: Bingpai) -> Self {
-        Self { bingpai }
+    pub(crate) fn from_qipai(seat: Seat<P>, bingpai: Bingpai) -> Self {
+        Self { seat, bingpai }
+    }
+
+    pub fn seat(&self) -> &Seat<P> {
+        &self.seat
     }
 
     pub fn bingpai(&self) -> &Bingpai {
@@ -25,11 +31,11 @@ impl Player {
 #[cfg(test)]
 mod tests {
     use crate::bipai::Bipai;
-    use crate::seat::FourPlayer;
+    use crate::seat::{FourPlayer, Seat};
     use crate::tile::TileKind;
     use crate::tile_set::TileSet;
 
-    use super::*;
+    use super::Player;
 
     fn red_three_tiles() -> ([TileKind; 136], TileSet) {
         let tile_set = TileSet::red_three_four_player();
@@ -52,8 +58,28 @@ mod tests {
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (_, bingpai) = bipai.qipai();
         let expected = *bingpai[0].counts();
-        let player = Player::from_qipai(bingpai.into_iter().next().unwrap());
+        let player = Player::from_qipai(
+            Seat::<FourPlayer>::ALL[0],
+            bingpai.into_iter().next().unwrap(),
+        );
 
         assert_eq!(*player.bingpai().counts(), expected);
+    }
+
+    #[test]
+    fn four_players_follow_seat_all_order() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (_, bingpai) = bipai.qipai();
+        let players = Seat::<FourPlayer>::ALL
+            .into_iter()
+            .zip(bingpai)
+            .map(|(seat, bingpai)| Player::from_qipai(seat, bingpai))
+            .collect::<Vec<_>>();
+
+        assert_eq!(
+            players.iter().map(Player::seat).collect::<Vec<_>>(),
+            Seat::<FourPlayer>::ALL.iter().collect::<Vec<_>>()
+        );
     }
 }
