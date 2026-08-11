@@ -153,6 +153,18 @@ impl<P: BipaiSpec> Bipai<P, QipaiCompleted> {
         Ok(self)
     }
 
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "will be called by the Round additional baopai policy transition"
+        )
+    )]
+    pub(crate) fn reveal_additional_baopai_indicator(mut self) -> Self {
+        self.baopai_indicator_count += 1;
+        self
+    }
+
     pub fn zimo(mut self) -> Result<(Self, TileKind), BipaiError> {
         if self.remaining_count() == 0 {
             return Err(BipaiError::LiveWallExhausted);
@@ -375,6 +387,21 @@ mod tests {
         assert_eq!(
             [first, second, third, fourth],
             [TileKind::S0, TileKind::P0, TileKind::M0, TileKind::Z7],
+        );
+    }
+
+    #[test]
+    fn first_additional_baopai_indicator_is_tile_at_index_129() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles.swap(129, 133);
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (bipai, _) = bipai.qipai();
+        let bipai = bipai.reveal_initial_baopai_indicator().unwrap();
+        let bipai = bipai.reveal_additional_baopai_indicator();
+
+        assert_eq!(
+            bipai.baopai_indicators().skip(1).collect::<Vec<_>>(),
+            [TileKind::M0],
         );
     }
 

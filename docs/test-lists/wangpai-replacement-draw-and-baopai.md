@@ -111,8 +111,8 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ### Additional baopai indicators
 
-- [ ] **Selected:** 初期表示後、最初の追加表示はindex 129の`TileKind`を返す。
-- [ ] 表ドラ表示牌はindex `131, 129, 127, 125, 123`の順を保つ。
+- [x] 初期表示後、最初の追加表示はindex 129の`TileKind`を返す。
+- [ ] **Selected:** 表ドラ表示牌はindex `131, 129, 127, 125, 123`の順を保つ。
 - [ ] 初期表示を含む5枚の表示後は追加表示を拒否する。
 - [ ] 追加表示権限なしでは表ドラ表示牌を増やせない。
 - [ ] 一つの槓成立から追加の表ドラ表示牌を二枚公開できない。
@@ -180,12 +180,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: 初期表示後、最初の追加表示はindex 129の`TileKind`を返す。
+- Selected: 表ドラ表示牌はindex `131, 129, 127, 125, 123`の順を保つ。
 - Phase: Red
-- Why this is the smallest useful next test: 136枚全体のindex分類を固定したため、初期表示後に追加の表ドラ表示牌を一枚増やす最小の状態遷移を確認する。
+- Why this is the smallest useful next test: 最初の追加表示の開始位置を固定したため、初期表示を含む最大5枚の表ドラ表示順を固定する。
 
 ## Cycle log
 
+- 2026-08-11: 「初期表示後、最初の追加表示はindex 129」を選択した。`Bipai<QipaiCompleted>`へcrate-privateな`reveal_additional_baopai_indicator`を追加し、上位の`Round`が発行する一回分commandとして公開枚数を1だけ進める最小実装にした。index 129へ`M0`を固定し、初期表示を除く一覧を一assertionで比較した。追加枚数を2にするmutantでindex 127の牌まで公開されるredを確認し、1へ復元してgreenにした。上限、権限、初期表示前の追加表示は後続項目として分離する。
 - 2026-08-11: 136枚全体の分類propertyを追加した。配牌`0..=51`、通常ツモ、嶺上牌、表ドラ、裏ドラの各indexをソートして`0..=135`と比較し、各indexをちょうど一つの用途に分類することを一assertionで検証した。このtestは先行した王牌内4領域の非重複testを完全に包含するため置き換えた。配牌枚数を48へ変えるmutantで48〜51の重複が生じるredを確認し、52へ復元してgreenにした。
 - 2026-08-11: 「通常`zimo`可能範囲、嶺上牌、表ドラ表示牌、裏ドラ表示牌のindex集合は互いに重ならない」を選択した。4集合をソートしてindex `52..=135`の連続列と比較し、非重複だけでなく王牌領域全体を漏れなく覆うことを一assertionで検証した。嶺上牌開始indexを131へ変えるmutantで128〜131の重複と132〜135の欠番が生じるredを確認し、135へ復元してgreenにした。
 - 2026-08-11: 「`qipai`前の参照失敗後も`Bipai`の状態は変化しない」は、配牌前の`Bipai`に表示牌参照APIが存在しないtypestateと整合しないruntime failure表現だったため、「`qipai`前に表ドラ表示牌の参照APIを提供しない」へ正規化した。`baopai_indicators`は`Bipai<FourPlayer, QipaiCompleted>`だけのimplにあり、`QipaiPending`にはmethodが存在しないことをreviewして完了とした。外部compile-fail testを必要とする公開APIではないため、新dependencyは追加しない。
