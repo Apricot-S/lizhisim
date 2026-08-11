@@ -91,8 +91,8 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 ### Replacement draw order and limits
 
 - [x] 最初の嶺上ツモはindex 135の`TileKind`を返す。
-- [ ] **Selected:** 連続する4回の嶺上ツモはindex `135, 134, 133, 132`の順を保つ。
-- [ ] 4枚取得後は追加の嶺上ツモを拒否する。
+- [x] 連続する4回の嶺上ツモはindex `135, 134, 133, 132`の順を保つ。
+- [ ] **Selected:** 4枚取得後は追加の嶺上ツモを拒否する。
 - [ ] `lingshang_zimo`を1回行うと通常`zimo`の`remaining_count`も1減る。
 - [ ] 4回の`lingshang_zimo`後は通常`zimo`の`remaining_count`が4減る。
 - [ ] `lingshang_zimo`を1回行った後、通常`zimo`はindex 120までで終了し、補充対象となったindex 121を返さない。
@@ -180,12 +180,13 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 
 ## Current
 
-- Selected: 連続する4回の嶺上ツモはindex `135, 134, 133, 132`の順を保つ。
+- Selected: 4枚取得後は追加の嶺上ツモを拒否する。
 - Phase: Red
-- Why this is the smallest useful next test: 最初の取得で導入した物理cursorが四人用4枚全体で逆順を保つことを固定する。
+- Why this is the smallest useful next test: 四人用嶺上牌の物理順序を固定したため、同じ境界にある4枚上限を公開契約として固定する。
 
 ## Cycle log
 
+- 2026-08-11: 「連続する4回の`lingshang_zimo`はindex 135, 134, 133, 132の順を保つ」を選択した。取得位置をindex 135へ固定するmutantで実際値が4枚とも`S0`となるredを確認し、取得回数に応じて減算する実装へ復元してgreenにした。4回の期待列に最初の1回も含まれるため、単独の「最初はindex 135」testは重複として削除し、test list上の両項目を一つのtestで担保する。
 - 2026-08-11: 「最初の`lingshang_zimo`はindex 135」を選択し、method未定義でredを確認した。四人用`Bipai`へcrate-privateな消費型操作と取得回数を追加し、index 135から逆順に取得する最小実装でgreenにした。安全境界として4枚上限を`LingshangWallExhausted`、live wall残数0を`LiveWallExhausted`で拒否し、成功時だけ`remaining_count`と取得回数を更新する。
 - 2026-08-11: 反復参照testが2回とも一枚の一覧を返すため、「参照は公開枚数を変えない」を完了とした。`reveal_initial_baopai_indicator`の`BipaiSpec`共通implへの移動も確認した。次は上位rule判断と分離できる最初の`lingshang_zimo` index 135を選択した。
 - 2026-08-11: 「公開済み初期表ドラ表示牌を複数回参照できる」を選択し、iteratorを空にするmutantで2回とも空になるredを確認して復元後greenにした。2回の参照結果を一配列へ集約して一assertionで比較した。後続の非消費性項目は、公開枚数、通常`zimo`枚数、通常`zimo`位置、`lingshang_zimo`位置という独立して失敗し得る4観点へ分割した。
