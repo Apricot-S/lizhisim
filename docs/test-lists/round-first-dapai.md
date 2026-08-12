@@ -99,6 +99,7 @@
 - 2026-08-13: `Bipai::is_after_first_zimo`で四人配牌52枚、王牌14枚、最初の`Zimo`1枚を除いた残り69枚かを確認し、initial deal由来かつこの枚数の場合だけ`moqie = false`とする最小修正でgreenにした。全workspaceのformat、clippy、build、testがgreenであることを確認し、live wall由来の対照項目を再選択した。
 - 2026-08-13: `Dapai::Moqie(TileKind)`へ変更し、上位変換がRound stateなしで対象牌を参照できるようにした。コンパイラで保証できるvariant payloadの形だけを確認するtestは置かず、既存の`Round::dapai` testで摸切牌を明示するよう更新した。
 - 2026-08-13: green状態のrefactorとしてaction値を`round/dapai.rs`から`action.rs`と`action/dapai.rs`へ移した。`Round`が`Player`の`Bingpai`と`He`を外側から置換する経路を削除し、文脈から導いた`zimopai`と`moqie`を添えて`Player::dapai`へaction適用を委譲した。
+- 2026-08-13: `Player::dapai`も他のdomain遷移と同様に古い`Player`を消費し、成功時は新しい`Player`、失敗時は元の`Player`と`DapaiError`を保持するboxed `PlayerDapaiFailure`を返す形へrefactorした。`Round`は所有中の対象playerのsnapshotへ遷移を適用し、成功時だけ配列要素を置換する。
 
 ## Completion review
 

@@ -130,10 +130,15 @@ impl Round<FourPlayer, ZimoCompleted> {
             }
             Dapai::Shouqie(_) => false,
         };
-        if let Err(error) = self.players[self.actor.index()].dapai(dapai, self.state.zimopai, moqie)
-        {
-            return Err(Box::new(DapaiFailure { round: self, error }));
-        }
+        let player = self.players[self.actor.index()].clone();
+        let player = match player.dapai(dapai, self.state.zimopai, moqie) {
+            Ok(player) => player,
+            Err(failure) => {
+                let (_, error) = failure.into_parts();
+                return Err(Box::new(DapaiFailure { round: self, error }));
+            }
+        };
+        self.players[self.actor.index()] = player;
 
         Ok(Round {
             bipai: self.bipai,
