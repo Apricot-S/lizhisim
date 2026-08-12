@@ -57,8 +57,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - [x] `qipai`後の`Round`は四人分の`Player`を所有する。
 - [x] `qipai`後の最初のactorは親である。
 - [x] 親がseat 2のとき、親起点の配牌順`0, 1, 2, 3`を固定seat順`2, 3, 0, 1`へ対応付ける。
-- [ ] **Selected:** `qipai`後の`Round`が所有する`Bipai`の`remaining_count`は70である。
-- [ ] Property: `qipai`後の四人分の`Player`と未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。
+- [x] `qipai`後の`Round`が所有する`Bipai`の`remaining_count`は70である。
+- [ ] **Selected:** Property: `qipai`後の四人分の`Player`と未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。
 
 ### First `Zimo` transition
 
@@ -83,9 +83,9 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: `qipai`後の`Round`が所有する`Bipai`の`remaining_count`は70である。
+- Selected: Property: `qipai`後の四人分の`Player`と未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。
 - Phase: Not started
-- Why this is the smallest useful next test: 親起点の配牌順を固定seat順へ正しく対応付けられたため、牌の移送後に通常ツモ可能枚数が維持されることを次に確認する。
+- Why this is the smallest useful next test: 配牌済み`Bipai`の残り枚数を`Round`境界で確認できたため、配牌によって牌が欠落・重複していないことを全37種類の保存則として次に確認する。
 
 ## Cycle log
 
@@ -104,6 +104,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: `qipai_round_starts_with_zhuangjia_as_actor`を追加し、`FourPlayerZimoPending`にactorと参照APIがないcompile errorをredとして確認した。actorを共通fieldではなくツモ前phase payloadへ追加し、`qipai`時に親から初期化する最小実装でgreenにした。
 - 2026-08-12: `Seat`は`TableMatch`中の固定位置、`Bipai::qipai`の配列indexは親起点の配牌順であることを明確化した。親がseat 0以外でも配牌順をseat 0から割り当てていた不具合を修正するため、親seat 2の回帰testを選択した。
 - 2026-08-12: `qipai_maps_deal_order_from_zhuangjia_to_fixed_seat_order`を追加し、親seat 2で四人すべての固定期待countsが不一致になるredを確認した。親起点の配牌配列を親の固定seat indexだけ右回転してから`Seat::ALL`順の`Player`へ変換しgreenにした。`Bipai`内の`seat_index`は`deal_index`へ改名した。
+- 2026-08-12: `qipai_round_has_seventy_remaining_tiles`を追加した。`Bipai`単体では既に検証済みだが、配牌済み`Bipai`を`Round`の次phaseへ保持する境界として独立しており、追加時点からgreenだった。production変更はない。
 
 ## Completion review
 

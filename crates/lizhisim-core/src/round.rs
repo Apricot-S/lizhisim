@@ -172,4 +172,13 @@ mod tests {
             [4, 4, 4, 4]
         );
     }
+
+    #[test]
+    fn qipai_round_has_seventy_remaining_tiles() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[0]).qipai();
+
+        assert_eq!(round.bipai().remaining_count(), 70);
+    }
 }
