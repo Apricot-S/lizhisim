@@ -1,0 +1,86 @@
+# Test list: `Round`の最初の`Dapai`
+
+## Metadata
+
+- Owner: project owner / implementer
+- Created: 2026-08-12
+- Updated: 2026-08-12
+- Status: Planned
+- Requirements: `CORE-001`, `CORE-002`, `CORE-006`, `CORE-007`, `CORE-008`, `NFR-001`
+- ADR / design: [ADR-0001](../adr/0001-event-driven-typed-continuations.md)、[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)、[ADR-0013](../adr/0013-tile-kind-without-copy-identity.md)、[domain model](../design/domain-model.md)
+- Related lists: [最小Player aggregateとRound初期遷移](round-player-initial-state.md)、[雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md)
+- Rule sources / clauses: `initial_deal`由来の親第一`Zimo`はADR-0012に従って`moqie = false`とする。
+
+## Scope
+
+四人用のツモ後`Round`から、通常の`Dapai`を一回だけ原子的に適用し、打牌後の反応待ちtypestateへ
+遷移するまでを扱う。`Dapai`は分離された`zimopai`を捨てる選択と、`Bingpai`から指定牌を捨てる
+選択を区別する。
+
+このlistでは合法action生成、AI request、`Chi`、`Peng`、`Rong`、反応競合の解決、次actorの`Zimo`、
+立直打牌を実装しない。
+
+## Responsibility boundary
+
+- rules crateは親の開始方式を検証し、最初の`Zimo` originをcoreへ渡す。
+- `Round`は`Zimo` originとactionの打牌元から`moqie`を導く。
+- 呼び出し側は`moqie`を直接指定しない。
+- `Player`は`Bingpai`と`He`を所有するが、phaseや`zimopai`を所有しない。
+- `He`への追加、`Bingpai`更新、`zimopai`消費は一つの消費型`Round`遷移で行う。
+- 失敗する遷移は消費前の有効な`Round`と型付きerrorを返す。
+- 反応待ちphaseのactorは打牌者とし、reactor集合はphase固有dataとして後続項目で追加する。
+- `He::is_empty()`から第一打または第一巡の資格を推定しない。配牌後の暗槓または北抜きが第一打より先に行われても意味を失わない明示的なbool flagを状態として保持する。
+- playerごとの「まだ第一打前か」と、Round共通の「第一巡の無 interruption 条件が保たれているか」は別の事実として保持する。天和・地和・人和・ダブル立直は、現在phaseとこれらのflagを組み合わせて判定する。
+- 暗槓、北抜き、副露などの各actionがどのflagを失わせるかはrule variationを確認し、それぞれのrule testを選択した時点で固定する。
+
+## Examples and tests
+
+### Origin and first-turn state
+
+- [ ] initial deal由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = false`になる。
+- [ ] live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
+- [ ] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
+- [ ] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
+- [ ] 他家の第一打前flagを変更せず、打牌によるRound共通の第一巡成立条件だけをruleどおり更新する。
+
+### `zimopai`からの`Dapai`
+
+- [ ] `zimopai`を捨てると、actorの`Bingpai` countsは変わらない。
+- [ ] `zimopai`を捨てると、actorの`He`末尾へ同じ`TileKind`が追加される。
+- [ ] 成功後のtypestateは`zimopai`を所有しない。
+- [ ] 成功後の反応待ちphaseのactorは打牌者である。
+
+### `Bingpai`からの`Dapai`
+
+- [ ] `Bingpai`の牌を捨てると、そのkindが一枚減り、元の`zimopai`が一枚増える。
+- [ ] `Bingpai`から捨てた`Sipai`は`moqie = false`になる。
+- [ ] `Bingpai`と`zimopai`が同じ`TileKind`でも、打牌元の選択を保持する。
+- [ ] 存在しない`Bingpai`の牌を指定すると、元のツモ後`Round`を伴う型付きerrorを返す。
+
+### Atomicity and typestate
+
+- [ ] ツモ後typestateを消費して打牌後の反応待ちtypestateを返す。
+- [ ] ツモ前typestateから`Dapai`できない。
+- [ ] 打牌後typestateから同じ`Dapai`を連続して行えない。
+- [ ] `He`容量違反を不正な部分更新として公開しない。
+- [ ] Property: 成功する`Dapai`前後で37種類すべての牌保存則を満たす。正式な状態観測または安定hash導入後に実施する。
+
+## Current
+
+- Selected: なし
+- Phase: Design review
+- Why: playerごとの第一打前flagとRound共通の第一巡成立flag、および最初の`Zimo` originを`Round`へ渡すconstructor境界をreviewしてから最初のtestを選択する。
+
+## Cycle log
+
+- 2026-08-12: 最初の`Dapai`縦切りを設計した。`Zimo` origin、`Dapai`の打牌元、原子的な`Player`更新と反応待ちtypestateを境界とした。
+- 2026-08-12: 「親の第一打を常に`moqie = false`とするvariation」は`initial_deal`由来の第一`Zimo`を指しており、ADR-0012の既存判断で表現できると訂正した。追加policyと後継ADR案を削除した。また`actor == zhuangjia && He::is_empty()`では第一打前の暗槓・北抜きを扱えないため、天和・地和・人和・ダブル立直でも使う明示的な第一巡関連bool flagを状態として保持する方針へ修正した。playerごとの第一打前とRound共通の無 interruption 条件は別の事実なので分離する。
+
+## Completion review
+
+- [ ] 最初の`Zimo` originを渡すruntime値のproduction識別子がreview済みである。
+- [ ] playerごとの第一打前flagとRound共通の第一巡成立flagの所有位置・更新責務がreview済みである。
+- [ ] すべての項目が完了または理由付きで移送されている。
+- [ ] `Bingpai`、`zimopai`、`He`の原子性を確認した。
+- [ ] 不正actionで消費前の有効状態を失わないことを確認した。
+- [ ] event、observation、replayへの`moqie`射影を後続listへ移送した。

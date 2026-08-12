@@ -119,6 +119,12 @@ index 130から、それぞれ2ずつ戻る。取得時点と可視性は`Round`
 
 親へ14枚を配るruleも、親へ13枚を配って第一`Zimo`を行うruleも、coreでは`bingpai`最大13枚と分離した`zimopai`へ正規化する。initial deal由来の14枚目はcanonical event上の最初の`Zimo`にするが、その直後に同じ牌を`Dapai`してもlive wall由来の`zimopai`を捨てたとは扱わない。詳細は[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)に従う。
 
+第一打および第一巡に依存する条件を`He::is_empty()`から推定しない。第一打前に暗槓または北抜きが
+行われても`He`は空のままであり、状態の意味を復元できないためである。playerごとの「まだ第一打前か」と、
+Round共通の「第一巡の無 interruption 条件が保たれているか」を明示的な状態として分ける。天和、地和、
+人和、ダブル立直は、現在phaseとこれらの状態を組み合わせて判定する。暗槓、北抜き、副露等が各状態を
+失わせる条件はrule variationとして検証し、対応するaction遷移が原子的に更新する。
+
 `Bingpai`の任意countsを作るconstructorと、牌種を直接追加・除去する低水準操作はcrate内に閉じる。
 公開された手牌更新は、検証済み`Bipai`からの`qipai`と、現在phaseを消費する`Round`のツモ、
 打牌、副露遷移だけから行う。進行phaseは`Bingpai`自体のtypestateへ重ねず、合法actionを判断する
