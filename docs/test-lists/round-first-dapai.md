@@ -23,7 +23,7 @@
 ## Responsibility boundary
 
 - rules crateは親の開始方式を検証し、最初の`Zimo` originをcoreへ渡す。
-- `Round`は`Zimo` originとactionの打牌元から`moqie`を導く。
+- `Round`は最初の`Zimo` originとactionの打牌元から`moqie`を導く。
 - 呼び出し側は`moqie`を直接指定しない。
 - `Player`は`Bingpai`と`He`を所有するが、phaseや`zimopai`を所有しない。
 - 将来の`Player`は`LizhiState`も所有する。`Sipai`へ立直宣言牌flagを追加せず、立直状態が追記専用`He`の検証済み`SipaiIndex`を高々一つ保持する。
@@ -38,7 +38,8 @@
 
 ### Origin and first-turn state
 
-- [ ] initial deal由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = false`になる。
+- [x] `Round`開始時に指定した`FirstZimoOrigin`を、ツモ後typestateが保持する。
+- [ ] **Selected:** initial deal由来の親の最初の`zimopai`は、originから`moqie = false`になる。
 - [ ] live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
 - [ ] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
 - [ ] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
@@ -78,15 +79,17 @@
 
 ## Current
 
-- Selected: なし
-- Phase: Design review
-- Why: playerごとの第一打前flagとRound共通の第一巡成立flag、および最初の`Zimo` originを`Round`へ渡すconstructor境界をreviewしてから最初のtestを選択する。
+- Selected: initial deal由来の親の最初の`zimopai`は、originから`moqie = false`になる。
+- Phase: Not started
+- Why: 最初の`Zimo` originをツモ後stateまで移送できるようになったため、次は`Dapai`で`moqie`を呼び出し側ではなく状態から導出する。
 
 ## Cycle log
 
 - 2026-08-12: 最初の`Dapai`縦切りを設計した。`Zimo` origin、`Dapai`の打牌元、原子的な`Player`更新と反応待ちtypestateを境界とした。
 - 2026-08-12: 「親の第一打を常に`moqie = false`とするvariation」は`initial_deal`由来の第一`Zimo`を指しており、ADR-0012の既存判断で表現できると訂正した。追加policyと後継ADR案を削除した。また`actor == zhuangjia && He::is_empty()`では第一打前の暗槓・北抜きを扱えないため、天和・地和・人和・ダブル立直でも使う明示的な第一巡関連bool flagを状態として保持する方針へ修正した。playerごとの第一打前とRound共通の無 interruption 条件は別の事実なので分離する。
 - 2026-08-12: 立直宣言牌の識別を追加検討した。高々一回の情報を全`Sipai`へboolとして重複させず、将来`Player`が所有する`LizhiState`から追記専用`He`の検証済み`SipaiIndex`を参照する。宣言牌を追加した応答待ちと立直成立済みを分け、宣言牌への和了可能性を解決する前に成立扱いしない。通常`Dapai`の現在scopeでは実装せず、立直宣言actionの後続項目へ残す。
+- 2026-08-12: `Dapai`の`moqie`導出に先立ち、`Round`開始境界から最初の`Zimo` originをツモ後stateへ移送する準備項目を追加した。rules crateの開始方式validationは後続項目とし、この項目ではcoreが検証済みruntime値を保持する契約だけを扱う。
+- 2026-08-12: `first_zimo_preserves_configured_origin`を追加した。redでは`FirstZimoOrigin`、`Round::new`の入力、ツモ後stateの観測がなく失敗した。`FourPlayerZimoPending`から`FourPlayerZimoCompleted`へoriginを移送してgreenにし、既存の`Round::new` fixtureも開始方式を明示するよう更新した。
 
 ## Completion review
 
