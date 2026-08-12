@@ -17,14 +17,18 @@ pub struct RoundQipaiPending<P: BipaiSpec> {
     bipai: Bipai<P, QipaiPending>,
 }
 
-pub struct FourPlayerZimoPending {
+struct FourPlayerRoundData {
     bipai: Bipai<FourPlayer, QipaiCompleted>,
     players: [Player<FourPlayer>; 4],
     actor: Seat<FourPlayer>,
 }
 
+pub struct FourPlayerZimoPending {
+    data: FourPlayerRoundData,
+}
+
 pub struct FourPlayerZimoCompleted {
-    pending: FourPlayerZimoPending,
+    data: FourPlayerRoundData,
     zimopai: TileKind,
 }
 
@@ -60,9 +64,11 @@ impl Round<FourPlayer, RoundQipaiPending<FourPlayer>> {
 
         Round {
             state: FourPlayerZimoPending {
-                bipai,
-                players,
-                actor: self.zhuangjia,
+                data: FourPlayerRoundData {
+                    bipai,
+                    players,
+                    actor: self.zhuangjia,
+                },
             },
             zhuangjia: self.zhuangjia,
         }
@@ -71,27 +77,32 @@ impl Round<FourPlayer, RoundQipaiPending<FourPlayer>> {
 
 impl Round<FourPlayer, FourPlayerZimoPending> {
     pub fn bipai(&self) -> &Bipai<FourPlayer, QipaiCompleted> {
-        &self.state.bipai
+        &self.state.data.bipai
     }
 
     pub fn players(&self) -> &[Player<FourPlayer>; 4] {
-        &self.state.players
+        &self.state.data.players
     }
 
     pub fn actor(&self) -> &Seat<FourPlayer> {
-        &self.state.actor
+        &self.state.data.actor
     }
 
     pub fn zimo(self) -> Result<Round<FourPlayer, FourPlayerZimoCompleted>, BipaiError> {
-        let (bipai, zimopai) = self.state.bipai.zimo()?;
-        let pending = FourPlayerZimoPending {
+        let FourPlayerRoundData {
             bipai,
-            players: self.state.players,
-            actor: self.state.actor,
+            players,
+            actor,
+        } = self.state.data;
+        let (bipai, zimopai) = bipai.zimo()?;
+        let data = FourPlayerRoundData {
+            bipai,
+            players,
+            actor,
         };
 
         Ok(Round {
-            state: FourPlayerZimoCompleted { pending, zimopai },
+            state: FourPlayerZimoCompleted { data, zimopai },
             zhuangjia: self.zhuangjia,
         })
     }
@@ -99,7 +110,7 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
 
 impl Round<FourPlayer, FourPlayerZimoCompleted> {
     pub fn actor(&self) -> &Seat<FourPlayer> {
-        &self.state.pending.actor
+        &self.state.data.actor
     }
 
     pub fn zimopai(&self) -> TileKind {

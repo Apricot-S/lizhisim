@@ -106,6 +106,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: `qipai_round_has_seventy_remaining_tiles`を追加した。`Bipai`単体では既に検証済みだが、配牌済み`Bipai`を`Round`の次phaseへ保持する境界として独立しており、追加時点からgreenだった。production変更はない。
 - 2026-08-12: `qipai_round_conserves_every_tile_kind`と、そのtestだけが使う`Bipai::unread_counts`をrefactorで削除した。牌の生成・配牌保存則は`Bipai`、親起点deal orderから固定seat orderへの移送は`Round`の全4要素対応testで保証する。Round全状態の保存則は、正式な状態観測またはhash機構を導入する後続listへ残し、test専用production APIを設けない。
 - 2026-08-12: `zimo_consumes_pending_round_and_returns_completed_round`を追加し、ツモ後payloadと`zimo`未定義のcompile errorをredとして確認した。`FourPlayerZimoPending`専用の`zimo(self)`が、ツモ前payloadを保持した`FourPlayerZimoCompleted`を返す最小実装でgreenにした。method可用性と消費後の戻り型は同じ型注釈で検証されるため一項目へ統合し、重複するactor assertionはrefactorで削除した。
+- 2026-08-12: refactorとしてprivateな`FourPlayerRoundData`へ配牌済み`Bipai`と固定seat順の`Player`を切り出した。`FourPlayerZimoPending`と`FourPlayerZimoCompleted`は互いを内包せず共有dataを値で移送し、phase固有のactorは各payload、`zimopai`はツモ後payloadだけに保持する。三人用dataとの共通化は先行していない。
+- 2026-08-12: actorは進行中の局で常に必要であり、応答待ちphaseでreactorが加わっても次の手番を示す役割を失わないため、`FourPlayerRoundData`へ移した。各遷移は共通dataを不変値として扱うのではなく、必要なfieldを更新して次のtypestateへ値で移送する。phase payloadには`zimopai`や将来のreactorなど、そのphaseだけに存在するdataを残す。
 
 ## Completion review
 
