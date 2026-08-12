@@ -6,8 +6,7 @@ use core::marker::PhantomData;
 
 use thiserror::Error;
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct FourPlayer;
+use crate::player_set::FourPlayer;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct Seat<P> {

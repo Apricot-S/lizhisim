@@ -7,7 +7,7 @@ use core::marker::PhantomData;
 use thiserror::Error;
 
 use crate::bingpai::Bingpai;
-use crate::seat::FourPlayer;
+use crate::player_set::FourPlayer;
 use crate::tile::TileKind;
 use crate::tile_set::TileSet;
 

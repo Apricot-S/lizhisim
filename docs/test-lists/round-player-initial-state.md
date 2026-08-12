@@ -116,6 +116,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: 「ツモ後typestateから通常`zimo`を連続して行えない」はAPI構造reviewで完了とした。消費型の`zimo(self)`は`Round<FourPlayer, FourPlayerZimoPending>`にだけ定義され、戻り値の`Round<FourPlayer, FourPlayerZimoCompleted>`には存在しない。失敗理由をこのmethod不在へ限定できない`compile_fail` testは追加しない。
 - 2026-08-12: 最初の通常`zimo`後の牌保存則propertyは、四人分の`Player`と`zimopai`に加えて未取得`Bipai`の種類別countsを必要とする。正式な観測APIがない現段階で検証すると、以前削除したtest専用`Bipai::unread_counts`相当を再導入することになるため、observationまたは安定hashの後続listへ移送した。具体牌、親`Bingpai`非混入、残数、typestate境界の個別testはgreenであり、現在の縦切りは完了とする。
 - 2026-08-12: refactorとして`FourPlayerRoundData`を削除し、配牌済み`Bipai`、player集合、actor、親を`Round<P, State>`の直接fieldへ移した。phase payloadはツモ前のunit markerとツモ後の`zimopai`だけになった。人数ごとのplayer配列長は新しいsealed `PlayerSet`のassociated typeで表し、`BipaiSpec`の牌山責務と分離した。共通accessorを通常の`Round` implへ置けるため、`FourPlayerRoundState`と`private_bounds`抑制を削除した。
+- 2026-08-12: `PlayerSet`から`BipaiSpec` supertraitを外し、`Round`だけが`P: PlayerSet + BipaiSpec`を要求する直交した責務へ整理した。`FourPlayer` markerはseatの詳細ではなくplayer setを表すため`seat` moduleから`player_set` moduleへ移した。generic名`P`はplayer-set markerを表すため維持した。
 
 ## Completion review
 

@@ -154,9 +154,12 @@ phase payloadではなく`Round<P, State>`が直接所有する。`State`は`zim
 そのphaseだけに存在するdataを保持する。共通dataも不変値ではなく、消費型遷移が必要なfieldを更新して
 次の`Round`へ値で移送する。
 
-player setごとの`Player`集合型は、牌山配列だけを扱う`BipaiSpec`へ追加しない。sealed `PlayerSet`が
+player setごとのmarkerと`Player`集合型は`player_set` moduleに置く。牌山配列だけを扱う`BipaiSpec`へ
+追加せず、sealed `PlayerSet`が
 associated typeとして所有し、四人用は`[Player<FourPlayer>; 4]`、将来の三人用は
 `[Player<ThreePlayer>; 3]`とする。これにより人数とplayer配列長の不一致を型として作れない。
+`PlayerSet`と`BipaiSpec`は互いをsupertraitにせず、両方の機能を所有する`Round`が
+`P: PlayerSet + BipaiSpec`として合成する。型parameter名`P`はplayer-set markerを表すため維持する。
 `bipai`、`players`、actor、親の参照APIはphaseに依存しない共通`Round`実装とし、private trait boundで
 phaseごとに中継しない。
 

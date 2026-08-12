@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use crate::bipai::{Bipai, BipaiError, QipaiCompleted, QipaiPending};
+use crate::bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
 use crate::player::Player;
-use crate::player_set::PlayerSet;
-use crate::seat::FourPlayer;
+use crate::player_set::{FourPlayer, PlayerSet};
 use crate::seat::Seat;
 use crate::tile::TileKind;
 
-pub struct Round<P: PlayerSet, State> {
+pub struct Round<P: PlayerSet + BipaiSpec, State> {
     bipai: Bipai<P, QipaiCompleted>,
     players: P::Players,
     actor: Seat<P>,
@@ -23,7 +22,7 @@ pub struct FourPlayerZimoCompleted {
     zimopai: TileKind,
 }
 
-impl<P: PlayerSet, State> Round<P, State> {
+impl<P: PlayerSet + BipaiSpec, State> Round<P, State> {
     pub fn bipai(&self) -> &Bipai<P, QipaiCompleted> {
         &self.bipai
     }
@@ -96,7 +95,7 @@ impl Round<FourPlayer, FourPlayerZimoCompleted> {
 #[cfg(test)]
 mod tests {
     use crate::bipai::Bipai;
-    use crate::seat::FourPlayer;
+    use crate::player_set::FourPlayer;
     use crate::seat::Seat;
     use crate::tile::TileKind;
     use crate::tile_set::TileSet;

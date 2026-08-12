@@ -37,7 +37,8 @@ impl<P> Player<P> {
 #[cfg(test)]
 mod tests {
     use crate::bipai::Bipai;
-    use crate::seat::{FourPlayer, Seat};
+    use crate::player_set::FourPlayer;
+    use crate::seat::Seat;
     use crate::tile::TileKind;
     use crate::tile_set::TileSet;
 

@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use crate::bipai::BipaiSpec;
 use crate::player::Player;
-use crate::seat::FourPlayer;
 
 mod private {
     pub trait Sealed {}
 }
 
-pub trait PlayerSet: BipaiSpec + private::Sealed {
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub struct FourPlayer;
+
+pub trait PlayerSet: private::Sealed {
     type Players;
 }
 
