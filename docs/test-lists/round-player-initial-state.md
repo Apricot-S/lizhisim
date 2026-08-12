@@ -63,9 +63,9 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - [x] 通常`zimo`はツモ前typestateだけを消費し、ツモ後typestateを返す。
 - [x] 親の最初の`zimopai`は固定`Bipai`のindex 52の牌である。
 - [x] ツモ後typestateでも親の`Bingpai`は13枚のままである。
-- [ ] **Selected:** ツモ後typestateは親の`Bingpai`と分離した`zimopai`を一枚だけ所有する。
-- [ ] 最初の通常`zimo`後の`Bipai::remaining_count()`は69である。
-- [ ] ツモ後typestateから通常`zimo`を連続して行えない。
+- [x] ツモ後typestateは親の`Bingpai`と分離した`zimopai`を一枚だけ所有する。
+- [x] 最初の通常`zimo`後の`Bipai::remaining_count()`は69である。
+- [ ] **Selected:** ツモ後typestateから通常`zimo`を連続して行えない。
 - [ ] Property: 最初の通常`zimo`後の四人分の`Player`、`zimopai`、未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。
 
 ## Later listsへ残す項目
@@ -80,9 +80,9 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: ツモ後typestateは親の`Bingpai`と分離した`zimopai`を一枚だけ所有する。
+- Selected: ツモ後typestateから通常`zimo`を連続して行えない。
 - Phase: Not started
-- Why this is the smallest useful next test: 親の`Bingpai`が13枚のまま維持されることを確認したため、ツモ牌がツモ後phase固有dataとして一枚だけ存在する契約を次に確認する。
+- Why this is the smallest useful next test: 最初の通常`zimo`による牌山更新を確認したため、打牌などの介在なしに同じ遷移を繰り返せないtypestate境界を次に確認する。
 
 ## Cycle log
 
@@ -110,6 +110,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: `zhuangjia_first_zimopai_uses_wall_index_52`を追加した。固定牌山のindex 52にある具体値`P5`を期待値とし、既存の`Round::zimo`がその牌を返すため追加時点からgreenだった。production変更はなく、次にツモ牌と親の`Bingpai`が分離されていることを選択した。
 - 2026-08-12: `zhuangjia_bingpai_stays_at_thirteen_tiles_after_zimo`を追加し、ツモ後typestateに`players()`がないcompile errorをredとして確認した。phaseをまたぐ共通状態をツモ後からも観測できる読み取りAPIを追加し、親seat 2の`Bingpai` counts合計が13のままであることを一assertionで確認してgreenにした。
 - 2026-08-12: refactorとして`zhuangjia()`を型定義直後の全`Round<P, State>`共通implへ移した。四人用phaseに共通する`bipai()`、`players()`、`actor()`はprivateな`FourPlayerRoundState`で共通dataへの参照を閉じ、単一implへ統合した。private boundにより未知のstateへAPIを開放せず、具体的な公開typestateからの利用可否は維持する。
+- 2026-08-12: 「ツモ後typestateは親の`Bingpai`と分離した`zimopai`を一枚だけ所有する」は構造reviewで完了とした。`zhuangjia_bingpai_stays_at_thirteen_tiles_after_zimo`が非混入、`zhuangjia_first_zimopai_uses_wall_index_52`が独立したツモ牌の存在と値、単一の`TileKind` fieldが一枚だけであることを保証する。これらを一つのtestで再検証すると既存契約の重複になるため追加しない。
+- 2026-08-12: `first_zimo_leaves_sixty_nine_remaining_tiles`を追加した。既存実装が更新済み`Bipai`をツモ後typestateへ移送しているため追加時点からgreenだった。`Bipai`単体の減算だけでなく、`Round`境界で更新済み状態を保持する契約として維持する。production変更はない。
 
 ## Completion review
 

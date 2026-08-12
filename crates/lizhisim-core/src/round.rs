@@ -229,4 +229,15 @@ mod tests {
 
         assert_eq!(tile_count, 13);
     }
+
+    #[test]
+    fn first_zimo_leaves_sixty_nine_remaining_tiles() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2]);
+
+        let round = round.zimo().unwrap();
+
+        assert_eq!(round.bipai().remaining_count(), 69);
+    }
 }
