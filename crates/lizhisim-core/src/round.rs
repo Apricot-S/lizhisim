@@ -13,6 +13,12 @@ pub struct Round<P, State> {
     zhuangjia: Seat<P>,
 }
 
+impl<P, State> Round<P, State> {
+    pub fn zhuangjia(&self) -> &Seat<P> {
+        &self.zhuangjia
+    }
+}
+
 struct FourPlayerRoundData {
     bipai: Bipai<FourPlayer, QipaiCompleted>,
     players: [Player<FourPlayer>; 4],
@@ -26,6 +32,40 @@ pub struct FourPlayerZimoPending {
 pub struct FourPlayerZimoCompleted {
     data: FourPlayerRoundData,
     zimopai: TileKind,
+}
+
+trait FourPlayerRoundState {
+    fn data(&self) -> &FourPlayerRoundData;
+}
+
+impl FourPlayerRoundState for FourPlayerZimoPending {
+    fn data(&self) -> &FourPlayerRoundData {
+        &self.data
+    }
+}
+
+impl FourPlayerRoundState for FourPlayerZimoCompleted {
+    fn data(&self) -> &FourPlayerRoundData {
+        &self.data
+    }
+}
+
+#[expect(
+    private_bounds,
+    reason = "the private bound seals accessors to four-player Round typestates"
+)]
+impl<State: FourPlayerRoundState> Round<FourPlayer, State> {
+    pub fn bipai(&self) -> &Bipai<FourPlayer, QipaiCompleted> {
+        &self.state.data().bipai
+    }
+
+    pub fn players(&self) -> &[Player<FourPlayer>; 4] {
+        &self.state.data().players
+    }
+
+    pub fn actor(&self) -> &Seat<FourPlayer> {
+        &self.state.data().actor
+    }
 }
 
 impl Round<FourPlayer, FourPlayerZimoPending> {
@@ -57,18 +97,6 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
         }
     }
 
-    pub fn bipai(&self) -> &Bipai<FourPlayer, QipaiCompleted> {
-        &self.state.data.bipai
-    }
-
-    pub fn players(&self) -> &[Player<FourPlayer>; 4] {
-        &self.state.data.players
-    }
-
-    pub fn actor(&self) -> &Seat<FourPlayer> {
-        &self.state.data.actor
-    }
-
     pub fn zimo(self) -> Result<Round<FourPlayer, FourPlayerZimoCompleted>, BipaiError> {
         let FourPlayerRoundData {
             bipai,
@@ -90,22 +118,8 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
 }
 
 impl Round<FourPlayer, FourPlayerZimoCompleted> {
-    pub fn players(&self) -> &[Player<FourPlayer>; 4] {
-        &self.state.data.players
-    }
-
-    pub fn actor(&self) -> &Seat<FourPlayer> {
-        &self.state.data.actor
-    }
-
     pub fn zimopai(&self) -> TileKind {
         self.state.zimopai
-    }
-}
-
-impl<P, State> Round<P, State> {
-    pub fn zhuangjia(&self) -> &Seat<P> {
-        &self.zhuangjia
     }
 }
 

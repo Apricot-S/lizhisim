@@ -109,6 +109,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: 雀魂およびmjaiの`start_round`と同様に、局開始を配牌完了後の状態として扱うことにした。外部応答、rule分岐、独立した観測を持たない`RoundQipaiPending`を削除し、`Round::new`が`Bipai`の配牌typestateを消費して`FourPlayerZimoPending`を直接構築する。`Bipai`単体の不正な通常ツモを防ぐ配牌typestateは維持する。
 - 2026-08-12: `zhuangjia_first_zimopai_uses_wall_index_52`を追加した。固定牌山のindex 52にある具体値`P5`を期待値とし、既存の`Round::zimo`がその牌を返すため追加時点からgreenだった。production変更はなく、次にツモ牌と親の`Bingpai`が分離されていることを選択した。
 - 2026-08-12: `zhuangjia_bingpai_stays_at_thirteen_tiles_after_zimo`を追加し、ツモ後typestateに`players()`がないcompile errorをredとして確認した。phaseをまたぐ共通状態をツモ後からも観測できる読み取りAPIを追加し、親seat 2の`Bingpai` counts合計が13のままであることを一assertionで確認してgreenにした。
+- 2026-08-12: refactorとして`zhuangjia()`を型定義直後の全`Round<P, State>`共通implへ移した。四人用phaseに共通する`bipai()`、`players()`、`actor()`はprivateな`FourPlayerRoundState`で共通dataへの参照を閉じ、単一implへ統合した。private boundにより未知のstateへAPIを開放せず、具体的な公開typestateからの利用可否は維持する。
 
 ## Completion review
 
