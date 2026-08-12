@@ -42,13 +42,6 @@ impl Bingpai {
         }
     }
 
-    #[cfg_attr(
-        not(test),
-        expect(
-            dead_code,
-            reason = "will be used by Player and Round hand transitions"
-        )
-    )]
     pub(crate) fn with_added(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
         let count = &mut self.counts[tile_kind.index()];
         let max_count = self.tile_set.max_count(tile_kind);
@@ -62,13 +55,6 @@ impl Bingpai {
         Ok(self)
     }
 
-    #[cfg_attr(
-        not(test),
-        expect(
-            dead_code,
-            reason = "will be used by Player and Round hand transitions"
-        )
-    )]
     pub(crate) fn with_removed(mut self, tile_kind: TileKind) -> Result<Self, BingpaiError> {
         self.counts[tile_kind.index()] = self.counts[tile_kind.index()]
             .checked_sub(1)

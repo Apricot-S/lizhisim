@@ -8,6 +8,9 @@ use crate::tile::TileKind;
 
 const MAX_SIPAI_COUNT: usize = 27;
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) struct HeFull;
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Sipai {
     pub tile_kind: TileKind,
@@ -26,5 +29,14 @@ impl He {
 
     pub fn is_empty(&self) -> bool {
         self.sipai.is_empty()
+    }
+
+    pub fn last(&self) -> Option<&Sipai> {
+        self.sipai.last()
+    }
+
+    pub(crate) fn with_appended(mut self, sipai: Sipai) -> Result<Self, HeFull> {
+        self.sipai.push(sipai).map_err(|_| HeFull)?;
+        Ok(self)
     }
 }

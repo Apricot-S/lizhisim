@@ -34,6 +34,11 @@ impl<P> Player<P> {
     pub fn he(&self) -> &He {
         &self.he
     }
+
+    pub(crate) fn replace_bingpai_and_he(&mut self, bingpai: Bingpai, he: He) {
+        self.bingpai = bingpai;
+        self.he = he;
+    }
 }
 
 impl PlayerSet for FourPlayer {

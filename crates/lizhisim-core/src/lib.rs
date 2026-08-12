@@ -17,7 +17,10 @@ pub use bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
 pub use he::{He, Sipai};
 pub use player::Player;
 pub use player_set::{FourPlayer, PlayerSet};
-pub use round::{FirstZimoOrigin, Round, ZimoCompleted, ZimoPending};
+pub use round::{
+    Dapai, DapaiCompleted, DapaiError, DapaiFailure, FirstZimoOrigin, Round, ZimoCompleted,
+    ZimoPending,
+};
 pub use seat::{Seat, SeatIndexOutOfRange};
 pub use tile::TileKind;
 pub use tile_set::{TileSet, TileSetError};

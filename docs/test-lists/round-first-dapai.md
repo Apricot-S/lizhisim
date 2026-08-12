@@ -4,8 +4,8 @@
 
 - Owner: project owner / implementer
 - Created: 2026-08-12
-- Updated: 2026-08-12
-- Status: Planned
+- Updated: 2026-08-13
+- Status: In progress
 - Requirements: `CORE-001`, `CORE-002`, `CORE-006`, `CORE-007`, `CORE-008`, `NFR-001`
 - ADR / design: [ADR-0001](../adr/0001-event-driven-typed-continuations.md)、[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)、[ADR-0013](../adr/0013-tile-kind-without-copy-identity.md)、[domain model](../design/domain-model.md)
 - Related lists: [最小Player aggregateとRound初期遷移](round-player-initial-state.md)、[雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md)
@@ -39,8 +39,8 @@
 ### Origin and first-turn state
 
 - [x] `Round`開始時に指定した`FirstZimoOrigin`を、ツモ後typestateが保持する。
-- [ ] **Selected:** initial deal由来の親の最初の`zimopai`は、originから`moqie = false`になる。
-- [ ] live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
+- [x] initial deal由来の親の最初の`zimopai`は、originから`moqie = false`になる。
+- [ ] **Selected:** live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
 - [ ] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
 - [ ] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
 - [ ] 他家の第一打前flagを変更せず、打牌によるRound共通の第一巡成立条件だけをruleどおり更新する。
@@ -79,9 +79,9 @@
 
 ## Current
 
-- Selected: initial deal由来の親の最初の`zimopai`は、originから`moqie = false`になる。
+- Selected: live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
 - Phase: Not started
-- Why: 最初の`Zimo` originをツモ後stateまで移送できるようになったため、次は`Dapai`で`moqie`を呼び出し側ではなく状態から導出する。
+- Why: initial deal由来との対照testで、同じ`Dapai::Moqie`からoriginに応じて公開情報が変わることを確認する。
 
 ## Cycle log
 
@@ -90,6 +90,9 @@
 - 2026-08-12: 立直宣言牌の識別を追加検討した。高々一回の情報を全`Sipai`へboolとして重複させず、将来`Player`が所有する`LizhiState`から追記専用`He`の検証済み`SipaiIndex`を参照する。宣言牌を追加した応答待ちと立直成立済みを分け、宣言牌への和了可能性を解決する前に成立扱いしない。通常`Dapai`の現在scopeでは実装せず、立直宣言actionの後続項目へ残す。
 - 2026-08-12: `Dapai`の`moqie`導出に先立ち、`Round`開始境界から最初の`Zimo` originをツモ後stateへ移送する準備項目を追加した。rules crateの開始方式validationは後続項目とし、この項目ではcoreが検証済みruntime値を保持する契約だけを扱う。
 - 2026-08-12: `first_zimo_preserves_configured_origin`を追加した。redでは`FirstZimoOrigin`、`Round::new`の入力、ツモ後stateの観測がなく失敗した。`FourPlayerZimoPending`から`FourPlayerZimoCompleted`へoriginを移送してgreenにし、既存の`Round::new` fixtureも開始方式を明示するよう更新した。
+- 2026-08-13: `initial_deal_zimopai_dapai_is_not_moqie`を追加した。`Dapai`、`Round::dapai`、`He`の末尾観測が未定義のcompile errorを、選択項目に対するredとして確認した。
+- 2026-08-13: `Dapai::Moqie`と`Dapai::Shouqie(TileKind)`を`round/dapai.rs`へ追加し、`Round::dapai`が打牌後typestateへ遷移する最小実装でgreenにした。initial deal由来では`Sipai::moqie`をfalseとして導出する。失敗時は元のツモ後`Round`を`DapaiFailure`から回収できる。
+- 2026-08-13: refactorで大きな`Result` errorを避けるため`DapaiFailure`を`Box`化し、全workspaceのformat、clippy、build、testがgreenであることを確認した。次の対照項目としてlive wall由来を選択した。
 
 ## Completion review
 
