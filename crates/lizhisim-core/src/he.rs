@@ -8,11 +8,13 @@ use crate::tile::TileKind;
 
 const MAX_SIPAI_COUNT: usize = 27;
 
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Sipai {
     pub tile_kind: TileKind,
     pub moqie: bool,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct He {
     sipai: Vec<Sipai, MAX_SIPAI_COUNT>,
 }

@@ -6,6 +6,7 @@ use crate::bingpai::Bingpai;
 use crate::he::He;
 use crate::seat::Seat;
 
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Player<P> {
     seat: Seat<P>,
     bingpai: Bingpai,
