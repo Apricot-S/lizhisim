@@ -16,17 +16,6 @@ pub struct Player<P> {
     he: He,
 }
 
-pub(crate) struct PlayerDapaiFailure<P> {
-    player: Player<P>,
-    error: DapaiError,
-}
-
-impl<P> PlayerDapaiFailure<P> {
-    pub(crate) fn into_parts(self) -> (Player<P>, DapaiError) {
-        (self.player, self.error)
-    }
-}
-
 impl<P> Player<P> {
     pub(crate) fn from_qipai(seat: Seat<P>, bingpai: Bingpai) -> Self {
         Self {
@@ -53,49 +42,22 @@ impl<P> Player<P> {
         dapai: Dapai,
         zimopai: TileKind,
         moqie: bool,
-    ) -> Result<Self, Box<PlayerDapaiFailure<P>>> {
+    ) -> Result<Self, DapaiError> {
+        let Self { seat, bingpai, he } = self;
+
         let (bingpai, sipai) = match dapai {
-            Dapai::Moqie(tile_kind) => (self.bingpai.clone(), Sipai { tile_kind, moqie }),
-            Dapai::Shouqie(tile_kind) => {
-                let bingpai = self
-                    .bingpai
-                    .clone()
-                    .with_removed(tile_kind)
-                    .and_then(|bingpai| bingpai.with_added(zimopai));
-                let bingpai = match bingpai {
-                    Ok(bingpai) => bingpai,
-                    Err(error) => {
-                        return Err(Box::new(PlayerDapaiFailure {
-                            player: self,
-                            error: error.into(),
-                        }));
-                    }
-                };
-                (
-                    bingpai,
-                    Sipai {
-                        tile_kind,
-                        moqie: false,
-                    },
-                )
-            }
+            Dapai::Moqie(tile_kind) => (bingpai, Sipai { tile_kind, moqie }),
+            Dapai::Shouqie(tile_kind) => (
+                bingpai.with_removed(tile_kind)?.with_added(zimopai)?,
+                Sipai {
+                    tile_kind,
+                    moqie: false,
+                },
+            ),
         };
+        let he = he.with_appended(sipai).map_err(|_| DapaiError::HeFull)?;
 
-        let he = match self.he.clone().with_appended(sipai) {
-            Ok(he) => he,
-            Err(_) => {
-                return Err(Box::new(PlayerDapaiFailure {
-                    player: self,
-                    error: DapaiError::HeFull,
-                }));
-            }
-        };
-
-        Ok(Self {
-            seat: self.seat,
-            bingpai,
-            he,
-        })
+        Ok(Self { seat, bingpai, he })
     }
 }
 

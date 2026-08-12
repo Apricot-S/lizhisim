@@ -34,17 +34,6 @@ pub struct ZimoCompleted {
 
 pub struct DapaiCompleted;
 
-pub struct DapaiFailure {
-    round: Round<FourPlayer, ZimoCompleted>,
-    error: DapaiError,
-}
-
-impl DapaiFailure {
-    pub fn into_parts(self) -> (Round<FourPlayer, ZimoCompleted>, DapaiError) {
-        (self.round, self.error)
-    }
-}
-
 impl<P: PlayerSet + BipaiSpec, State> Round<P, State> {
     pub fn bipai(&self) -> &Bipai<P, QipaiCompleted> {
         &self.bipai
@@ -120,31 +109,56 @@ impl Round<FourPlayer, ZimoCompleted> {
         self.state.origin
     }
 
-    pub fn dapai(
-        mut self,
-        dapai: Dapai,
-    ) -> Result<Round<FourPlayer, DapaiCompleted>, Box<DapaiFailure>> {
+    pub fn dapai(self, dapai: Dapai) -> Result<Round<FourPlayer, DapaiCompleted>, DapaiError> {
         let moqie = match dapai {
             Dapai::Moqie(_) => {
                 self.state.origin == FirstZimoOrigin::LiveWall || !self.bipai.is_after_first_zimo()
             }
             Dapai::Shouqie(_) => false,
         };
-        let player = self.players[self.actor.index()].clone();
-        let player = match player.dapai(dapai, self.state.zimopai, moqie) {
-            Ok(player) => player,
-            Err(failure) => {
-                let (_, error) = failure.into_parts();
-                return Err(Box::new(DapaiFailure { round: self, error }));
-            }
+        let Self {
+            bipai,
+            players,
+            actor,
+            zhuangjia,
+            state,
+        } = self;
+        let [player0, player1, player2, player3] = players;
+        let players = if actor.index() == 0 {
+            [
+                player0.dapai(dapai, state.zimopai, moqie)?,
+                player1,
+                player2,
+                player3,
+            ]
+        } else if actor.index() == 1 {
+            [
+                player0,
+                player1.dapai(dapai, state.zimopai, moqie)?,
+                player2,
+                player3,
+            ]
+        } else if actor.index() == 2 {
+            [
+                player0,
+                player1,
+                player2.dapai(dapai, state.zimopai, moqie)?,
+                player3,
+            ]
+        } else {
+            [
+                player0,
+                player1,
+                player2,
+                player3.dapai(dapai, state.zimopai, moqie)?,
+            ]
         };
-        self.players[self.actor.index()] = player;
 
         Ok(Round {
-            bipai: self.bipai,
-            players: self.players,
-            actor: self.actor,
-            zhuangjia: self.zhuangjia,
+            bipai,
+            players,
+            actor,
+            zhuangjia,
             state: DapaiCompleted,
         })
     }
@@ -338,15 +352,28 @@ mod tests {
     fn later_zimopai_dapai_is_moqie_when_initial_deal_origin_remains() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let mut round = Round::new(
+        let round = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
             FirstZimoOrigin::InitialDeal,
         )
         .zimo()
         .unwrap();
-        let (bipai, _) = round.bipai.clone().zimo().unwrap();
-        round.bipai = bipai;
+        let Round {
+            bipai,
+            players,
+            actor,
+            zhuangjia,
+            state,
+        } = round;
+        let (bipai, _) = bipai.zimo().unwrap();
+        let round = Round {
+            bipai,
+            players,
+            actor,
+            zhuangjia,
+            state,
+        };
 
         let moqie = round
             .dapai(Dapai::Moqie(TileKind::P5))

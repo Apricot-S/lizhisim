@@ -3,12 +3,14 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 use heapless::Vec;
+use thiserror::Error;
 
 use crate::tile::TileKind;
 
 const MAX_SIPAI_COUNT: usize = 27;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Error, PartialEq)]
+#[error("he cannot hold another sipai")]
 pub(crate) struct HeFull;
 
 #[derive(Clone, Debug, Eq, PartialEq)]

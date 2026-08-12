@@ -29,7 +29,7 @@
 - `Player`は`Bingpai`と`He`を所有し、`Player::dapai`が`Dapai` actionを両方へ原子的に適用する。phase、`zimopai`、`moqie`の文脈は所有しない。
 - 将来の`Player`は`LizhiState`も所有する。`Sipai`へ立直宣言牌flagを追加せず、立直状態が追記専用`He`の検証済み`SipaiIndex`を高々一つ保持する。
 - `He`への追加、`Bingpai`更新、`zimopai`消費は一つの消費型`Round`遷移で行う。
-- 失敗する遷移は消費前の有効な`Round`と型付きerrorを返す。
+- 失敗する遷移は型付きerrorを返し、部分更新状態を公開しない。消費済みの`Round`はerrorから回収しない。
 - 反応待ちphaseのactorは打牌者とし、reactor集合はphase固有dataとして後続項目で追加する。
 - `He::is_empty()`から第一打または第一巡の資格を推定しない。配牌後の暗槓または北抜きが第一打より先に行われても意味を失わない明示的なbool flagを状態として保持する。
 - playerごとの「まだ第一打前か」と、Round共通の「第一巡の無 interruption 条件が保たれているか」は別の事実として保持する。天和・地和・人和・ダブル立直は、現在phaseとこれらのflagを組み合わせて判定する。
@@ -59,7 +59,7 @@
 - [ ] `Bingpai`の牌を捨てると、そのkindが一枚減り、元の`zimopai`が一枚増える。
 - [ ] `Bingpai`から捨てた`Sipai`は`moqie = false`になる。
 - [ ] `Bingpai`と`zimopai`が同じ`TileKind`でも、打牌元の選択を保持する。
-- [ ] 存在しない`Bingpai`の牌を指定すると、元のツモ後`Round`を伴う型付きerrorを返す。
+- [ ] 存在しない`Bingpai`の牌を指定すると、対象牌を伴う型付きerrorを返す。
 
 ### Atomicity and typestate
 
@@ -99,7 +99,7 @@
 - 2026-08-13: `Bipai::is_after_first_zimo`で四人配牌52枚、王牌14枚、最初の`Zimo`1枚を除いた残り69枚かを確認し、initial deal由来かつこの枚数の場合だけ`moqie = false`とする最小修正でgreenにした。全workspaceのformat、clippy、build、testがgreenであることを確認し、live wall由来の対照項目を再選択した。
 - 2026-08-13: `Dapai::Moqie(TileKind)`へ変更し、上位変換がRound stateなしで対象牌を参照できるようにした。コンパイラで保証できるvariant payloadの形だけを確認するtestは置かず、既存の`Round::dapai` testで摸切牌を明示するよう更新した。
 - 2026-08-13: green状態のrefactorとしてaction値を`round/dapai.rs`から`action.rs`と`action/dapai.rs`へ移した。`Round`が`Player`の`Bingpai`と`He`を外側から置換する経路を削除し、文脈から導いた`zimopai`と`moqie`を添えて`Player::dapai`へaction適用を委譲した。
-- 2026-08-13: `Player::dapai`も他のdomain遷移と同様に古い`Player`を消費し、成功時は新しい`Player`、失敗時は元の`Player`と`DapaiError`を保持するboxed `PlayerDapaiFailure`を返す形へrefactorした。`Round`は所有中の対象playerのsnapshotへ遷移を適用し、成功時だけ配列要素を置換する。
+- 2026-08-13: 上位設計を再確認し、旧状態回収はprotocol/scheduler境界のpending continuationが担い、`Round::dapai`のerror payloadへ旧`Round`を含める必須要件ではないと整理した。旧状態回収用のtransition型とprepared型を削除し、消費型の`Result<NewState, DapaiError>`へ簡素化する。
 
 ## Completion review
 
@@ -107,6 +107,6 @@
 - [ ] playerごとの第一打前flagとRound共通の第一巡成立flagの所有位置・更新責務がreview済みである。
 - [ ] すべての項目が完了または理由付きで移送されている。
 - [ ] `Bingpai`、`zimopai`、`He`の原子性を確認した。
-- [ ] 不正actionで消費前の有効状態を失わないことを確認した。
+- [ ] 不正actionで部分更新状態を公開せず、具体的な型付きerrorを返すことを確認した。
 - [ ] event、observation、replayへの`moqie`射影を後続listへ移送した。
 - [ ] 立直宣言牌を`Sipai`の重複flagではなく`LizhiState`の`SipaiIndex`から射影することを確認した。
