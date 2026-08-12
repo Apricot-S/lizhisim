@@ -188,4 +188,15 @@ mod tests {
 
         let _: Round<FourPlayer, FourPlayerZimoCompleted> = round.zimo().unwrap();
     }
+
+    #[test]
+    fn zhuangjia_first_zimopai_uses_wall_index_52() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2]);
+
+        let round = round.zimo().unwrap();
+
+        assert_eq!(round.zimopai(), TileKind::P5);
+    }
 }
