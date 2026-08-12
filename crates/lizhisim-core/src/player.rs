@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
+use crate::action::{Dapai, DapaiError};
 use crate::bingpai::Bingpai;
-use crate::he::He;
+use crate::he::{He, Sipai};
 use crate::player_set::{FourPlayer, PlayerSet};
 use crate::seat::Seat;
+use crate::tile::TileKind;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Player<P> {
@@ -35,9 +37,34 @@ impl<P> Player<P> {
         &self.he
     }
 
-    pub(crate) fn replace_bingpai_and_he(&mut self, bingpai: Bingpai, he: He) {
+    pub(crate) fn dapai(
+        &mut self,
+        dapai: Dapai,
+        zimopai: TileKind,
+        moqie: bool,
+    ) -> Result<(), DapaiError> {
+        let (bingpai, sipai) = match dapai {
+            Dapai::Moqie(tile_kind) => (self.bingpai.clone(), Sipai { tile_kind, moqie }),
+            Dapai::Shouqie(tile_kind) => (
+                self.bingpai
+                    .clone()
+                    .with_removed(tile_kind)?
+                    .with_added(zimopai)?,
+                Sipai {
+                    tile_kind,
+                    moqie: false,
+                },
+            ),
+        };
+        let he = self
+            .he
+            .clone()
+            .with_appended(sipai)
+            .map_err(|_| DapaiError::HeFull)?;
+
         self.bingpai = bingpai;
         self.he = he;
+        Ok(())
     }
 }
 

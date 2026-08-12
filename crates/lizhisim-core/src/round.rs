@@ -2,15 +2,12 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-mod dapai;
-
+use crate::action::{Dapai, DapaiError};
 use crate::bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
 use crate::player::Player;
 use crate::player_set::{FourPlayer, PlayerSet};
 use crate::seat::Seat;
 use crate::tile::TileKind;
-
-pub use dapai::{Dapai, DapaiError};
 
 pub struct Round<P: PlayerSet + BipaiSpec, State> {
     bipai: Bipai<P, QipaiCompleted>,
@@ -127,44 +124,16 @@ impl Round<FourPlayer, ZimoCompleted> {
         mut self,
         dapai: Dapai,
     ) -> Result<Round<FourPlayer, DapaiCompleted>, Box<DapaiFailure>> {
-        let (tile_kind, moqie, bingpai) = match dapai {
-            Dapai::Moqie(_) => (
-                self.state.zimopai,
-                self.state.origin == FirstZimoOrigin::LiveWall || !self.bipai.is_after_first_zimo(),
-                self.players[self.actor.index()].bingpai().clone(),
-            ),
-            Dapai::Shouqie(tile_kind) => {
-                let bingpai = self.players[self.actor.index()]
-                    .bingpai()
-                    .clone()
-                    .with_removed(tile_kind)
-                    .and_then(|bingpai| bingpai.with_added(self.state.zimopai));
-                let bingpai = match bingpai {
-                    Ok(bingpai) => bingpai,
-                    Err(error) => {
-                        return Err(Box::new(DapaiFailure {
-                            round: self,
-                            error: error.into(),
-                        }));
-                    }
-                };
-                (tile_kind, false, bingpai)
+        let moqie = match dapai {
+            Dapai::Moqie(_) => {
+                self.state.origin == FirstZimoOrigin::LiveWall || !self.bipai.is_after_first_zimo()
             }
+            Dapai::Shouqie(_) => false,
         };
-        let he = self.players[self.actor.index()]
-            .he()
-            .clone()
-            .with_appended(crate::he::Sipai { tile_kind, moqie });
-        let he = match he {
-            Ok(he) => he,
-            Err(_) => {
-                return Err(Box::new(DapaiFailure {
-                    round: self,
-                    error: DapaiError::HeFull,
-                }));
-            }
-        };
-        self.players[self.actor.index()].replace_bingpai_and_he(bingpai, he);
+        if let Err(error) = self.players[self.actor.index()].dapai(dapai, self.state.zimopai, moqie)
+        {
+            return Err(Box::new(DapaiFailure { round: self, error }));
+        }
 
         Ok(Round {
             bipai: self.bipai,
