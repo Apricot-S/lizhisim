@@ -62,9 +62,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ### First `Zimo` transition
 
-- [ ] **Selected:** 通常`zimo`はツモ前typestateにだけ提供する。
-- [ ] 通常`zimo`はツモ前typestateを消費し、ツモ後typestateを返す。
-- [ ] 親の最初の`zimopai`は固定`Bipai`のindex 52の牌である。
+- [x] 通常`zimo`はツモ前typestateだけを消費し、ツモ後typestateを返す。
+- [ ] **Selected:** 親の最初の`zimopai`は固定`Bipai`のindex 52の牌である。
 - [ ] ツモ後typestateでも親の`Bingpai`は13枚のままである。
 - [ ] ツモ後typestateは親の`Bingpai`と分離した`zimopai`を一枚だけ所有する。
 - [ ] 最初の通常`zimo`後の`Bipai::remaining_count()`は69である。
@@ -83,9 +82,9 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: 通常`zimo`はツモ前typestateにだけ提供する。
+- Selected: 親の最初の`zimopai`は固定`Bipai`のindex 52の牌である。
 - Phase: Not started
-- Why this is the smallest useful next test: 配牌後の牌保存則を確認できたため、最初の通常ツモをツモ前phaseだけに限定する型境界を次に固定する。
+- Why this is the smallest useful next test: 通常`zimo`の消費型遷移を固定できたため、遷移が取得する具体的な牌を次に確認する。
 
 ## Cycle log
 
@@ -106,6 +105,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: `qipai_maps_deal_order_from_zhuangjia_to_fixed_seat_order`を追加し、親seat 2で四人すべての固定期待countsが不一致になるredを確認した。親起点の配牌配列を親の固定seat indexだけ右回転してから`Seat::ALL`順の`Player`へ変換しgreenにした。`Bipai`内の`seat_index`は`deal_index`へ改名した。
 - 2026-08-12: `qipai_round_has_seventy_remaining_tiles`を追加した。`Bipai`単体では既に検証済みだが、配牌済み`Bipai`を`Round`の次phaseへ保持する境界として独立しており、追加時点からgreenだった。production変更はない。
 - 2026-08-12: `qipai_round_conserves_every_tile_kind`と、そのtestだけが使う`Bipai::unread_counts`をrefactorで削除した。牌の生成・配牌保存則は`Bipai`、親起点deal orderから固定seat orderへの移送は`Round`の全4要素対応testで保証する。Round全状態の保存則は、正式な状態観測またはhash機構を導入する後続listへ残し、test専用production APIを設けない。
+- 2026-08-12: `zimo_consumes_pending_round_and_returns_completed_round`を追加し、ツモ後payloadと`zimo`未定義のcompile errorをredとして確認した。`FourPlayerZimoPending`専用の`zimo(self)`が、ツモ前payloadを保持した`FourPlayerZimoCompleted`を返す最小実装でgreenにした。method可用性と消費後の戻り型は同じ型注釈で検証されるため一項目へ統合し、重複するactor assertionはrefactorで削除した。
 
 ## Completion review
 

@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use crate::bipai::{Bipai, BipaiSpec, QipaiCompleted, QipaiPending};
+use crate::bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
 use crate::player::Player;
 use crate::seat::FourPlayer;
 use crate::seat::Seat;
+use crate::tile::TileKind;
 
 pub struct Round<P, State> {
     state: State,
@@ -20,6 +21,11 @@ pub struct FourPlayerZimoPending {
     bipai: Bipai<FourPlayer, QipaiCompleted>,
     players: [Player<FourPlayer>; 4],
     actor: Seat<FourPlayer>,
+}
+
+pub struct FourPlayerZimoCompleted {
+    pending: FourPlayerZimoPending,
+    zimopai: TileKind,
 }
 
 impl<P: BipaiSpec> Round<P, RoundQipaiPending<P>> {
@@ -74,6 +80,30 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
 
     pub fn actor(&self) -> &Seat<FourPlayer> {
         &self.state.actor
+    }
+
+    pub fn zimo(self) -> Result<Round<FourPlayer, FourPlayerZimoCompleted>, BipaiError> {
+        let (bipai, zimopai) = self.state.bipai.zimo()?;
+        let pending = FourPlayerZimoPending {
+            bipai,
+            players: self.state.players,
+            actor: self.state.actor,
+        };
+
+        Ok(Round {
+            state: FourPlayerZimoCompleted { pending, zimopai },
+            zhuangjia: self.zhuangjia,
+        })
+    }
+}
+
+impl Round<FourPlayer, FourPlayerZimoCompleted> {
+    pub fn actor(&self) -> &Seat<FourPlayer> {
+        &self.state.pending.actor
+    }
+
+    pub fn zimopai(&self) -> TileKind {
+        self.state.zimopai
     }
 }
 
@@ -180,5 +210,15 @@ mod tests {
         let round = Round::new(bipai, Seat::<FourPlayer>::ALL[0]).qipai();
 
         assert_eq!(round.bipai().remaining_count(), 70);
+    }
+
+    #[test]
+    fn zimo_consumes_pending_round_and_returns_completed_round() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let zhuangjia = Seat::<FourPlayer>::ALL[2];
+        let round = Round::new(bipai, zhuangjia).qipai();
+
+        let _: Round<FourPlayer, FourPlayerZimoCompleted> = round.zimo().unwrap();
     }
 }
