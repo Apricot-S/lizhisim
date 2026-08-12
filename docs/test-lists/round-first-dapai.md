@@ -18,7 +18,7 @@
 選択を区別する。
 
 このlistでは合法action生成、AI request、`Chi`、`Peng`、`Rong`、反応競合の解決、次actorの`Zimo`、
-立直打牌を実装しない。
+立直宣言を伴う`Dapai`を実装しない。
 
 ## Responsibility boundary
 
@@ -26,6 +26,7 @@
 - `Round`は`Zimo` originとactionの打牌元から`moqie`を導く。
 - 呼び出し側は`moqie`を直接指定しない。
 - `Player`は`Bingpai`と`He`を所有するが、phaseや`zimopai`を所有しない。
+- 将来の`Player`は`LizhiState`も所有する。`Sipai`へ立直宣言牌flagを追加せず、立直状態が追記専用`He`の検証済み`SipaiIndex`を高々一つ保持する。
 - `He`への追加、`Bingpai`更新、`zimopai`消費は一つの消費型`Round`遷移で行う。
 - 失敗する遷移は消費前の有効な`Round`と型付きerrorを返す。
 - 反応待ちphaseのactorは打牌者とし、reactor集合はphase固有dataとして後続項目で追加する。
@@ -65,6 +66,16 @@
 - [ ] `He`容量違反を不正な部分更新として公開しない。
 - [ ] Property: 成功する`Dapai`前後で37種類すべての牌保存則を満たす。正式な状態観測または安定hash導入後に実施する。
 
+### Later: 立直宣言牌
+
+- [ ] 通常の`Dapai`は未宣言の`LizhiState`を変更しない。
+- [ ] 立直宣言を伴う`Dapai`は、宣言牌を`He`へ追加し、その要素を指す検証済み`SipaiIndex`を応答待ち`LizhiState`へ記録する。
+- [ ] 応答待ち`LizhiState`のindexは、`He`へ追加した宣言牌と同じ`TileKind`を指す。
+- [ ] 宣言牌への和了可能性を解決する前は、立直成立済みとして扱わない。
+- [ ] 宣言牌への和了が成立しなかった場合、同じ`SipaiIndex`を保持した成立済み`LizhiState`へ遷移する。
+- [ ] `He`の各`Sipai`へ立直宣言牌flagを重複して保持せず、`LizhiState`から高々一枚を導出する。
+- [ ] 応答待ちまたは成立済みのplayerは、二つ目の立直宣言牌を記録できない。
+
 ## Current
 
 - Selected: なし
@@ -75,6 +86,7 @@
 
 - 2026-08-12: 最初の`Dapai`縦切りを設計した。`Zimo` origin、`Dapai`の打牌元、原子的な`Player`更新と反応待ちtypestateを境界とした。
 - 2026-08-12: 「親の第一打を常に`moqie = false`とするvariation」は`initial_deal`由来の第一`Zimo`を指しており、ADR-0012の既存判断で表現できると訂正した。追加policyと後継ADR案を削除した。また`actor == zhuangjia && He::is_empty()`では第一打前の暗槓・北抜きを扱えないため、天和・地和・人和・ダブル立直でも使う明示的な第一巡関連bool flagを状態として保持する方針へ修正した。playerごとの第一打前とRound共通の無 interruption 条件は別の事実なので分離する。
+- 2026-08-12: 立直宣言牌の識別を追加検討した。高々一回の情報を全`Sipai`へboolとして重複させず、将来`Player`が所有する`LizhiState`から追記専用`He`の検証済み`SipaiIndex`を参照する。宣言牌を追加した応答待ちと立直成立済みを分け、宣言牌への和了可能性を解決する前に成立扱いしない。通常`Dapai`の現在scopeでは実装せず、立直宣言actionの後続項目へ残す。
 
 ## Completion review
 
@@ -84,3 +96,4 @@
 - [ ] `Bingpai`、`zimopai`、`He`の原子性を確認した。
 - [ ] 不正actionで消費前の有効状態を失わないことを確認した。
 - [ ] event、observation、replayへの`moqie`射影を後続listへ移送した。
+- [ ] 立直宣言牌を`Sipai`の重複flagではなく`LizhiState`の`SipaiIndex`から射影することを確認した。

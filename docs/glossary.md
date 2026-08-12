@@ -59,7 +59,7 @@
 | 場風 | 圏風牌 | `quanfengpai` | `Quanfengpai` |
 | 自風 | 門風牌 | `menfengpai` | `Menfengpai` |
 | 河・捨て牌列 | 河 | `he` | `He` |
-| 捨て牌 | 死牌 | `sipai` | `Sipai` |
+| 捨て牌 | 死牌 | `sipai` | `Sipai`, `SipaiIndex` |
 | 責任払い | 包 | `bao` | `Bao` |
 
 #### `TileKind` variantとcompact notation

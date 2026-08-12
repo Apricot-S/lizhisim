@@ -125,6 +125,20 @@ Round共通の「第一巡の無 interruption 条件が保たれているか」�
 人和、ダブル立直は、現在phaseとこれらの状態を組み合わせて判定する。暗槓、北抜き、副露等が各状態を
 失わせる条件はrule variationとして検証し、対応するaction遷移が原子的に更新する。
 
+`Sipai`は`TileKind`と`moqie`だけを保持し、各要素へ立直宣言牌flagを持たせない。立直宣言牌は一人につき
+高々一枚であり、追記専用の`He`における位置をplayerの`LizhiState`から参照する。位置は裸の整数ではなく、
+`He`の最大27要素に収まり、実在する要素だけを指せる検証済み`SipaiIndex`とする。`He`の要素を削除または
+並べ替えないため、記録後のindexは局終了まで安定する。
+
+`LizhiState`は少なくとも未宣言、宣言牌を`He`へ追加して応答解決を待つ状態、成立済み状態を区別する。
+応答待ちと成立済みの両方が同じ`SipaiIndex`を保持し、宣言牌への和了可能性を解決する前に立直成立として
+扱わない。宣言牌かどうかは`Sipai`自身のfieldではなく、`LizhiState`のindexと`He`のindexを比較して導く。
+特徴量、observation、eventへの射影はこの導出結果を使う。
+
+立直宣言を伴う`Dapai`は通常の`Dapai`と別actionとし、`He`への宣言牌追加、`SipaiIndex`の生成、
+`LizhiState`の応答待ちへの遷移を原子的に行う。応答解決後に成立済みへ進め、供託の確定時点も同じ
+遷移境界で扱う。通常の`Dapai`だけを実装する段階では`LizhiState`を先行実装しない。
+
 `Bingpai`の任意countsを作るconstructorと、牌種を直接追加・除去する低水準操作はcrate内に閉じる。
 公開された手牌更新は、検証済み`Bipai`からの`qipai`と、現在phaseを消費する`Round`のツモ、
 打牌、副露遷移だけから行う。進行phaseは`Bingpai`自体のtypestateへ重ねず、合法actionを判断する
