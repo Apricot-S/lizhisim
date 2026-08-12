@@ -16,7 +16,7 @@ mod tile_set;
 pub use action::{Dapai, DapaiError};
 pub use bingpai::{Bingpai, BingpaiError};
 pub use bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
-pub use he::{He, Sipai};
+pub use he::{He, HeFull, Sipai};
 pub use player::Player;
 pub use player_set::{FourPlayer, PlayerSet};
 pub use round::{DapaiCompleted, FirstZimoOrigin, Round, ZimoCompleted, ZimoPending};

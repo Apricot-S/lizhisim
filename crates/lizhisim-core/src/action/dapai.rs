@@ -5,6 +5,7 @@
 use thiserror::Error;
 
 use crate::bingpai::BingpaiError;
+use crate::he::HeFull;
 use crate::tile::TileKind;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -17,6 +18,6 @@ pub enum Dapai {
 pub enum DapaiError {
     #[error(transparent)]
     Bingpai(#[from] BingpaiError),
-    #[error("he cannot hold another sipai")]
-    HeFull,
+    #[error(transparent)]
+    HeFull(#[from] HeFull),
 }

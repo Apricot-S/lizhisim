@@ -55,7 +55,7 @@ impl<P> Player<P> {
                 },
             ),
         };
-        let he = he.with_appended(sipai).map_err(|_| DapaiError::HeFull)?;
+        let he = he.with_appended(sipai)?;
 
         Ok(Self { seat, bingpai, he })
     }

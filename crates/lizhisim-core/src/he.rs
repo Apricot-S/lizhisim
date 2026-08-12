@@ -11,7 +11,7 @@ const MAX_SIPAI_COUNT: usize = 27;
 
 #[derive(Debug, Error, PartialEq)]
 #[error("he cannot hold another sipai")]
-pub(crate) struct HeFull;
+pub struct HeFull;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Sipai {

@@ -118,41 +118,17 @@ impl Round<FourPlayer, ZimoCompleted> {
         };
         let Self {
             bipai,
-            players,
+            mut players,
             actor,
             zhuangjia,
             state,
         } = self;
-        let [player0, player1, player2, player3] = players;
-        let players = if actor.index() == 0 {
-            [
-                player0.dapai(dapai, state.zimopai, moqie)?,
-                player1,
-                player2,
-                player3,
-            ]
-        } else if actor.index() == 1 {
-            [
-                player0,
-                player1.dapai(dapai, state.zimopai, moqie)?,
-                player2,
-                player3,
-            ]
-        } else if actor.index() == 2 {
-            [
-                player0,
-                player1,
-                player2.dapai(dapai, state.zimopai, moqie)?,
-                player3,
-            ]
-        } else {
-            [
-                player0,
-                player1,
-                player2,
-                player3.dapai(dapai, state.zimopai, moqie)?,
-            ]
-        };
+        let actor_index = actor.index();
+        players.swap(0, actor_index);
+        let [player, player1, player2, player3] = players;
+        let player = player.dapai(dapai, state.zimopai, moqie)?;
+        let mut players = [player, player1, player2, player3];
+        players.swap(0, actor_index);
 
         Ok(Round {
             bipai,
