@@ -67,20 +67,13 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
     }
 
     pub fn zimo(self) -> Result<Round<FourPlayer, FourPlayerZimoCompleted>, BipaiError> {
-        let Round {
-            bipai,
-            players,
-            actor,
-            zhuangjia,
-            state: FourPlayerZimoPending,
-        } = self;
-        let (bipai, zimopai) = bipai.zimo()?;
+        let (bipai, zimopai) = self.bipai.zimo()?;
 
         Ok(Round {
             bipai,
-            players,
-            actor,
-            zhuangjia,
+            players: self.players,
+            actor: self.actor,
+            zhuangjia: self.zhuangjia,
             state: FourPlayerZimoCompleted { zimopai },
         })
     }
