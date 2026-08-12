@@ -66,7 +66,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - [x] ツモ後typestateは親の`Bingpai`と分離した`zimopai`を一枚だけ所有する。
 - [x] 最初の通常`zimo`後の`Bipai::remaining_count()`は69である。
 - [x] ツモ後typestateから通常`zimo`を連続して行えない。
-- [ ] **Selected:** Property: 最初の通常`zimo`後の四人分の`Player`、`zimopai`、未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。
+- [ ] Deferred: Property: 最初の通常`zimo`後の四人分の`Player`、`zimopai`、未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。正式な状態観測または安定hashの導入時に検証する。
 
 ## Later listsへ残す項目
 
@@ -76,13 +76,14 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - [ ] `Angang`、`Jiagang`、嶺上ツモ、追加表ドラ表示の順序と権限。
 - [ ] 合法action集合、型付き中断、応答検証、continuationの一回消費。
 - [ ] public observation、canonical event、replay、終端状態hash。
+- [ ] 正式な状態観測または安定hashを使い、最初の通常`zimo`後の牌保存則を検証する。
 - [ ] 三人用`Player`集合と三人用`Round`。
 
 ## Current
 
-- Selected: Property: 最初の通常`zimo`後の四人分の`Player`、`zimopai`、未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。
-- Phase: Not started
-- Why this is the smallest useful next test: 最初の通常`zimo`の具体的な状態遷移を個別に確認できたため、遷移全体の牌保存則を最後にreviewし、現在の観測境界で検証可能か判断する。
+- Selected: なし。このlistの現在実装可能な最初の`Zimo`縦切りは完了した。
+- Phase: Complete
+- Why: 牌保存則propertyは未取得`Bipai`の種類別countsを必要とするが、現在は正式な状態観測APIがない。テスト専用production APIを増やさず後続listへ移送する。
 
 ## Cycle log
 
@@ -113,6 +114,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: 「ツモ後typestateは親の`Bingpai`と分離した`zimopai`を一枚だけ所有する」は構造reviewで完了とした。`zhuangjia_bingpai_stays_at_thirteen_tiles_after_zimo`が非混入、`zhuangjia_first_zimopai_uses_wall_index_52`が独立したツモ牌の存在と値、単一の`TileKind` fieldが一枚だけであることを保証する。これらを一つのtestで再検証すると既存契約の重複になるため追加しない。
 - 2026-08-12: `first_zimo_leaves_sixty_nine_remaining_tiles`を追加した。既存実装が更新済み`Bipai`をツモ後typestateへ移送しているため追加時点からgreenだった。`Bipai`単体の減算だけでなく、`Round`境界で更新済み状態を保持する契約として維持する。production変更はない。
 - 2026-08-12: 「ツモ後typestateから通常`zimo`を連続して行えない」はAPI構造reviewで完了とした。消費型の`zimo(self)`は`Round<FourPlayer, FourPlayerZimoPending>`にだけ定義され、戻り値の`Round<FourPlayer, FourPlayerZimoCompleted>`には存在しない。失敗理由をこのmethod不在へ限定できない`compile_fail` testは追加しない。
+- 2026-08-12: 最初の通常`zimo`後の牌保存則propertyは、四人分の`Player`と`zimopai`に加えて未取得`Bipai`の種類別countsを必要とする。正式な観測APIがない現段階で検証すると、以前削除したtest専用`Bipai::unread_counts`相当を再導入することになるため、observationまたは安定hashの後続listへ移送した。具体牌、親`Bingpai`非混入、残数、typestate境界の個別testはgreenであり、現在の縦切りは完了とする。
 
 ## Completion review
 
