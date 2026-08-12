@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use crate::bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
+use crate::bipai::{Bipai, BipaiError, QipaiCompleted, QipaiPending};
 use crate::player::Player;
 use crate::seat::FourPlayer;
 use crate::seat::Seat;
@@ -11,10 +11,6 @@ use crate::tile::TileKind;
 pub struct Round<P, State> {
     state: State,
     zhuangjia: Seat<P>,
-}
-
-pub struct RoundQipaiPending<P: BipaiSpec> {
-    bipai: Bipai<P, QipaiPending>,
 }
 
 struct FourPlayerRoundData {
@@ -32,27 +28,14 @@ pub struct FourPlayerZimoCompleted {
     zimopai: TileKind,
 }
 
-impl<P: BipaiSpec> Round<P, RoundQipaiPending<P>> {
+impl Round<FourPlayer, FourPlayerZimoPending> {
     #[cfg_attr(
         not(test),
         expect(dead_code, reason = "will be called by the Round creation boundary")
     )]
-    pub(crate) fn new(bipai: Bipai<P, QipaiPending>, zhuangjia: Seat<P>) -> Self {
-        Self {
-            state: RoundQipaiPending { bipai },
-            zhuangjia,
-        }
-    }
-
-    pub fn bipai(&self) -> &Bipai<P, QipaiPending> {
-        &self.state.bipai
-    }
-}
-
-impl Round<FourPlayer, RoundQipaiPending<FourPlayer>> {
-    pub fn qipai(self) -> Round<FourPlayer, FourPlayerZimoPending> {
-        let (bipai, mut bingpai) = self.state.bipai.qipai();
-        bingpai.rotate_right(self.zhuangjia.index());
+    pub(crate) fn new(bipai: Bipai<FourPlayer, QipaiPending>, zhuangjia: Seat<FourPlayer>) -> Self {
+        let (bipai, mut bingpai) = bipai.qipai();
+        bingpai.rotate_right(zhuangjia.index());
         let [bingpai0, bingpai1, bingpai2, bingpai3] = bingpai;
         let [seat0, seat1, seat2, seat3] = Seat::<FourPlayer>::ALL;
         let players = [
@@ -62,20 +45,18 @@ impl Round<FourPlayer, RoundQipaiPending<FourPlayer>> {
             Player::from_qipai(seat3, bingpai3),
         ];
 
-        Round {
+        Self {
             state: FourPlayerZimoPending {
                 data: FourPlayerRoundData {
                     bipai,
                     players,
-                    actor: self.zhuangjia,
+                    actor: zhuangjia,
                 },
             },
-            zhuangjia: self.zhuangjia,
+            zhuangjia,
         }
     }
-}
 
-impl Round<FourPlayer, FourPlayerZimoPending> {
     pub fn bipai(&self) -> &Bipai<FourPlayer, QipaiCompleted> {
         &self.state.data.bipai
     }
@@ -150,35 +131,10 @@ mod tests {
     }
 
     #[test]
-    fn qipai_pending_round_preserves_bipai_and_zhuangjia() {
+    fn round_starts_with_four_players() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let zhuangjia = Seat::<FourPlayer>::ALL[2];
-        let round = Round::new(bipai, zhuangjia);
-
-        assert_eq!(
-            (round.bipai().remaining_count(), round.zhuangjia()),
-            (122, &zhuangjia)
-        );
-    }
-
-    #[test]
-    fn qipai_consumes_pending_round_and_returns_zimo_pending_round() {
-        let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let zhuangjia = Seat::<FourPlayer>::ALL[2];
-        let round = Round::new(bipai, zhuangjia);
-
-        let round: Round<FourPlayer, FourPlayerZimoPending> = round.qipai();
-
-        assert_eq!(round.zhuangjia(), &zhuangjia);
-    }
-
-    #[test]
-    fn qipai_round_preserves_four_players() {
-        let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[0]).qipai();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[0]);
 
         assert_eq!(
             round.players().each_ref().map(Player::seat),
@@ -187,20 +143,20 @@ mod tests {
     }
 
     #[test]
-    fn qipai_round_starts_with_zhuangjia_as_actor() {
+    fn round_starts_with_zhuangjia_as_actor() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let zhuangjia = Seat::<FourPlayer>::ALL[2];
-        let round = Round::new(bipai, zhuangjia).qipai();
+        let round = Round::new(bipai, zhuangjia);
 
         assert_eq!(round.actor(), &zhuangjia);
     }
 
     #[test]
-    fn qipai_maps_deal_order_from_zhuangjia_to_fixed_seat_order() {
+    fn round_maps_deal_order_from_zhuangjia_to_fixed_seat_order() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2]).qipai();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2]);
         let [seat0, seat1, seat2, seat3] = round.players();
 
         assert_eq!(
@@ -215,10 +171,10 @@ mod tests {
     }
 
     #[test]
-    fn qipai_round_has_seventy_remaining_tiles() {
+    fn round_starts_with_seventy_remaining_tiles() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[0]).qipai();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[0]);
 
         assert_eq!(round.bipai().remaining_count(), 70);
     }
@@ -228,7 +184,7 @@ mod tests {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let zhuangjia = Seat::<FourPlayer>::ALL[2];
-        let round = Round::new(bipai, zhuangjia).qipai();
+        let round = Round::new(bipai, zhuangjia);
 
         let _: Round<FourPlayer, FourPlayerZimoCompleted> = round.zimo().unwrap();
     }

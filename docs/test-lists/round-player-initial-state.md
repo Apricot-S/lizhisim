@@ -14,7 +14,7 @@
 ## Scope
 
 現在フェーズの四人用`Bipai`から、seatごとの永続状態を所有する最小の`Player`を構築し、
-`Round`の配牌前状態を消費してツモ前状態へ遷移し、親の最初の`Zimo`でツモ後状態へ進むまでを扱う。
+`Round`の開始時に配牌を完了してツモ前状態を構築し、親の最初の`Zimo`でツモ後状態へ進むまでを扱う。
 
 `Player`は`Bingpai`、`fulu`、`he`を所有する。初期状態の`fulu`と`he`は空の有効値とし、
 未初期化を表す`Option`にはしない。`zimopai`、現在actor、進行phaseは`Player`へ置かず、
@@ -49,16 +49,14 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - [x] 外部crateは任意の`Bingpai`、`fulu`、`he`を渡して`Player`を構築できない。
 - [ ] Deferred: 配牌直後の各`Player`の`fulu`は空である。構成要素の型を決めてから選択する。
 
-### `Round` qipai transition
+### `Round` initial state
 
-- [x] 配牌前の`Round`は`Bipai<FourPlayer, QipaiPending>`と親`Seat`を所有する。
-- [x] 配牌前の`Round`には通常`zimo`操作を提供しない。
-- [x] `qipai`は配牌前の`Round`を消費し、ツモ前typestateを返す。
-- [x] `qipai`後の`Round`は四人分の`Player`を所有する。
-- [x] `qipai`後の最初のactorは親である。
+- [x] `Round`の開始時に`Bipai<FourPlayer, QipaiPending>`と親`Seat`からツモ前typestateを直接構築する。
+- [x] 開始直後の`Round`は四人分の`Player`を所有する。
+- [x] 開始直後の最初のactorは親である。
 - [x] 親がseat 2のとき、親起点の配牌順`0, 1, 2, 3`を固定seat順`2, 3, 0, 1`へ対応付ける。
-- [x] `qipai`後の`Round`が所有する`Bipai`の`remaining_count`は70である。
-- [x] Property: `qipai`後の牌保存則は`Bipai`の配牌検証と、`Round`の全4要素の固定seat対応検証を組み合わせて保証する。
+- [x] 開始直後の`Round`が所有する`Bipai`の`remaining_count`は70である。
+- [x] Property: 開始直後の牌保存則は`Bipai`の配牌検証と、`Round`の全4要素の固定seat対応検証を組み合わせて保証する。
 
 ### First `Zimo` transition
 
@@ -108,6 +106,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: `zimo_consumes_pending_round_and_returns_completed_round`を追加し、ツモ後payloadと`zimo`未定義のcompile errorをredとして確認した。`FourPlayerZimoPending`専用の`zimo(self)`が、ツモ前payloadを保持した`FourPlayerZimoCompleted`を返す最小実装でgreenにした。method可用性と消費後の戻り型は同じ型注釈で検証されるため一項目へ統合し、重複するactor assertionはrefactorで削除した。
 - 2026-08-12: refactorとしてprivateな`FourPlayerRoundData`へ配牌済み`Bipai`と固定seat順の`Player`を切り出した。`FourPlayerZimoPending`と`FourPlayerZimoCompleted`は互いを内包せず共有dataを値で移送し、phase固有のactorは各payload、`zimopai`はツモ後payloadだけに保持する。三人用dataとの共通化は先行していない。
 - 2026-08-12: actorは進行中の局で常に必要であり、応答待ちphaseでreactorが加わっても次の手番を示す役割を失わないため、`FourPlayerRoundData`へ移した。各遷移は共通dataを不変値として扱うのではなく、必要なfieldを更新して次のtypestateへ値で移送する。phase payloadには`zimopai`や将来のreactorなど、そのphaseだけに存在するdataを残す。
+- 2026-08-12: 雀魂およびmjaiの`start_round`と同様に、局開始を配牌完了後の状態として扱うことにした。外部応答、rule分岐、独立した観測を持たない`RoundQipaiPending`を削除し、`Round::new`が`Bipai`の配牌typestateを消費して`FourPlayerZimoPending`を直接構築する。`Bipai`単体の不正な通常ツモを防ぐ配牌typestateは維持する。
 
 ## Completion review
 
