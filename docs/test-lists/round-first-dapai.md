@@ -23,7 +23,7 @@
 ## Responsibility boundary
 
 - rules crateは親の開始方式を検証し、最初の`Zimo` originをcoreへ渡す。
-- `Round`は最初の`Zimo` originとactionの打牌元から`moqie`を導く。
+- `Round`は最初の`Zimo` origin、牌山が第一`Zimo`直後の残り枚数か、およびactionの打牌元から`moqie`を導く。
 - 呼び出し側は`moqie`を直接指定しない。
 - `Player`は`Bingpai`と`He`を所有するが、phaseや`zimopai`を所有しない。
 - 将来の`Player`は`LizhiState`も所有する。`Sipai`へ立直宣言牌flagを追加せず、立直状態が追記専用`He`の検証済み`SipaiIndex`を高々一つ保持する。
@@ -40,6 +40,7 @@
 
 - [x] `Round`開始時に指定した`FirstZimoOrigin`を、ツモ後typestateが保持する。
 - [x] initial deal由来の親の最初の`zimopai`は、originから`moqie = false`になる。
+- [x] initial deal由来のoriginが残っていても、牌山が第一`Zimo`直後の枚数でなければ`moqie = true`になる。
 - [ ] **Selected:** live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
 - [ ] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
 - [ ] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
@@ -93,6 +94,8 @@
 - 2026-08-13: `initial_deal_zimopai_dapai_is_not_moqie`を追加した。`Dapai`、`Round::dapai`、`He`の末尾観測が未定義のcompile errorを、選択項目に対するredとして確認した。
 - 2026-08-13: `Dapai::Moqie`と`Dapai::Shouqie(TileKind)`を`round/dapai.rs`へ追加し、`Round::dapai`が打牌後typestateへ遷移する最小実装でgreenにした。initial deal由来では`Sipai::moqie`をfalseとして導出する。失敗時は元のツモ後`Round`を`DapaiFailure`から回収できる。
 - 2026-08-13: refactorで大きな`Result` errorを避けるため`DapaiFailure`を`Box`化し、全workspaceのformat、clippy、build、testがgreenであることを確認した。次の対照項目としてlive wall由来を選択した。
+- 2026-08-13: originだけでは第二打以降も`moqie = false`になる不具合に対して、`later_zimopai_dapai_is_moqie_when_initial_deal_origin_remains`を追加した。牌山をもう一枚消費した状態で実際値false、期待値trueとなるredを確認した。
+- 2026-08-13: `Bipai::is_after_first_zimo`で四人配牌52枚、王牌14枚、最初の`Zimo`1枚を除いた残り69枚かを確認し、initial deal由来かつこの枚数の場合だけ`moqie = false`とする最小修正でgreenにした。全workspaceのformat、clippy、build、testがgreenであることを確認し、live wall由来の対照項目を再選択した。
 
 ## Completion review
 

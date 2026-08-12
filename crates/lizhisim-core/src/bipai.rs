@@ -13,6 +13,8 @@ use crate::tile_set::TileSet;
 
 const FOUR_PLAYER_QIPAI_TILE_COUNT: usize = 52;
 const FOUR_PLAYER_WANGPAI_TILE_COUNT: usize = 14;
+const FOUR_PLAYER_FIRST_ZIMO_REMAINING_COUNT: usize =
+    136 - FOUR_PLAYER_QIPAI_TILE_COUNT - FOUR_PLAYER_WANGPAI_TILE_COUNT - 1;
 const FOUR_PLAYER_INITIAL_BAOPAI_INDICATOR_INDEX: usize = 131;
 const FOUR_PLAYER_MAX_BAOPAI_INDICATOR_COUNT: usize = 5;
 const FOUR_PLAYER_FIRST_LINGSHANG_ZIMO_INDEX: usize = 135;
@@ -183,6 +185,10 @@ impl<P: BipaiSpec> Bipai<P, QipaiCompleted> {
 }
 
 impl Bipai<FourPlayer, QipaiCompleted> {
+    pub(crate) fn is_after_first_zimo(&self) -> bool {
+        self.remaining_count == FOUR_PLAYER_FIRST_ZIMO_REMAINING_COUNT
+    }
+
     #[cfg_attr(
         not(test),
         expect(

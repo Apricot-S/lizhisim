@@ -130,7 +130,7 @@ impl Round<FourPlayer, ZimoCompleted> {
         let (tile_kind, moqie, bingpai) = match dapai {
             Dapai::Moqie => (
                 self.state.zimopai,
-                self.state.origin == FirstZimoOrigin::LiveWall,
+                self.state.origin == FirstZimoOrigin::LiveWall || !self.bipai.is_after_first_zimo(),
                 self.players[self.actor.index()].bingpai().clone(),
             ),
             Dapai::Shouqie(tile_kind) => {
@@ -358,5 +358,27 @@ mod tests {
                 moqie: false,
             })
         );
+    }
+
+    #[test]
+    fn later_zimopai_dapai_is_moqie_when_initial_deal_origin_remains() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let mut round = Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            FirstZimoOrigin::InitialDeal,
+        )
+        .zimo()
+        .unwrap();
+        let (bipai, _) = round.bipai.clone().zimo().unwrap();
+        round.bipai = bipai;
+
+        let moqie = round
+            .dapai(Dapai::Moqie)
+            .ok()
+            .and_then(|round| round.players()[2].he().last().map(|sipai| sipai.moqie));
+
+        assert_eq!(moqie, Some(true));
     }
 }
