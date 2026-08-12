@@ -4,6 +4,7 @@
 
 use crate::bingpai::Bingpai;
 use crate::he::He;
+use crate::player_set::{FourPlayer, PlayerSet};
 use crate::seat::Seat;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -33,6 +34,10 @@ impl<P> Player<P> {
     pub fn he(&self) -> &He {
         &self.he
     }
+}
+
+impl PlayerSet for FourPlayer {
+    type Players = [Player<FourPlayer>; 4];
 }
 
 #[cfg(test)]
