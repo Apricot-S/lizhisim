@@ -116,6 +116,7 @@ impl Round<FourPlayer, ZimoCompleted> {
             }
             Dapai::Shouqie(_) => false,
         };
+
         let Self {
             bipai,
             mut players,
@@ -123,6 +124,7 @@ impl Round<FourPlayer, ZimoCompleted> {
             zhuangjia,
             state,
         } = self;
+
         let actor_index = actor.index();
         players.swap(0, actor_index);
         let [player, player1, player2, player3] = players;
