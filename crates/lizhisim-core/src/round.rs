@@ -22,11 +22,11 @@ pub enum FirstZimoOrigin {
     LiveWall,
 }
 
-pub struct FourPlayerZimoPending {
+pub struct ZimoPending {
     origin: FirstZimoOrigin,
 }
 
-pub struct FourPlayerZimoCompleted {
+pub struct ZimoCompleted {
     zimopai: TileKind,
     origin: FirstZimoOrigin,
 }
@@ -49,7 +49,7 @@ impl<P: PlayerSet + BipaiSpec, State> Round<P, State> {
     }
 }
 
-impl Round<FourPlayer, FourPlayerZimoPending> {
+impl Round<FourPlayer, ZimoPending> {
     #[cfg_attr(
         not(test),
         expect(dead_code, reason = "will be called by the Round creation boundary")
@@ -75,13 +75,13 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
             players,
             actor: zhuangjia,
             zhuangjia,
-            state: FourPlayerZimoPending {
+            state: ZimoPending {
                 origin: first_zimo_origin,
             },
         }
     }
 
-    pub fn zimo(self) -> Result<Round<FourPlayer, FourPlayerZimoCompleted>, BipaiError> {
+    pub fn zimo(self) -> Result<Round<FourPlayer, ZimoCompleted>, BipaiError> {
         let (bipai, zimopai) = self.bipai.zimo()?;
 
         Ok(Round {
@@ -89,7 +89,7 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
             players: self.players,
             actor: self.actor,
             zhuangjia: self.zhuangjia,
-            state: FourPlayerZimoCompleted {
+            state: ZimoCompleted {
                 zimopai,
                 origin: self.state.origin,
             },
@@ -97,7 +97,7 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
     }
 }
 
-impl Round<FourPlayer, FourPlayerZimoCompleted> {
+impl Round<FourPlayer, ZimoCompleted> {
     pub fn zimopai(&self) -> TileKind {
         self.state.zimopai
     }
@@ -200,7 +200,7 @@ mod tests {
         let zhuangjia = Seat::<FourPlayer>::ALL[2];
         let round = Round::new(bipai, zhuangjia, FirstZimoOrigin::InitialDeal);
 
-        let _: Round<FourPlayer, FourPlayerZimoCompleted> = round.zimo().unwrap();
+        let _: Round<FourPlayer, ZimoCompleted> = round.zimo().unwrap();
     }
 
     #[test]
