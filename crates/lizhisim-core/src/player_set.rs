@@ -8,12 +8,12 @@ mod private {
     pub trait Sealed {}
 }
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct FourPlayer;
-
 pub trait PlayerSet: private::Sealed {
     type Players;
 }
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub struct FourPlayer;
 
 impl private::Sealed for FourPlayer {}
 
