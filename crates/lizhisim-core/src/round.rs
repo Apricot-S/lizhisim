@@ -128,7 +128,7 @@ impl Round<FourPlayer, ZimoCompleted> {
         dapai: Dapai,
     ) -> Result<Round<FourPlayer, DapaiCompleted>, Box<DapaiFailure>> {
         let (tile_kind, moqie, bingpai) = match dapai {
-            Dapai::Moqie => (
+            Dapai::Moqie(_) => (
                 self.state.zimopai,
                 self.state.origin == FirstZimoOrigin::LiveWall || !self.bipai.is_after_first_zimo(),
                 self.players[self.actor.index()].bingpai().clone(),
@@ -347,7 +347,7 @@ mod tests {
         .unwrap();
 
         let sipai = round
-            .dapai(Dapai::Moqie)
+            .dapai(Dapai::Moqie(TileKind::P5))
             .ok()
             .and_then(|round| round.players()[2].he().last().cloned());
 
@@ -375,7 +375,7 @@ mod tests {
         round.bipai = bipai;
 
         let moqie = round
-            .dapai(Dapai::Moqie)
+            .dapai(Dapai::Moqie(TileKind::P5))
             .ok()
             .and_then(|round| round.players()[2].he().last().map(|sipai| sipai.moqie));
 

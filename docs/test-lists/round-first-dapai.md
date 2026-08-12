@@ -25,6 +25,7 @@
 - rules crateは親の開始方式を検証し、最初の`Zimo` originをcoreへ渡す。
 - `Round`は最初の`Zimo` origin、牌山が第一`Zimo`直後の残り枚数か、およびactionの打牌元から`moqie`を導く。
 - 呼び出し側は`moqie`を直接指定しない。
+- `Dapai::Moqie`と`Dapai::Shouqie`は、上位のaction変換がRound stateなしで対象牌を参照できるよう、どちらも`TileKind`を保持する。
 - `Player`は`Bingpai`と`He`を所有するが、phaseや`zimopai`を所有しない。
 - 将来の`Player`は`LizhiState`も所有する。`Sipai`へ立直宣言牌flagを追加せず、立直状態が追記専用`He`の検証済み`SipaiIndex`を高々一つ保持する。
 - `He`への追加、`Bingpai`更新、`zimopai`消費は一つの消費型`Round`遷移で行う。
@@ -82,7 +83,7 @@
 
 - Selected: live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
 - Phase: Not started
-- Why: initial deal由来との対照testで、同じ`Dapai::Moqie`からoriginに応じて公開情報が変わることを確認する。
+- Why: initial deal由来との対照testで、同じ摸切actionからoriginに応じて公開情報が変わることを確認する。
 
 ## Cycle log
 
@@ -96,6 +97,7 @@
 - 2026-08-13: refactorで大きな`Result` errorを避けるため`DapaiFailure`を`Box`化し、全workspaceのformat、clippy、build、testがgreenであることを確認した。次の対照項目としてlive wall由来を選択した。
 - 2026-08-13: originだけでは第二打以降も`moqie = false`になる不具合に対して、`later_zimopai_dapai_is_moqie_when_initial_deal_origin_remains`を追加した。牌山をもう一枚消費した状態で実際値false、期待値trueとなるredを確認した。
 - 2026-08-13: `Bipai::is_after_first_zimo`で四人配牌52枚、王牌14枚、最初の`Zimo`1枚を除いた残り69枚かを確認し、initial deal由来かつこの枚数の場合だけ`moqie = false`とする最小修正でgreenにした。全workspaceのformat、clippy、build、testがgreenであることを確認し、live wall由来の対照項目を再選択した。
+- 2026-08-13: `Dapai::Moqie(TileKind)`へ変更し、上位変換がRound stateなしで対象牌を参照できるようにした。コンパイラで保証できるvariant payloadの形だけを確認するtestは置かず、既存の`Round::dapai` testで摸切牌を明示するよう更新した。
 
 ## Completion review
 

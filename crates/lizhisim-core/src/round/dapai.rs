@@ -9,7 +9,7 @@ use crate::tile::TileKind;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Dapai {
-    Moqie,
+    Moqie(TileKind),
     Shouqie(TileKind),
 }
 
