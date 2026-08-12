@@ -149,6 +149,17 @@ Round共通の「第一巡の無 interruption 条件が保たれているか」�
 
 `Round` を nullable field の集合で表現しない。Phase ごとに必要な data と合法な遷移を分ける。
 
+配牌済み`Bipai`、player set固有の`Player`集合、現在actor、親は進行中の全phaseで必要なため、
+phase payloadではなく`Round<P, State>`が直接所有する。`State`は`zimopai`、打牌原因、reactor集合など
+そのphaseだけに存在するdataを保持する。共通dataも不変値ではなく、消費型遷移が必要なfieldを更新して
+次の`Round`へ値で移送する。
+
+player setごとの`Player`集合型は、牌山配列だけを扱う`BipaiSpec`へ追加しない。sealed `PlayerSet`が
+associated typeとして所有し、四人用は`[Player<FourPlayer>; 4]`、将来の三人用は
+`[Player<ThreePlayer>; 3]`とする。これにより人数とplayer配列長の不一致を型として作れない。
+`bipai`、`players`、actor、親の参照APIはphaseに依存しない共通`Round`実装とし、private trait boundで
+phaseごとに中継しない。
+
 ```mermaid
 stateDiagram-v2
     [*] --> Prepared

@@ -4,67 +4,40 @@
 
 use crate::bipai::{Bipai, BipaiError, QipaiCompleted, QipaiPending};
 use crate::player::Player;
+use crate::player_set::PlayerSet;
 use crate::seat::FourPlayer;
 use crate::seat::Seat;
 use crate::tile::TileKind;
 
-pub struct Round<P, State> {
-    state: State,
+pub struct Round<P: PlayerSet, State> {
+    bipai: Bipai<P, QipaiCompleted>,
+    players: P::Players,
+    actor: Seat<P>,
     zhuangjia: Seat<P>,
+    state: State,
 }
 
-impl<P, State> Round<P, State> {
-    pub fn zhuangjia(&self) -> &Seat<P> {
-        &self.zhuangjia
-    }
-}
-
-struct FourPlayerRoundData {
-    bipai: Bipai<FourPlayer, QipaiCompleted>,
-    players: [Player<FourPlayer>; 4],
-    actor: Seat<FourPlayer>,
-}
-
-pub struct FourPlayerZimoPending {
-    data: FourPlayerRoundData,
-}
+pub struct FourPlayerZimoPending;
 
 pub struct FourPlayerZimoCompleted {
-    data: FourPlayerRoundData,
     zimopai: TileKind,
 }
 
-trait FourPlayerRoundState {
-    fn data(&self) -> &FourPlayerRoundData;
-}
-
-impl FourPlayerRoundState for FourPlayerZimoPending {
-    fn data(&self) -> &FourPlayerRoundData {
-        &self.data
-    }
-}
-
-impl FourPlayerRoundState for FourPlayerZimoCompleted {
-    fn data(&self) -> &FourPlayerRoundData {
-        &self.data
-    }
-}
-
-#[expect(
-    private_bounds,
-    reason = "the private bound seals accessors to four-player Round typestates"
-)]
-impl<State: FourPlayerRoundState> Round<FourPlayer, State> {
-    pub fn bipai(&self) -> &Bipai<FourPlayer, QipaiCompleted> {
-        &self.state.data().bipai
+impl<P: PlayerSet, State> Round<P, State> {
+    pub fn bipai(&self) -> &Bipai<P, QipaiCompleted> {
+        &self.bipai
     }
 
-    pub fn players(&self) -> &[Player<FourPlayer>; 4] {
-        &self.state.data().players
+    pub fn players(&self) -> &P::Players {
+        &self.players
     }
 
-    pub fn actor(&self) -> &Seat<FourPlayer> {
-        &self.state.data().actor
+    pub fn actor(&self) -> &Seat<P> {
+        &self.actor
+    }
+
+    pub fn zhuangjia(&self) -> &Seat<P> {
+        &self.zhuangjia
     }
 }
 
@@ -86,33 +59,30 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
         ];
 
         Self {
-            state: FourPlayerZimoPending {
-                data: FourPlayerRoundData {
-                    bipai,
-                    players,
-                    actor: zhuangjia,
-                },
-            },
+            bipai,
+            players,
+            actor: zhuangjia,
             zhuangjia,
+            state: FourPlayerZimoPending,
         }
     }
 
     pub fn zimo(self) -> Result<Round<FourPlayer, FourPlayerZimoCompleted>, BipaiError> {
-        let FourPlayerRoundData {
+        let Round {
             bipai,
             players,
             actor,
-        } = self.state.data;
+            zhuangjia,
+            state: FourPlayerZimoPending,
+        } = self;
         let (bipai, zimopai) = bipai.zimo()?;
-        let data = FourPlayerRoundData {
-            bipai,
-            players,
-            actor,
-        };
 
         Ok(Round {
-            state: FourPlayerZimoCompleted { data, zimopai },
-            zhuangjia: self.zhuangjia,
+            bipai,
+            players,
+            actor,
+            zhuangjia,
+            state: FourPlayerZimoCompleted { zimopai },
         })
     }
 }
