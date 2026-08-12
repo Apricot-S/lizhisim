@@ -9,7 +9,7 @@ use crate::tile::TileKind;
 
 const MAX_SIPAI_COUNT: usize = 27;
 
-#[derive(Clone, Copy, Debug, Eq, Error, PartialEq)]
+#[derive(Debug, Error, PartialEq)]
 #[error("he cannot hold another sipai")]
 pub(crate) struct HeFull;
 
