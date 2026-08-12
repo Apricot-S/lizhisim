@@ -90,6 +90,10 @@ impl Round<FourPlayer, FourPlayerZimoPending> {
 }
 
 impl Round<FourPlayer, FourPlayerZimoCompleted> {
+    pub fn players(&self) -> &[Player<FourPlayer>; 4] {
+        &self.state.data.players
+    }
+
     pub fn actor(&self) -> &Seat<FourPlayer> {
         &self.state.data.actor
     }
@@ -198,5 +202,17 @@ mod tests {
         let round = round.zimo().unwrap();
 
         assert_eq!(round.zimopai(), TileKind::P5);
+    }
+
+    #[test]
+    fn zhuangjia_bingpai_stays_at_thirteen_tiles_after_zimo() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2]);
+
+        let round = round.zimo().unwrap();
+        let tile_count: u8 = round.players()[2].bingpai().counts().iter().sum();
+
+        assert_eq!(tile_count, 13);
     }
 }

@@ -62,8 +62,8 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 - [x] 通常`zimo`はツモ前typestateだけを消費し、ツモ後typestateを返す。
 - [x] 親の最初の`zimopai`は固定`Bipai`のindex 52の牌である。
-- [ ] **Selected:** ツモ後typestateでも親の`Bingpai`は13枚のままである。
-- [ ] ツモ後typestateは親の`Bingpai`と分離した`zimopai`を一枚だけ所有する。
+- [x] ツモ後typestateでも親の`Bingpai`は13枚のままである。
+- [ ] **Selected:** ツモ後typestateは親の`Bingpai`と分離した`zimopai`を一枚だけ所有する。
 - [ ] 最初の通常`zimo`後の`Bipai::remaining_count()`は69である。
 - [ ] ツモ後typestateから通常`zimo`を連続して行えない。
 - [ ] Property: 最初の通常`zimo`後の四人分の`Player`、`zimopai`、未取得`Bipai`の牌を合計すると元の`TileSet`と一致する。
@@ -80,9 +80,9 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 
 ## Current
 
-- Selected: ツモ後typestateでも親の`Bingpai`は13枚のままである。
+- Selected: ツモ後typestateは親の`Bingpai`と分離した`zimopai`を一枚だけ所有する。
 - Phase: Not started
-- Why this is the smallest useful next test: 最初の`zimopai`を取得できたため、ツモ牌を`Bingpai`へ暗黙に加えず分離して保持する境界を次に確認する。
+- Why this is the smallest useful next test: 親の`Bingpai`が13枚のまま維持されることを確認したため、ツモ牌がツモ後phase固有dataとして一枚だけ存在する契約を次に確認する。
 
 ## Cycle log
 
@@ -108,6 +108,7 @@ observation、event、replayを実装しない。それらは最初のツモ後�
 - 2026-08-12: actorは進行中の局で常に必要であり、応答待ちphaseでreactorが加わっても次の手番を示す役割を失わないため、`FourPlayerRoundData`へ移した。各遷移は共通dataを不変値として扱うのではなく、必要なfieldを更新して次のtypestateへ値で移送する。phase payloadには`zimopai`や将来のreactorなど、そのphaseだけに存在するdataを残す。
 - 2026-08-12: 雀魂およびmjaiの`start_round`と同様に、局開始を配牌完了後の状態として扱うことにした。外部応答、rule分岐、独立した観測を持たない`RoundQipaiPending`を削除し、`Round::new`が`Bipai`の配牌typestateを消費して`FourPlayerZimoPending`を直接構築する。`Bipai`単体の不正な通常ツモを防ぐ配牌typestateは維持する。
 - 2026-08-12: `zhuangjia_first_zimopai_uses_wall_index_52`を追加した。固定牌山のindex 52にある具体値`P5`を期待値とし、既存の`Round::zimo`がその牌を返すため追加時点からgreenだった。production変更はなく、次にツモ牌と親の`Bingpai`が分離されていることを選択した。
+- 2026-08-12: `zhuangjia_bingpai_stays_at_thirteen_tiles_after_zimo`を追加し、ツモ後typestateに`players()`がないcompile errorをredとして確認した。phaseをまたぐ共通状態をツモ後からも観測できる読み取りAPIを追加し、親seat 2の`Bingpai` counts合計が13のままであることを一assertionで確認してgreenにした。
 
 ## Completion review
 
