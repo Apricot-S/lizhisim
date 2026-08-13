@@ -142,23 +142,12 @@ impl Round<FourPlayer, ZimoCompleted> {
             },
         };
 
+        let [player0, player1, player2, player3] = players;
         let players = match actor_index {
-            0 => {
-                let [player, player1, player2, player3] = players;
-                [player.dapai(player_dapai)?, player1, player2, player3]
-            }
-            1 => {
-                let [player0, player, player2, player3] = players;
-                [player0, player.dapai(player_dapai)?, player2, player3]
-            }
-            2 => {
-                let [player0, player1, player, player3] = players;
-                [player0, player1, player.dapai(player_dapai)?, player3]
-            }
-            3 => {
-                let [player0, player1, player2, player] = players;
-                [player0, player1, player2, player.dapai(player_dapai)?]
-            }
+            0 => [player0.dapai(player_dapai)?, player1, player2, player3],
+            1 => [player0, player1.dapai(player_dapai)?, player2, player3],
+            2 => [player0, player1, player2.dapai(player_dapai)?, player3],
+            3 => [player0, player1, player2, player3.dapai(player_dapai)?],
             _ => return Err(DapaiError::ActorIndexOutOfRange { actor_index }),
         };
 
