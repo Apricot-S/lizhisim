@@ -45,6 +45,7 @@
 - [x] live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
 - [x] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
 - [ ] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
+- [ ] 他家の`fulu`や`babei`など、外部から適用される行為によっても対象playerの第一打前flagをfalseへ変更できる。
 - [ ] 他家の第一打前flagを変更せず、打牌によるRound共通の第一巡成立条件だけをruleどおり更新する。
 
 ### `zimopai`からの`Dapai`
@@ -53,6 +54,10 @@
 - [ ] `zimopai`を捨てると、actorの`He`末尾へ同じ`TileKind`が追加される。
 - [ ] 成功後のtypestateは`zimopai`を所有しない。
 - [ ] 成功後の反応待ちphaseのactorは打牌者である。
+
+### `He`の観測
+
+- [ ] `He::is_empty()`を廃止し、`He`の空・非空をiteratorなどの要素観測APIから判定できる。
 
 ### `Bingpai`からの`Dapai`
 
