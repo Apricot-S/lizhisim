@@ -43,7 +43,7 @@
 - [x] initial deal由来の親の最初の`zimopai`は、originから`moqie = false`になる。
 - [x] initial deal由来のoriginが残っていても、牌山が第一`Zimo`直後の枚数でなければ`moqie = true`になる。
 - [x] live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
-- [ ] **Selected:** 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
+- [x] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
 - [ ] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
 - [ ] 他家の第一打前flagを変更せず、打牌によるRound共通の第一巡成立条件だけをruleどおり更新する。
 
@@ -81,9 +81,9 @@
 
 ## Current
 
-- Selected: 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
+- Selected: 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
 - Phase: Not started
-- Why: `He::is_empty()`では第一打前の意味を復元できないため、明示的なplayer状態を導入する前提を確認する。
+- Why: 第一打前flagを`Player`が所有する基盤を追加したため、次は通常の`Dapai`でactor自身のflagだけを更新する。
 
 ## Cycle log
 
@@ -101,6 +101,7 @@
 - 2026-08-13: green状態のrefactorとしてaction値を`round/dapai.rs`から`action.rs`と`action/dapai.rs`へ移した。`Round`が`Player`の`Bingpai`と`He`を外側から置換する経路を削除し、文脈から導いた`zimopai`と`moqie`を添えて`Player::dapai`へaction適用を委譲した。
 - 2026-08-13: 上位設計を再確認し、旧状態回収はprotocol/scheduler境界のpending continuationが担い、`Round::dapai`のerror payloadへ旧`Round`を含める必須要件ではないと整理した。旧状態回収用のtransition型とprepared型を削除し、消費型の`Result<NewState, DapaiError>`へ簡素化する。
 - 2026-08-13: `live_wall_zimopai_dapai_is_moqie`を追加した。`FirstZimoOrigin::LiveWall`の最初の`zimopai`を摸切すると`Sipai::moqie = true`になる対照testで、initial deal由来との差を固定した。既存のorigin-based導出でgreenとなった。
+- 2026-08-13: `player_tracks_first_dapai_pending_independently_of_empty_he`を追加した。配牌直後の`He`が空でも、第一打前の事実を独立した`Player`状態として観測できる契約を追加した。`angang`/`babei` actionは未実装のため、打牌後のflag更新は次項目へ分離した。
 
 ## Completion review
 

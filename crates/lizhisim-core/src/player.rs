@@ -14,6 +14,7 @@ pub struct Player<P> {
     seat: Seat<P>,
     bingpai: Bingpai,
     he: He,
+    first_dapai_pending: bool,
 }
 
 impl<P> Player<P> {
@@ -22,6 +23,7 @@ impl<P> Player<P> {
             seat,
             bingpai,
             he: He::new(),
+            first_dapai_pending: true,
         }
     }
 
@@ -37,13 +39,22 @@ impl<P> Player<P> {
         &self.he
     }
 
+    pub fn first_dapai_pending(&self) -> bool {
+        self.first_dapai_pending
+    }
+
     pub(crate) fn dapai(
         self,
         dapai: Dapai,
         zimopai: TileKind,
         moqie: bool,
     ) -> Result<Self, DapaiError> {
-        let Self { seat, bingpai, he } = self;
+        let Self {
+            seat,
+            bingpai,
+            he,
+            first_dapai_pending,
+        } = self;
 
         let (bingpai, sipai) = match dapai {
             Dapai::Moqie(tile_kind) => (bingpai, Sipai { tile_kind, moqie }),
@@ -57,7 +68,12 @@ impl<P> Player<P> {
         };
         let he = he.with_appended(sipai)?;
 
-        Ok(Self { seat, bingpai, he })
+        Ok(Self {
+            seat,
+            bingpai,
+            he,
+            first_dapai_pending,
+        })
     }
 }
 
@@ -132,5 +148,21 @@ mod tests {
         );
 
         assert!(player.he().is_empty());
+    }
+
+    #[test]
+    fn player_tracks_first_dapai_pending_independently_of_empty_he() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (_, bingpai) = bipai.qipai();
+        let player = Player::from_qipai(
+            Seat::<FourPlayer>::ALL[0],
+            bingpai.into_iter().next().unwrap(),
+        );
+
+        assert_eq!(
+            (player.he().is_empty(), player.first_dapai_pending()),
+            (true, true)
+        );
     }
 }
