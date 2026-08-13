@@ -257,4 +257,43 @@ mod tests {
             })
         );
     }
+
+    #[test]
+    fn same_tile_kind_keeps_moqie_and_shouqie_distinct() {
+        let mut counts = [0; 37];
+        counts[TileKind::P5.index()] = 1;
+        let player = Player::from_qipai(
+            Seat::<FourPlayer>::ALL[0],
+            Bingpai::from_validated_counts(counts, TileSet::red_three_four_player()),
+        );
+
+        let sipai = [
+            player
+                .clone()
+                .dapai(PlayerDapai::Moqie(TileKind::P5))
+                .ok()
+                .and_then(|player| player.he().last().cloned()),
+            player
+                .dapai(PlayerDapai::ShouqieFromBingpai {
+                    tile_kind: TileKind::P5,
+                    zimopai: TileKind::P5,
+                })
+                .ok()
+                .and_then(|player| player.he().last().cloned()),
+        ];
+
+        assert_eq!(
+            sipai,
+            [
+                Some(Sipai {
+                    tile_kind: TileKind::P5,
+                    moqie: true,
+                }),
+                Some(Sipai {
+                    tile_kind: TileKind::P5,
+                    moqie: false,
+                }),
+            ]
+        );
+    }
 }
