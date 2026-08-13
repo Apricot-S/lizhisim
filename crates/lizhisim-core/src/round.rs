@@ -327,6 +327,28 @@ mod tests {
     }
 
     #[test]
+    fn live_wall_zimopai_dapai_is_moqie() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
+            .zimo()
+            .unwrap();
+
+        let sipai = round
+            .dapai(Dapai::Moqie(TileKind::P5))
+            .ok()
+            .and_then(|round| round.players()[2].he().last().cloned());
+
+        assert_eq!(
+            sipai,
+            Some(Sipai {
+                tile_kind: TileKind::P5,
+                moqie: true,
+            })
+        );
+    }
+
+    #[test]
     fn later_zimopai_dapai_is_moqie_when_initial_deal_origin_remains() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();

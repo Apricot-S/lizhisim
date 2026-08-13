@@ -42,8 +42,8 @@
 - [x] `Round`開始時に指定した`FirstZimoOrigin`を、ツモ後typestateが保持する。
 - [x] initial deal由来の親の最初の`zimopai`は、originから`moqie = false`になる。
 - [x] initial deal由来のoriginが残っていても、牌山が第一`Zimo`直後の枚数でなければ`moqie = true`になる。
-- [ ] **Selected:** live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
-- [ ] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
+- [x] live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
+- [ ] **Selected:** 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
 - [ ] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
 - [ ] 他家の第一打前flagを変更せず、打牌によるRound共通の第一巡成立条件だけをruleどおり更新する。
 
@@ -81,9 +81,9 @@
 
 ## Current
 
-- Selected: live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
+- Selected: 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
 - Phase: Not started
-- Why: initial deal由来との対照testで、同じ摸切actionからoriginに応じて公開情報が変わることを確認する。
+- Why: `He::is_empty()`では第一打前の意味を復元できないため、明示的なplayer状態を導入する前提を確認する。
 
 ## Cycle log
 
@@ -100,6 +100,7 @@
 - 2026-08-13: `Dapai::Moqie(TileKind)`へ変更し、上位変換がRound stateなしで対象牌を参照できるようにした。コンパイラで保証できるvariant payloadの形だけを確認するtestは置かず、既存の`Round::dapai` testで摸切牌を明示するよう更新した。
 - 2026-08-13: green状態のrefactorとしてaction値を`round/dapai.rs`から`action.rs`と`action/dapai.rs`へ移した。`Round`が`Player`の`Bingpai`と`He`を外側から置換する経路を削除し、文脈から導いた`zimopai`と`moqie`を添えて`Player::dapai`へaction適用を委譲した。
 - 2026-08-13: 上位設計を再確認し、旧状態回収はprotocol/scheduler境界のpending continuationが担い、`Round::dapai`のerror payloadへ旧`Round`を含める必須要件ではないと整理した。旧状態回収用のtransition型とprepared型を削除し、消費型の`Result<NewState, DapaiError>`へ簡素化する。
+- 2026-08-13: `live_wall_zimopai_dapai_is_moqie`を追加した。`FirstZimoOrigin::LiveWall`の最初の`zimopai`を摸切すると`Sipai::moqie = true`になる対照testで、initial deal由来との差を固定した。既存のorigin-based導出でgreenとなった。
 
 ## Completion review
 
