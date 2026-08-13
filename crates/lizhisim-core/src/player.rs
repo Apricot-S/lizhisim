@@ -318,4 +318,30 @@ mod tests {
             }))
         );
     }
+
+    #[test]
+    fn dapai_with_full_he_returns_he_full_without_player() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (_, bingpai) = bipai.qipai();
+        let he = (0..27)
+            .try_fold(He::new(), |he, _| {
+                he.with_appended(Sipai {
+                    tile_kind: TileKind::M1,
+                    moqie: false,
+                })
+            })
+            .unwrap();
+        let player = Player {
+            seat: Seat::<FourPlayer>::ALL[0],
+            bingpai: bingpai.into_iter().next().unwrap(),
+            he,
+            first_turn_eligible: true,
+        };
+
+        assert_eq!(
+            player.dapai(PlayerDapai::Moqie(TileKind::P5)),
+            Err(DapaiError::HeFull(crate::he::HeFull))
+        );
+    }
 }
