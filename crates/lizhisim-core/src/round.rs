@@ -545,4 +545,24 @@ mod tests {
 
         assert_eq!((round.bipai().clone(), round.players().clone()), before);
     }
+
+    #[test]
+    fn no_reaction_then_zimo_gives_next_wall_tile_to_next_actor() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles.swap(53, 120);
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
+            .zimo()
+            .unwrap()
+            .dapai(Dapai::Moqie(TileKind::P5))
+            .unwrap()
+            .no_reaction()
+            .zimo()
+            .unwrap();
+
+        assert_eq!(
+            (*round.actor(), round.zimopai()),
+            (Seat::<FourPlayer>::ALL[3], TileKind::Z4)
+        );
+    }
 }

@@ -38,11 +38,11 @@ request、応答、優先順位をまだモデル化しないため、反応な�
 - [x] 打牌者がseat 2のとき、反応なし遷移後のactorはseat 3であり、戻り値はツモ前typestateである。
 - [x] 四つの開始seatすべてで、反応なし遷移は固定seat順に一つ進み、seat 3の次はseat 0になる。
 - [x] 反応なし遷移は`Bipai`と全playerの状態を変更しない。
-- [ ] **Selected:** 反応なし遷移後の通常`zimo`は、次actorに牌山の次の通常ツモ牌を渡す。
+- [x] 反応なし遷移後の通常`zimo`は、次actorに牌山の次の通常ツモ牌を渡す。
 
 ### Typestate
 
-- [ ] 打牌後typestateだけが反応なし遷移を提供する。
+- [ ] **Selected:** 打牌後typestateだけが反応なし遷移を提供する。
 - [ ] 反応なし遷移後のツモ前typestateから、反応なし遷移を連続して行えない。
 
 ### Later: 反応解決
@@ -54,9 +54,9 @@ request、応答、優先順位をまだモデル化しないため、反応な�
 
 ## Current
 
-- Selected: 反応なし遷移後の通常`zimo`は、次actorに牌山の次の通常ツモ牌を渡す。
+- Selected: 打牌後typestateだけが反応なし遷移を提供する。
 - Phase: Not started
-- Why: actorの循環と反応なし遷移での状態非変更を固定したため、次は通常`zimo`が次actorと牌山cursorを正しく接続することを検証する。
+- Why: 反応なし後の通常`zimo`が次actorと牌山cursorを正しく接続することを固定したため、次は`no_reaction`のmethod可用性をtypestate APIとしてreviewする。
 
 ## Cycle log
 
@@ -66,6 +66,8 @@ request、応答、優先順位をまだモデル化しないため、反応な�
 - 2026-08-14: `no_reaction_advances_every_seat_in_fixed_order`を追加した。各seatを親として実際に`zimo`と`dapai`を行い、反応なし後のactor列を`[1, 2, 3, 0]`と一assertionで比較した。seat 2からseat 3の最小例に対する三角測量であり、既存の剰余演算による実装でgreenとなった。
 - 2026-08-14: `no_reaction_preserves_bipai_and_players`を追加した。打牌後の`Bipai`と全playerをcloneした組と、`no_reaction`後の組を一assertionで比較し、actor以外の共通状態を値のまま移送する既存実装でgreenとなった。
 - 2026-08-14: `no_reaction_advances_actor_from_seat_two_to_seat_three`を削除した。`no_reaction_advances_every_seat_in_fixed_order`が同じ実遷移列でseat 2からseat 3を含む全4通りとseat 3からseat 0の境界を検証するため、単独testを残しても独立した契約を増やさない。
+- 2026-08-14: 牌山index 53を`Z4`へ差し替え、親の通常ツモ・打牌・反応なし後の通常`zimo`が次actorへ`Z4`を渡すtestを追加する。既存の通常`zimo`遷移がこの経路で未検証のため、まず回帰testとしてred/greenを確認する。
+- 2026-08-14: `no_reaction_then_zimo_gives_next_wall_tile_to_next_actor`を追加した。index 53を`Z4`へ差し替え、seat 2の通常ツモ・`Moqie`・反応なし後にseat 3が`Z4`を`zimopai`として受け取る組を一assertionで比較した。既存の`Bipai::zimo`と`Round<ZimoPending>::zimo`の実装でgreenとなった。
 
 ## Completion review
 
