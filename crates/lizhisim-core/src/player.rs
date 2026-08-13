@@ -230,4 +230,31 @@ mod tests {
             [3, 1]
         );
     }
+
+    #[test]
+    fn shouqie_appends_non_moqie_sipai() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (_, bingpai) = bipai.qipai();
+        let player = Player::from_qipai(
+            Seat::<FourPlayer>::ALL[0],
+            bingpai.into_iter().next().unwrap(),
+        );
+
+        let sipai = player
+            .dapai(PlayerDapai::ShouqieFromBingpai {
+                tile_kind: TileKind::M1,
+                zimopai: TileKind::P5,
+            })
+            .ok()
+            .and_then(|player| player.he().last().cloned());
+
+        assert_eq!(
+            sipai,
+            Some(Sipai {
+                tile_kind: TileKind::M1,
+                moqie: false,
+            })
+        );
+    }
 }

@@ -72,7 +72,7 @@
 ### `Bingpai`からの`Dapai`
 
 - [x] `Bingpai`の牌を捨てると、そのkindが一枚減り、元の`zimopai`が一枚増える。
-- [ ] `Bingpai`から捨てた`Sipai`は`moqie = false`になる。
+- [x] `Bingpai`から捨てた`Sipai`は`moqie = false`になる。
 - [ ] `Bingpai`と`zimopai`が同じ`TileKind`でも、打牌元の選択を保持する。
 - [ ] 存在しない`Bingpai`の牌を指定すると、対象牌を伴う型付きerrorを返す。
 
@@ -96,9 +96,9 @@
 
 ## Current
 
-- Selected: `Bingpai`から捨てた`Sipai`は`moqie = false`になる。
+- Selected: `Bingpai`と`zimopai`が同じ`TileKind`でも、打牌元の選択を保持する。
 - Phase: Not started
-- Why: 打牌後phaseが打牌者をactorとして保持することを固定したため、次は通常の`Shouqie`の公開情報を検証する。
+- Why: `ShouqieFromBingpai`が手切として`moqie = false`を記録することを固定したため、次は同一牌種でも打牌元を区別することを検証する。
 
 ## Cycle log
 
@@ -130,6 +130,7 @@
 - 2026-08-13: `moqie_appends_zimopai_tile_kind_to_actor_he`を追加した。live wall由来の通常`Moqie`後、actorの`He`末尾に`zimopai`と同じ`TileKind`が追加される既存挙動を回帰testとして固定した。
 - 2026-08-13: `DapaiCompleted`はunit structで`zimopai`を保持せず、`Round<FourPlayer, ZimoCompleted>`だけが`zimopai()`を公開することをAPI reviewで確認した。コンパイラが保証する形状のため、`compile_error!()`やcompile-fail testは追加しない。
 - 2026-08-13: `dapai_completed_actor_is_dapai_actor`を追加した。親以外のseatをactorとして再構成したfixtureで`DapaiCompleted`のactorが同じ打牌者として移送される既存挙動を回帰testで固定した。
+- 2026-08-13: `shouqie_appends_non_moqie_sipai`を追加した。`PlayerDapai::ShouqieFromBingpai`が指定牌種の`Sipai`を`moqie = false`で追加する既存挙動を単体testで固定した。
 
 ## Completion review
 
