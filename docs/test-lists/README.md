@@ -9,6 +9,7 @@
 - [王牌・嶺上ツモ・宝牌表示](wangpai-replacement-draw-and-baopai.md) — 王牌index、嶺上ツモ権限、表裏ドラ表示、rule依存の開槓順序。
 - [最小Player aggregateとRound初期遷移](round-player-initial-state.md) — 配牌結果のseat別所有と、局開始から最初のツモ後までのtypestate。
 - [`Round`の最初の`Dapai`](round-first-dapai.md) — 打牌元、`Zimo` origin、第一巡状態、`Bingpai`・`He`の原子的更新。
+- [`Round`の反応なし遷移](round-no-reaction-transition.md) — 打牌後に反応なしで解決し、次actorのツモ前typestateへ進む最小遷移。
 
 新規作成時は [template](../templates/test-list.md) を複製し、[開発手順書](../development-guide.md) の `test list -> one -> red -> green -> refactor` に従う。
 

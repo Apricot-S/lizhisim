@@ -8,7 +8,7 @@
 - Status: In progress
 - Requirements: `CORE-001`, `CORE-002`, `CORE-006`, `CORE-007`, `CORE-008`, `NFR-001`
 - ADR / design: [ADR-0001](../adr/0001-event-driven-typed-continuations.md)、[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)、[ADR-0013](../adr/0013-tile-kind-without-copy-identity.md)、[ADR-0016](../adr/0016-initial-deal-shouqie-action.md)、[domain model](../design/domain-model.md)
-- Related lists: [最小Player aggregateとRound初期遷移](round-player-initial-state.md)、[雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md)
+- Related lists: [最小Player aggregateとRound初期遷移](round-player-initial-state.md)、[`Round`の反応なし遷移](round-no-reaction-transition.md)、[雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md)
 - Rule sources / clauses: `initial_deal`由来の親第一打はADR-0016に従い`Moqie`を提示せず、分離された`zimopai`も`Shouqie`の対象とする。
 
 ## Scope
