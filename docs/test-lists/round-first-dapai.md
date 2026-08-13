@@ -45,7 +45,7 @@
 - [x] live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
 - [x] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
 - [x] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
-- [ ] **Selected:** 他家の`fulu`や`babei`など、外部から適用される行為によっても対象playerの第一打前flagをfalseへ変更できる。
+- [x] 他家の`fulu`や`babei`など、外部から適用される行為によっても対象playerの第一打前flagをfalseへ変更できる。
 - [ ] 他家の第一打前flagを変更せず、打牌によるRound共通の第一巡成立条件だけをruleどおり更新する。
 
 ### `zimopai`からの`Dapai`
@@ -86,9 +86,9 @@
 
 ## Current
 
-- Selected: 他家の`fulu`や`babei`など、外部から適用される行為によっても対象playerの第一打前flagをfalseへ変更できる。
+- Selected: 他家の第一打前flagを変更せず、打牌によるRound共通の第一巡成立条件だけをruleどおり更新する。
 - Phase: Not started
-- Why: 通常の`Dapai`でactor自身の第一打前flagをfalseへ更新できたため、次は他家への外部action適用を検証する。
+- Why: 他家への`fulu`・`babei`等を実装する境界として、対象`Player`のflagだけを消費型にfalseへ更新できることを確認した。具体的actionの追加は後続scopeとする。
 
 ## Cycle log
 
@@ -109,6 +109,7 @@
 - 2026-08-13: `player_tracks_first_dapai_pending_independently_of_empty_he`を追加した。配牌直後の`He`が空でも、第一打前の事実を独立した`Player`状態として観測できる契約を追加した。`angang`/`babei` actionは未実装のため、打牌後のflag更新は次項目へ分離した。
 - 2026-08-13: `He::is_empty()`を削除し、`He::iter()`を追加した。空`He`の判定と追加済み`Sipai`の列挙をiteratorで検証し、第一打前状態の判定が`He`の専用空判定APIへ依存しないようにした。
 - 2026-08-13: `first_dapai_clears_actor_first_dapai_pending`を追加した。actorの最初の`Dapai`成功後に、そのplayerの第一打前flagだけがfalseになる契約を固定し、`Player::dapai`の消費型遷移でflagを更新した。
+- 2026-08-13: `external_action_can_clear_first_dapai_pending`を追加した。`fulu`・`babei`等の後続actionが対象playerへ適用できる消費型のflag更新境界を追加し、具体的action enumは先行実装しないまま契約を固定した。
 
 ## Completion review
 

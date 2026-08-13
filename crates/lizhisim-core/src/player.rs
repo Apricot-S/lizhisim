@@ -43,6 +43,15 @@ impl<P> Player<P> {
         self.first_dapai_pending
     }
 
+    #[cfg_attr(
+        not(test),
+        expect(dead_code, reason = "will be called by fulu and babei transitions")
+    )]
+    pub(crate) fn clear_first_dapai_pending(mut self) -> Self {
+        self.first_dapai_pending = false;
+        self
+    }
+
     pub(crate) fn dapai(
         self,
         dapai: Dapai,
@@ -164,5 +173,18 @@ mod tests {
             (player.he().iter().next(), player.first_dapai_pending()),
             (None, true)
         );
+    }
+
+    #[test]
+    fn external_action_can_clear_first_dapai_pending() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (_, bingpai) = bipai.qipai();
+        let player = Player::from_qipai(
+            Seat::<FourPlayer>::ALL[0],
+            bingpai.into_iter().next().unwrap(),
+        );
+
+        assert!(!player.clear_first_dapai_pending().first_dapai_pending());
     }
 }
