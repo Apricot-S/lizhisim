@@ -105,7 +105,7 @@ mod tests {
     }
 
     #[test]
-    fn four_players_follow_seat_all_order() {
+    fn player_preserves_seat_from_qipai() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (_, bingpai) = bipai.qipai();
