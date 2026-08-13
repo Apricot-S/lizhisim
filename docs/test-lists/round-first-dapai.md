@@ -136,6 +136,7 @@
 - 2026-08-13: `Round<FourPlayer, ZimoCompleted>::dapai(self, Dapai) -> Result<Round<FourPlayer, DapaiCompleted>, DapaiError>`の公開APIをreviewし、成功時にツモ後typestateを消費して打牌後typestateを返すことを確認した。`Round<FourPlayer, ZimoPending>`には`dapai` implがないため、ツモ前typestateから打牌できないことも同じAPI形状で確認した。コンパイラが保証するためcompile-fail testは追加しない。
 - 2026-08-13: `Round::dapai`は`Round<FourPlayer, ZimoCompleted>`にのみ実装され、成功時の戻り値である`Round<FourPlayer, DapaiCompleted>`には同名メソッドがないことをreviewした。したがって打牌後typestateから同じ`Dapai`を連続して行えず、コンパイラが保証するためcompile-fail testは追加しない。
 - 2026-08-14: `dapai_with_full_he_returns_he_full_without_player`を追加した。27枚の`Sipai`で満杯にした`He`を所有する`Player`へ`Moqie`を適用すると、更新済み`Player`を返さず`DapaiError::HeFull`を返す既存挙動を固定した。`Round::dapai`もこのerrorをそのまま伝播するため、不正な部分更新状態は公開されない。37種類の牌保存則は状態観測または安定hashが未導入のためDeferredへ移送した。
+- 2026-08-14: `no_reaction`と通常巡目の`zimo`が利用可能になったため、`initial_deal_zimopai_shouqie_exception_requires_zhuangjia_actor`と`dapai_completed_actor_is_dapai_actor`から、privateな`Round` fieldを分解してactorを差し替えるfixtureを削除した。前者は親の第一打後に反応なしで次actorの通常ツモへ進め、後者は開始時の親actorのまま`dapai`する遷移列で既存の契約を検証する。
 
 ## Completion review
 

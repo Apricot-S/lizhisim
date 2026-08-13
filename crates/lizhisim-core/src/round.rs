@@ -385,7 +385,7 @@ mod tests {
     #[test]
     fn initial_deal_zimopai_shouqie_exception_requires_zhuangjia_actor() {
         let (mut tiles, tile_set) = red_three_tiles();
-        tiles.swap(52, 120);
+        tiles.swap(53, 120);
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let round = Round::new(
             bipai,
@@ -393,23 +393,12 @@ mod tests {
             FirstZimoOrigin::InitialDeal,
         )
         .zimo()
+        .unwrap()
+        .dapai(Dapai::Shouqie(TileKind::P5))
+        .unwrap()
+        .no_reaction()
+        .zimo()
         .unwrap();
-        let Round {
-            bipai,
-            players,
-            actor: _,
-            zhuangjia,
-            first_zimo_origin,
-            state,
-        } = round;
-        let round = Round {
-            bipai,
-            players,
-            actor: Seat::<FourPlayer>::ALL[1],
-            zhuangjia,
-            first_zimo_origin,
-            state,
-        };
 
         let result = round.dapai(Dapai::Shouqie(TileKind::Z4));
 
@@ -485,29 +474,12 @@ mod tests {
         let round = Round::new(bipai, zhuangjia, FirstZimoOrigin::LiveWall)
             .zimo()
             .unwrap();
-        let Round {
-            bipai,
-            players,
-            actor: _,
-            zhuangjia,
-            first_zimo_origin,
-            state,
-        } = round;
-        let dapai_actor = Seat::<FourPlayer>::ALL[1];
-        let round = Round {
-            bipai,
-            players,
-            actor: dapai_actor,
-            zhuangjia,
-            first_zimo_origin,
-            state,
-        };
 
         let result = round
             .dapai(Dapai::Moqie(TileKind::P5))
             .map(|round| *round.actor());
 
-        assert_eq!(result, Ok(dapai_actor));
+        assert_eq!(result, Ok(zhuangjia));
     }
 
     #[test]
