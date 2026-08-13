@@ -78,10 +78,10 @@
 
 ### Atomicity and typestate
 
-- [ ] ツモ後typestateを消費して打牌後の反応待ちtypestateを返す。
-- [ ] ツモ前typestateから`Dapai`できない。
-- [ ] 打牌後typestateから同じ`Dapai`を連続して行えない。
-- [ ] `He`容量違反を不正な部分更新として公開しない。
+- [x] ツモ後typestateを消費して打牌後の反応待ちtypestateを返す。
+- [x] ツモ前typestateから`Dapai`できない。
+- [x] 打牌後typestateから同じ`Dapai`を連続して行えない。
+- [ ] **Selected:** `He`容量違反を不正な部分更新として公開しない。
 - [ ] Property: 成功する`Dapai`前後で37種類すべての牌保存則を満たす。正式な状態観測または安定hash導入後に実施する。
 
 ### Later: 立直宣言牌
@@ -96,9 +96,9 @@
 
 ## Current
 
-- Selected: ツモ後typestateを消費して打牌後の反応待ちtypestateを返す。
+- Selected: `He`容量違反を不正な部分更新として公開しない。
 - Phase: Not started
-- Why: 存在しない手牌の`Shouqie`が対象牌を含む型付きerrorを返すことを固定したため、次は成功時のtypestate遷移を検証する。
+- Why: `Round::dapai`は`ZimoCompleted`にのみ実装され、打牌後の`DapaiCompleted`には実装されないことを確認したため、次は`HeFull`時に`Round::dapai`が状態を部分更新として公開しないことを検証する。
 
 ## Cycle log
 
@@ -133,6 +133,8 @@
 - 2026-08-13: `shouqie_appends_non_moqie_sipai`を追加した。`PlayerDapai::ShouqieFromBingpai`が指定牌種の`Sipai`を`moqie = false`で追加する既存挙動を単体testで固定した。
 - 2026-08-13: `same_tile_kind_keeps_moqie_and_shouqie_distinct`を追加した。`Bingpai`と`zimopai`がともに`P5`でも、`Moqie(P5)`は`moqie = true`、`ShouqieFromBingpai(P5, P5)`は`moqie = false`として記録し、打牌元の選択を保持することを単体testで固定した。
 - 2026-08-13: `shouqie_from_absent_bingpai_tile_reports_tile_kind`を追加した。`Bingpai`にない`Z4`を`ShouqieFromBingpai`へ指定すると、対象牌を持つ`DapaiError::Bingpai(BingpaiError::TileNotPresent)`を返す既存挙動を単体testで固定した。
+- 2026-08-13: `Round<FourPlayer, ZimoCompleted>::dapai(self, Dapai) -> Result<Round<FourPlayer, DapaiCompleted>, DapaiError>`の公開APIをreviewし、成功時にツモ後typestateを消費して打牌後typestateを返すことを確認した。`Round<FourPlayer, ZimoPending>`には`dapai` implがないため、ツモ前typestateから打牌できないことも同じAPI形状で確認した。コンパイラが保証するためcompile-fail testは追加しない。
+- 2026-08-13: `Round::dapai`は`Round<FourPlayer, ZimoCompleted>`にのみ実装され、成功時の戻り値である`Round<FourPlayer, DapaiCompleted>`には同名メソッドがないことをreviewした。したがって打牌後typestateから同じ`Dapai`を連続して行えず、コンパイラが保証するためcompile-fail testは追加しない。
 
 ## Completion review
 
