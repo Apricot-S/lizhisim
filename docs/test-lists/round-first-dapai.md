@@ -55,8 +55,8 @@
 
 - [x] `zimopai`を捨てると、actorの`Bingpai` countsは変わらない。
 - [x] `zimopai`を捨てると、actorの`He`末尾へ同じ`TileKind`が追加される。
-- [ ] 成功後のtypestateは`zimopai`を所有しない。
-- [ ] 成功後の反応待ちphaseのactorは打牌者である。
+- [x] 成功後のtypestateは`zimopai`を所有しない。
+- [ ] **Selected:** 成功後の反応待ちphaseのactorは打牌者である。
 
 ### Later: 合法action候補
 
@@ -96,9 +96,9 @@
 
 ## Current
 
-- Selected: 成功後のtypestateは`zimopai`を所有しない。
+- Selected: 成功後の反応待ちphaseのactorは打牌者である。
 - Phase: Not started
-- Why: 通常`Moqie`の`He`末尾へ`zimopai`と同じ牌種を追加することを固定したため、次は打牌後typestateに`zimopai`が残らないことを検証する。
+- Why: `DapaiCompleted`が`zimopai`を保持せず、`zimopai()`が`ZimoCompleted`にのみ提供される公開API形状をreviewしたため、次は打牌後phaseのactorを検証する。
 
 ## Cycle log
 
@@ -128,6 +128,7 @@
 - 2026-08-13: `initial_deal_first_dapai_rejects_moqie`を追加した。`MoqieUnavailableForInitialDealFirstDapai`を型付きerrorとして追加し、initial deal由来・親actor・第一巡資格の条件を満たす`Moqie`を`Player`更新前に拒否してgreenにした。
 - 2026-08-13: `moqie_preserves_actor_bingpai_counts`を追加した。既存の`PlayerDapai::Moqie`は`Bingpai`を変更しないため、counts全体を比較する回帰testとしてgreenを確認した。
 - 2026-08-13: `moqie_appends_zimopai_tile_kind_to_actor_he`を追加した。live wall由来の通常`Moqie`後、actorの`He`末尾に`zimopai`と同じ`TileKind`が追加される既存挙動を回帰testとして固定した。
+- 2026-08-13: `DapaiCompleted`はunit structで`zimopai`を保持せず、`Round<FourPlayer, ZimoCompleted>`だけが`zimopai()`を公開することをAPI reviewで確認した。コンパイラが保証する形状のため、`compile_error!()`やcompile-fail testは追加しない。
 
 ## Completion review
 
