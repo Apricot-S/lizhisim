@@ -16,6 +16,8 @@ pub enum Dapai {
 
 #[derive(Debug, Error, PartialEq)]
 pub enum DapaiError {
+    #[error("moqie is unavailable for the initial-deal dealer first dapai")]
+    MoqieUnavailableForInitialDealFirstDapai,
     #[error(transparent)]
     Bingpai(#[from] BingpaiError),
     #[error(transparent)]

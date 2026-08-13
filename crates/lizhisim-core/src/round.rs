@@ -120,6 +120,13 @@ impl Round<FourPlayer, ZimoCompleted> {
 
         let actor_index = actor.index();
         let player_dapai = match dapai {
+            Dapai::Moqie(_)
+                if state.origin == FirstZimoOrigin::InitialDeal
+                    && actor == zhuangjia
+                    && players[actor_index].first_turn_eligible() =>
+            {
+                return Err(DapaiError::MoqieUnavailableForInitialDealFirstDapai);
+            }
             Dapai::Moqie(tile_kind) => PlayerDapai::Moqie(tile_kind),
             Dapai::Shouqie(tile_kind)
                 if state.origin == FirstZimoOrigin::InitialDeal
@@ -337,6 +344,24 @@ mod tests {
                     moqie: false,
                 }),
             ))
+        );
+    }
+
+    #[test]
+    fn initial_deal_first_dapai_rejects_moqie() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            FirstZimoOrigin::InitialDeal,
+        )
+        .zimo()
+        .unwrap();
+
+        assert_eq!(
+            round.dapai(Dapai::Moqie(TileKind::P5)).map(|_| ()),
+            Err(DapaiError::MoqieUnavailableForInitialDealFirstDapai)
         );
     }
 

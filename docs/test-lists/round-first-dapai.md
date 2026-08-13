@@ -45,7 +45,7 @@
 - [x] `Round`開始時に指定した`FirstZimoOrigin`を、ツモ後typestateが保持する。
 - [x] initial deal由来の親第一打で`Shouqie(zimopai)`を選ぶと、`Bingpai` countsを変更せず`zimopai`を捨て、`Sipai::moqie = false`になる。
 - [x] initial deal由来でもactorが親でなければ、`Shouqie(zimopai)`の特例を適用しない。
-- [ ] **Selected:** initial deal由来の親第一打で`Moqie`を指定すると、型付きerrorで拒否する。
+- [x] initial deal由来の親第一打で`Moqie`を指定すると、型付きerrorで拒否する。
 - [x] live wall由来の親の最初の`zimopai`を`Moqie`すると、`Sipai::moqie = true`になる。
 - [x] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの`first_turn_eligible`を参照する。
 - [x] 最初の`Dapai`後は、そのplayerの`first_turn_eligible`がfalseになる。
@@ -96,9 +96,9 @@
 
 ## Current
 
-- Selected: initial deal由来の親第一打で`Moqie`を指定すると、型付きerrorで拒否する。
+- Selected: `zimopai`を捨てると、actorの`Bingpai` countsは変わらない。
 - Phase: Not started
-- Why: `Shouqie(zimopai)`の成功経路を固定したため、同じ文脈で旧仕様の`Moqie`を受理しないことをcore境界で検証する。
+- Why: initial deal由来の親第一打で`Moqie`をcore境界から拒否できたため、次はlive wall等の通常`Moqie`における`Bingpai`不変を検証する。
 
 ## Cycle log
 
@@ -125,6 +125,7 @@
 - 2026-08-13: 第一巡中断時の状態をRound共通flagではなくplayerごとの`first_turn_eligible`へ統一した。通常の`Dapai`はactorだけをfalseにし、`fulu`等のinterruptionは全playerをfalseにする。以前追加した対象playerだけを外部からfalseにするtestは、具体的な中断actionのtestで置き換える。
 - 2026-08-13: `initial_deal_zimopai_can_be_shouqie`へ旧testを置き換えた。redでは`Shouqie(P5)`が`Bingpai`に存在しないため失敗した。`Round`がorigin、actorの`first_turn_eligible`、`zimopai`との一致から検証済み`PlayerDapai`へ変換し、`ShouqieFromZimopai`が`Bingpai`を変更せず`moqie = false`の`Sipai`を追加してgreenにした。refactorで`Sipai::moqie`をaction由来へ統一し、旧origin補正専用の`Bipai::is_after_first_zimo`とtestを削除した。
 - 2026-08-13: `initial_deal_zimopai_shouqie_exception_requires_zhuangjia_actor`を追加した。redではinitial deal originと第一巡資格だけで非親actorにも`ShouqieFromZimopai`特例が適用された。特例guardへ`actor == zhuangjia`を追加し、残り枚数ではなく親第一打というdomain条件を直接表現してgreenにした。
+- 2026-08-13: `initial_deal_first_dapai_rejects_moqie`を追加した。`MoqieUnavailableForInitialDealFirstDapai`を型付きerrorとして追加し、initial deal由来・親actor・第一巡資格の条件を満たす`Moqie`を`Player`更新前に拒否してgreenにした。
 
 ## Completion review
 
