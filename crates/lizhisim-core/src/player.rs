@@ -187,4 +187,27 @@ mod tests {
 
         assert!(!player.clear_first_turn_eligibility().first_turn_eligible());
     }
+
+    #[test]
+    fn shouqie_moves_one_tile_kind_from_bingpai_to_zimopai() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (_, bingpai) = bipai.qipai();
+        let player = Player::from_qipai(
+            Seat::<FourPlayer>::ALL[0],
+            bingpai.into_iter().next().unwrap(),
+        );
+
+        let player = player
+            .dapai(Dapai::Shouqie(TileKind::M1), TileKind::P5, false)
+            .unwrap();
+
+        assert_eq!(
+            [
+                player.bingpai().counts()[TileKind::M1.index()],
+                player.bingpai().counts()[TileKind::P5.index()],
+            ],
+            [3, 1]
+        );
+    }
 }

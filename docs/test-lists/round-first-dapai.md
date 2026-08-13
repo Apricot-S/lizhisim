@@ -60,7 +60,7 @@
 
 ### `Bingpai`からの`Dapai`
 
-- [ ] `Bingpai`の牌を捨てると、そのkindが一枚減り、元の`zimopai`が一枚増える。
+- [x] `Bingpai`の牌を捨てると、そのkindが一枚減り、元の`zimopai`が一枚増える。
 - [ ] `Bingpai`から捨てた`Sipai`は`moqie = false`になる。
 - [ ] `Bingpai`と`zimopai`が同じ`TileKind`でも、打牌元の選択を保持する。
 - [ ] 存在しない`Bingpai`の牌を指定すると、対象牌を伴う型付きerrorを返す。
@@ -85,9 +85,9 @@
 
 ## Current
 
-- Selected: `Bingpai`の牌を捨てると、そのkindが一枚減り、元の`zimopai`が一枚増える。
+- Selected: `Bingpai`から捨てた`Sipai`は`moqie = false`になる。
 - Phase: Not started
-- Why: playerごとの`first_turn_eligible`を打牌以外の第一巡関連actionにも使える形へ整理したため、次は`Shouqie`の手牌・`zimopai`更新を検証する。
+- Why: `Player::dapai`の`Shouqie`で手牌の1枚減少と`zimopai`の1枚追加が既存実装どおりであることを単体テストで固定したため、次は捨て牌の`moqie`導出を検証する。
 
 ## Cycle log
 
@@ -109,6 +109,7 @@
 - 2026-08-13: `He::is_empty()`を削除し、`He::iter()`を追加した。空`He`の判定と追加済み`Sipai`の列挙をiteratorで検証し、第一打前状態の判定が`He`の専用空判定APIへ依存しないようにした。
 - 2026-08-13: `first_dapai_clears_actor_first_turn_eligibility`へ改名した。actorの最初の`Dapai`成功後に、そのplayerの`first_turn_eligible`だけがfalseになる契約を固定した。
 - 2026-08-13: `external_action_can_clear_first_turn_eligibility`へ改名した。`fulu`・`babei`等の後続actionが対象playerへ適用できる消費型のflag更新境界を明確化した。
+- 2026-08-13: `shouqie_moves_one_tile_kind_from_bingpai_to_zimopai`を追加した。`Player::dapai`の`Shouqie`が指定`Bingpai`を1枚減らし、文脈の`zimopai`を1枚加える契約を単体testで固定した。
 
 ## Completion review
 
