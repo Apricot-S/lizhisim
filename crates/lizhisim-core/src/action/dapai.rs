@@ -16,6 +16,8 @@ pub enum Dapai {
 
 #[derive(Debug, Error, PartialEq)]
 pub enum DapaiError {
+    #[error("actor index {actor_index} is out of range for four players")]
+    ActorIndexOutOfRange { actor_index: usize },
     #[error("moqie is unavailable for the initial-deal dealer first dapai")]
     MoqieUnavailableForInitialDealFirstDapai,
     #[error(transparent)]

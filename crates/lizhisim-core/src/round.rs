@@ -112,7 +112,7 @@ impl Round<FourPlayer, ZimoCompleted> {
     pub fn dapai(self, dapai: Dapai) -> Result<Round<FourPlayer, DapaiCompleted>, DapaiError> {
         let Self {
             bipai,
-            mut players,
+            players,
             actor,
             zhuangjia,
             state,
@@ -141,11 +141,26 @@ impl Round<FourPlayer, ZimoCompleted> {
                 zimopai: state.zimopai,
             },
         };
-        players.swap(0, actor_index);
-        let [player, player1, player2, player3] = players;
-        let player = player.dapai(player_dapai)?;
-        let mut players = [player, player1, player2, player3];
-        players.swap(0, actor_index);
+
+        let players = match actor_index {
+            0 => {
+                let [player, player1, player2, player3] = players;
+                [player.dapai(player_dapai)?, player1, player2, player3]
+            }
+            1 => {
+                let [player0, player, player2, player3] = players;
+                [player0, player.dapai(player_dapai)?, player2, player3]
+            }
+            2 => {
+                let [player0, player1, player, player3] = players;
+                [player0, player1, player.dapai(player_dapai)?, player3]
+            }
+            3 => {
+                let [player0, player1, player2, player] = players;
+                [player0, player1, player2, player.dapai(player_dapai)?]
+            }
+            _ => return Err(DapaiError::ActorIndexOutOfRange { actor_index }),
+        };
 
         Ok(Round {
             bipai,
