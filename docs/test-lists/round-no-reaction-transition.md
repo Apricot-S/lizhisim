@@ -42,8 +42,8 @@ request、応答、優先順位をまだモデル化しないため、反応な�
 
 ### Typestate
 
-- [ ] **Selected:** 打牌後typestateだけが反応なし遷移を提供する。
-- [ ] 反応なし遷移後のツモ前typestateから、反応なし遷移を連続して行えない。
+- [x] 打牌後typestateだけが反応なし遷移を提供する。
+- [ ] **Selected:** 反応なし遷移後のツモ前typestateから、反応なし遷移を連続して行えない。
 
 ### Later: 反応解決
 
@@ -54,9 +54,9 @@ request、応答、優先順位をまだモデル化しないため、反応な�
 
 ## Current
 
-- Selected: 打牌後typestateだけが反応なし遷移を提供する。
+- Selected: 反応なし遷移後のツモ前typestateから、反応なし遷移を連続して行えない。
 - Phase: Not started
-- Why: 反応なし後の通常`zimo`が次actorと牌山cursorを正しく接続することを固定したため、次は`no_reaction`のmethod可用性をtypestate APIとしてreviewする。
+- Why: `no_reaction`が打牌後typestateだけに提供されることを確認したため、次は戻り値のツモ前typestateから同じ遷移を連続できないことをreviewする。
 
 ## Cycle log
 
@@ -68,6 +68,7 @@ request、応答、優先順位をまだモデル化しないため、反応な�
 - 2026-08-14: `no_reaction_advances_actor_from_seat_two_to_seat_three`を削除した。`no_reaction_advances_every_seat_in_fixed_order`が同じ実遷移列でseat 2からseat 3を含む全4通りとseat 3からseat 0の境界を検証するため、単独testを残しても独立した契約を増やさない。
 - 2026-08-14: 牌山index 53を`Z4`へ差し替え、親の通常ツモ・打牌・反応なし後の通常`zimo`が次actorへ`Z4`を渡すtestを追加する。既存の通常`zimo`遷移がこの経路で未検証のため、まず回帰testとしてred/greenを確認する。
 - 2026-08-14: `no_reaction_then_zimo_gives_next_wall_tile_to_next_actor`を追加した。index 53を`Z4`へ差し替え、seat 2の通常ツモ・`Moqie`・反応なし後にseat 3が`Z4`を`zimopai`として受け取る組を一assertionで比較した。既存の`Bipai::zimo`と`Round<ZimoPending>::zimo`の実装でgreenとなった。
+- 2026-08-14: `Round<FourPlayer, DapaiCompleted>`にだけ`no_reaction(self) -> Round<FourPlayer, ZimoPending>`が実装され、他のtypestateには同名methodがないことをAPI reviewで確認した。コンパイラが保証するためcompile-fail testは追加しない。
 
 ## Completion review
 
