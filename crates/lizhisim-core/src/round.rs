@@ -519,4 +519,45 @@ mod tests {
 
         assert_eq!(*round.actor(), Seat::<FourPlayer>::ALL[3]);
     }
+
+    #[test]
+    fn no_reaction_advances_every_seat_in_fixed_order() {
+        let next_actors = Seat::<FourPlayer>::ALL.map(|zhuangjia| {
+            let (tiles, tile_set) = red_three_tiles();
+            let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+
+            *Round::new(bipai, zhuangjia, FirstZimoOrigin::LiveWall)
+                .zimo()
+                .unwrap()
+                .dapai(Dapai::Moqie(TileKind::P5))
+                .unwrap()
+                .no_reaction()
+                .actor()
+        });
+
+        assert_eq!(
+            next_actors,
+            [
+                Seat::<FourPlayer>::ALL[1],
+                Seat::<FourPlayer>::ALL[2],
+                Seat::<FourPlayer>::ALL[3],
+                Seat::<FourPlayer>::ALL[0],
+            ]
+        );
+    }
+
+    #[test]
+    fn no_reaction_preserves_bipai_and_players() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
+            .zimo()
+            .unwrap()
+            .dapai(Dapai::Moqie(TileKind::P5))
+            .unwrap();
+        let before = (round.bipai().clone(), round.players().clone());
+        let round = round.no_reaction();
+
+        assert_eq!((round.bipai().clone(), round.players().clone()), before);
+    }
 }
