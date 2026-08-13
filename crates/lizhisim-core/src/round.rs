@@ -447,6 +447,22 @@ mod tests {
     }
 
     #[test]
+    fn moqie_appends_zimopai_tile_kind_to_actor_he() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
+            .zimo()
+            .unwrap();
+
+        let result = round
+            .dapai(Dapai::Moqie(TileKind::P5))
+            .ok()
+            .and_then(|round| round.players()[2].he().last().map(|sipai| sipai.tile_kind));
+
+        assert_eq!(result, Some(TileKind::P5));
+    }
+
+    #[test]
     fn first_dapai_clears_actor_first_turn_eligibility() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
