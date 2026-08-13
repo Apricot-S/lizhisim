@@ -14,7 +14,7 @@ pub struct Player<P> {
     seat: Seat<P>,
     bingpai: Bingpai,
     he: He,
-    first_dapai_pending: bool,
+    first_turn_eligible: bool,
 }
 
 impl<P> Player<P> {
@@ -23,7 +23,7 @@ impl<P> Player<P> {
             seat,
             bingpai,
             he: He::new(),
-            first_dapai_pending: true,
+            first_turn_eligible: true,
         }
     }
 
@@ -39,16 +39,16 @@ impl<P> Player<P> {
         &self.he
     }
 
-    pub fn first_dapai_pending(&self) -> bool {
-        self.first_dapai_pending
+    pub fn first_turn_eligible(&self) -> bool {
+        self.first_turn_eligible
     }
 
     #[cfg_attr(
         not(test),
         expect(dead_code, reason = "will be called by fulu and babei transitions")
     )]
-    pub(crate) fn clear_first_dapai_pending(mut self) -> Self {
-        self.first_dapai_pending = false;
+    pub(crate) fn clear_first_turn_eligibility(mut self) -> Self {
+        self.first_turn_eligible = false;
         self
     }
 
@@ -62,7 +62,7 @@ impl<P> Player<P> {
             seat,
             bingpai,
             he,
-            first_dapai_pending: _,
+            first_turn_eligible: _,
         } = self;
 
         let (bingpai, sipai) = match dapai {
@@ -81,7 +81,7 @@ impl<P> Player<P> {
             seat,
             bingpai,
             he,
-            first_dapai_pending: false,
+            first_turn_eligible: false,
         })
     }
 }
@@ -160,7 +160,7 @@ mod tests {
     }
 
     #[test]
-    fn player_tracks_first_dapai_pending_independently_of_empty_he() {
+    fn player_tracks_first_turn_eligibility_independently_of_empty_he() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (_, bingpai) = bipai.qipai();
@@ -170,13 +170,13 @@ mod tests {
         );
 
         assert_eq!(
-            (player.he().iter().next(), player.first_dapai_pending()),
+            (player.he().iter().next(), player.first_turn_eligible()),
             (None, true)
         );
     }
 
     #[test]
-    fn external_action_can_clear_first_dapai_pending() {
+    fn external_action_can_clear_first_turn_eligibility() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (_, bingpai) = bipai.qipai();
@@ -185,6 +185,6 @@ mod tests {
             bingpai.into_iter().next().unwrap(),
         );
 
-        assert!(!player.clear_first_dapai_pending().first_dapai_pending());
+        assert!(!player.clear_first_turn_eligibility().first_turn_eligible());
     }
 }

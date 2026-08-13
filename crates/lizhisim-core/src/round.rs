@@ -349,7 +349,7 @@ mod tests {
     }
 
     #[test]
-    fn first_dapai_clears_actor_first_dapai_pending() {
+    fn first_dapai_clears_actor_first_turn_eligibility() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let round = Round::new(
@@ -366,7 +366,7 @@ mod tests {
             first_dapai_round
                 .players()
                 .each_ref()
-                .map(Player::first_dapai_pending),
+                .map(Player::first_turn_eligible),
             [true, true, false, true]
         );
     }

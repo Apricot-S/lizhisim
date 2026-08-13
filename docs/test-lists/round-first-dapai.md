@@ -31,8 +31,8 @@
 - `He`への追加、`Bingpai`更新、`zimopai`消費は一つの消費型`Round`遷移で行う。
 - 失敗する遷移は型付きerrorを返し、部分更新状態を公開しない。消費済みの`Round`はerrorから回収しない。
 - 反応待ちphaseのactorは打牌者とし、reactor集合はphase固有dataとして後続項目で追加する。
-- `He::is_empty()`から第一打または第一巡の資格を推定しない。配牌後の暗槓または北抜きが第一打より先に行われても意味を失わない明示的なbool flagを状態として保持する。
-- playerごとの「まだ第一打前か」と、Round共通の「第一巡の無 interruption 条件が保たれているか」は別の事実として保持する。天和・地和・人和・ダブル立直は、現在phaseとこれらのflagを組み合わせて判定する。
+- `He::is_empty()`から第一打または第一巡の資格を推定しない。配牌後の暗槓または北抜きが第一打より先に行われても意味を失わない、playerごとの`first_turn_eligible`を状態として保持する。
+- `first_turn_eligible`は第一打に限らず、九種九牌、暗槓、北抜き、副露など第一巡の資格へ影響するactionから更新する。天和・地和・人和・ダブル立直は、現在phaseとplayerごとのflagを組み合わせて判定する。
 - 暗槓、北抜き、副露などの各actionがどのflagを失わせるかはrule variationを確認し、それぞれのrule testを選択した時点で固定する。
 
 ## Examples and tests
@@ -43,10 +43,9 @@
 - [x] initial deal由来の親の最初の`zimopai`は、originから`moqie = false`になる。
 - [x] initial deal由来のoriginが残っていても、牌山が第一`Zimo`直後の枚数でなければ`moqie = true`になる。
 - [x] live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
-- [x] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
-- [x] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
-- [x] 他家の`fulu`や`babei`など、外部から適用される行為によっても対象playerの第一打前flagをfalseへ変更できる。
-- [ ] 他家の第一打前flagを変更せず、打牌によるRound共通の第一巡成立条件だけをruleどおり更新する。
+- [x] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの`first_turn_eligible`を参照する。
+- [x] 最初の`Dapai`後は、そのplayerの`first_turn_eligible`がfalseになる。
+- [x] 他家の`fulu`や`babei`など、外部から適用される行為によっても対象playerの`first_turn_eligible`をfalseへ変更できる。
 
 ### `zimopai`からの`Dapai`
 
@@ -86,9 +85,9 @@
 
 ## Current
 
-- Selected: 他家の第一打前flagを変更せず、打牌によるRound共通の第一巡成立条件だけをruleどおり更新する。
+- Selected: `Bingpai`の牌を捨てると、そのkindが一枚減り、元の`zimopai`が一枚増える。
 - Phase: Not started
-- Why: 他家への`fulu`・`babei`等を実装する境界として、対象`Player`のflagだけを消費型にfalseへ更新できることを確認した。具体的actionの追加は後続scopeとする。
+- Why: playerごとの`first_turn_eligible`を打牌以外の第一巡関連actionにも使える形へ整理したため、次は`Shouqie`の手牌・`zimopai`更新を検証する。
 
 ## Cycle log
 
@@ -106,15 +105,15 @@
 - 2026-08-13: green状態のrefactorとしてaction値を`round/dapai.rs`から`action.rs`と`action/dapai.rs`へ移した。`Round`が`Player`の`Bingpai`と`He`を外側から置換する経路を削除し、文脈から導いた`zimopai`と`moqie`を添えて`Player::dapai`へaction適用を委譲した。
 - 2026-08-13: 上位設計を再確認し、旧状態回収はprotocol/scheduler境界のpending continuationが担い、`Round::dapai`のerror payloadへ旧`Round`を含める必須要件ではないと整理した。旧状態回収用のtransition型とprepared型を削除し、消費型の`Result<NewState, DapaiError>`へ簡素化する。
 - 2026-08-13: `live_wall_zimopai_dapai_is_moqie`を追加した。`FirstZimoOrigin::LiveWall`の最初の`zimopai`を摸切すると`Sipai::moqie = true`になる対照testで、initial deal由来との差を固定した。既存のorigin-based導出でgreenとなった。
-- 2026-08-13: `player_tracks_first_dapai_pending_independently_of_empty_he`を追加した。配牌直後の`He`が空でも、第一打前の事実を独立した`Player`状態として観測できる契約を追加した。`angang`/`babei` actionは未実装のため、打牌後のflag更新は次項目へ分離した。
+- 2026-08-13: `player_tracks_first_turn_eligibility_independently_of_empty_he`へ改名した。配牌直後の`He`が空でも、第一巡資格を独立した`Player`状態として観測できる契約を明確化した。
 - 2026-08-13: `He::is_empty()`を削除し、`He::iter()`を追加した。空`He`の判定と追加済み`Sipai`の列挙をiteratorで検証し、第一打前状態の判定が`He`の専用空判定APIへ依存しないようにした。
-- 2026-08-13: `first_dapai_clears_actor_first_dapai_pending`を追加した。actorの最初の`Dapai`成功後に、そのplayerの第一打前flagだけがfalseになる契約を固定し、`Player::dapai`の消費型遷移でflagを更新した。
-- 2026-08-13: `external_action_can_clear_first_dapai_pending`を追加した。`fulu`・`babei`等の後続actionが対象playerへ適用できる消費型のflag更新境界を追加し、具体的action enumは先行実装しないまま契約を固定した。
+- 2026-08-13: `first_dapai_clears_actor_first_turn_eligibility`へ改名した。actorの最初の`Dapai`成功後に、そのplayerの`first_turn_eligible`だけがfalseになる契約を固定した。
+- 2026-08-13: `external_action_can_clear_first_turn_eligibility`へ改名した。`fulu`・`babei`等の後続actionが対象playerへ適用できる消費型のflag更新境界を明確化した。
 
 ## Completion review
 
 - [ ] 最初の`Zimo` originを渡すruntime値のproduction識別子がreview済みである。
-- [ ] playerごとの第一打前flagとRound共通の第一巡成立flagの所有位置・更新責務がreview済みである。
+- [ ] playerごとの`first_turn_eligible`の所有位置・更新責務がreview済みである。
 - [ ] すべての項目が完了または理由付きで移送されている。
 - [ ] `Bingpai`、`zimopai`、`He`の原子性を確認した。
 - [ ] 不正actionで部分更新状態を公開せず、具体的な型付きerrorを返すことを確認した。
