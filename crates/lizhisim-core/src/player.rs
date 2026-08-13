@@ -53,7 +53,7 @@ impl<P> Player<P> {
             seat,
             bingpai,
             he,
-            first_dapai_pending,
+            first_dapai_pending: _,
         } = self;
 
         let (bingpai, sipai) = match dapai {
@@ -72,7 +72,7 @@ impl<P> Player<P> {
             seat,
             bingpai,
             he,
-            first_dapai_pending,
+            first_dapai_pending: false,
         })
     }
 }

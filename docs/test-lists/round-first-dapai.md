@@ -44,8 +44,8 @@
 - [x] initial deal由来のoriginが残っていても、牌山が第一`Zimo`直後の枚数でなければ`moqie = true`になる。
 - [x] live wall由来の親の最初の`zimopai`は、originから判定するpolicyで`moqie = true`になる。
 - [x] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの第一打前flagを参照する。
-- [ ] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
-- [ ] 他家の`fulu`や`babei`など、外部から適用される行為によっても対象playerの第一打前flagをfalseへ変更できる。
+- [x] 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
+- [ ] **Selected:** 他家の`fulu`や`babei`など、外部から適用される行為によっても対象playerの第一打前flagをfalseへ変更できる。
 - [ ] 他家の第一打前flagを変更せず、打牌によるRound共通の第一巡成立条件だけをruleどおり更新する。
 
 ### `zimopai`からの`Dapai`
@@ -86,9 +86,9 @@
 
 ## Current
 
-- Selected: 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
+- Selected: 他家の`fulu`や`babei`など、外部から適用される行為によっても対象playerの第一打前flagをfalseへ変更できる。
 - Phase: Not started
-- Why: `He`の観測APIを確定したため、次は通常の`Dapai`でactor自身の第一打前flagだけを更新する。
+- Why: 通常の`Dapai`でactor自身の第一打前flagをfalseへ更新できたため、次は他家への外部action適用を検証する。
 
 ## Cycle log
 
@@ -108,6 +108,7 @@
 - 2026-08-13: `live_wall_zimopai_dapai_is_moqie`を追加した。`FirstZimoOrigin::LiveWall`の最初の`zimopai`を摸切すると`Sipai::moqie = true`になる対照testで、initial deal由来との差を固定した。既存のorigin-based導出でgreenとなった。
 - 2026-08-13: `player_tracks_first_dapai_pending_independently_of_empty_he`を追加した。配牌直後の`He`が空でも、第一打前の事実を独立した`Player`状態として観測できる契約を追加した。`angang`/`babei` actionは未実装のため、打牌後のflag更新は次項目へ分離した。
 - 2026-08-13: `He::is_empty()`を削除し、`He::iter()`を追加した。空`He`の判定と追加済み`Sipai`の列挙をiteratorで検証し、第一打前状態の判定が`He`の専用空判定APIへ依存しないようにした。
+- 2026-08-13: `first_dapai_clears_actor_first_dapai_pending`を追加した。actorの最初の`Dapai`成功後に、そのplayerの第一打前flagだけがfalseになる契約を固定し、`Player::dapai`の消費型遷移でflagを更新した。
 
 ## Completion review
 

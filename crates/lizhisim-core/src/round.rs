@@ -349,6 +349,29 @@ mod tests {
     }
 
     #[test]
+    fn first_dapai_clears_actor_first_dapai_pending() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            FirstZimoOrigin::InitialDeal,
+        )
+        .zimo()
+        .unwrap();
+
+        let first_dapai_round = round.dapai(Dapai::Moqie(TileKind::P5)).unwrap();
+
+        assert_eq!(
+            first_dapai_round
+                .players()
+                .each_ref()
+                .map(Player::first_dapai_pending),
+            [true, true, false, true]
+        );
+    }
+
+    #[test]
     fn later_zimopai_dapai_is_moqie_when_initial_deal_origin_remains() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
