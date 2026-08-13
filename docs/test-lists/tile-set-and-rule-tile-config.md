@@ -186,6 +186,8 @@
 
 ## Completion review
 
+- 2026-08-13: 全Rust testを三角測量後の重複という観点で再評価した。`Bingpai`のM1反復4回、M0/M5単独追加、P0/S0の色違い例は、設定上限0/1/3/4と5枚目拒否、およびM0/M5共存を検証する残存testが同じ一般化前の誤実装を検出するため削除した。M0/M5の両追加順は、片方だけでは検出できない順序依存の回帰を拒否する独立した契約として維持した。`TileSet`の空count `is_ok` smoke testは、具体的なcountを構築して`max_count`と`total_count`を検証するtestに包含されるため削除した。M/P/Sごとに別fieldまたは別validation分岐を持つtest、境界、具体的error payloadも独立した契約として維持した。
+
 - [x] coreとrulesの依存方向がADR-0015に一致する。
 - [x] `TileSet`を`Bingpai`と`Bipai`が共通利用する。
 - [x] 赤牌0、1、4枚の境界を確認した。

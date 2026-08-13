@@ -112,11 +112,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn physically_possible_counts_construct_tile_set() {
-        assert!(TileSet::try_from_counts([0; 37]).is_ok());
-    }
-
-    #[test]
     fn tile_set_reports_max_count_for_tile_kind() {
         let mut counts = [0; 37];
         counts[TileKind::M1.index()] = 3;

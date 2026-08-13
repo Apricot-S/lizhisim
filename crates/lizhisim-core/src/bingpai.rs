@@ -99,67 +99,6 @@ mod tests {
     }
 
     #[test]
-    fn adding_same_tile_kind_four_times_has_count_four() {
-        assert_eq!(
-            Bingpai::red_three_four_player()
-                .with_added(TileKind::M1)
-                .unwrap()
-                .with_added(TileKind::M1)
-                .unwrap()
-                .with_added(TileKind::M1)
-                .unwrap()
-                .with_added(TileKind::M1)
-                .unwrap()
-                .counts()[0],
-            4,
-        );
-    }
-
-    #[test]
-    fn adding_m0_to_empty_bingpai_has_one_m0() {
-        assert_eq!(
-            Bingpai::red_three_four_player()
-                .with_added(TileKind::M0)
-                .unwrap()
-                .counts()[TileKind::M0.index()],
-            1,
-        );
-    }
-
-    #[test]
-    fn adding_m0_to_empty_bingpai_does_not_change_m5_count() {
-        assert_eq!(
-            Bingpai::red_three_four_player()
-                .with_added(TileKind::M0)
-                .unwrap()
-                .counts()[TileKind::M5.index()],
-            0,
-        );
-    }
-
-    #[test]
-    fn adding_m5_to_empty_bingpai_has_one_m5() {
-        assert_eq!(
-            Bingpai::red_three_four_player()
-                .with_added(TileKind::M5)
-                .unwrap()
-                .counts()[TileKind::M5.index()],
-            1,
-        );
-    }
-
-    #[test]
-    fn adding_m5_to_empty_bingpai_does_not_change_m0_count() {
-        assert_eq!(
-            Bingpai::red_three_four_player()
-                .with_added(TileKind::M5)
-                .unwrap()
-                .counts()[TileKind::M0.index()],
-            0,
-        );
-    }
-
-    #[test]
     fn removing_present_tile_kind_decreases_its_count() {
         assert_eq!(
             Bingpai::red_three_four_player()
@@ -239,28 +178,6 @@ mod tests {
                 bingpai.counts()[TileKind::M5.index()],
             ],
             [1, 1],
-        );
-    }
-
-    #[test]
-    fn adding_p0_to_empty_bingpai_does_not_change_p5_count() {
-        assert_eq!(
-            Bingpai::red_three_four_player()
-                .with_added(TileKind::P0)
-                .unwrap()
-                .counts()[TileKind::P5.index()],
-            0,
-        );
-    }
-
-    #[test]
-    fn adding_s0_to_empty_bingpai_does_not_change_s5_count() {
-        assert_eq!(
-            Bingpai::red_three_four_player()
-                .with_added(TileKind::S0)
-                .unwrap()
-                .counts()[TileKind::S5.index()],
-            0,
         );
     }
 
