@@ -109,6 +109,7 @@ impl PlayerSet for FourPlayer {
 
 #[cfg(test)]
 mod tests {
+    use crate::bingpai::BingpaiError;
     use crate::bipai::Bipai;
     use crate::player_set::FourPlayer;
     use crate::seat::Seat;
@@ -294,6 +295,27 @@ mod tests {
                     moqie: false,
                 }),
             ]
+        );
+    }
+
+    #[test]
+    fn shouqie_from_absent_bingpai_tile_reports_tile_kind() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let (_, bingpai) = bipai.qipai();
+        let player = Player::from_qipai(
+            Seat::<FourPlayer>::ALL[0],
+            bingpai.into_iter().next().unwrap(),
+        );
+
+        assert_eq!(
+            player.dapai(PlayerDapai::ShouqieFromBingpai {
+                tile_kind: TileKind::Z4,
+                zimopai: TileKind::P5,
+            }),
+            Err(DapaiError::Bingpai(BingpaiError::TileNotPresent {
+                tile_kind: TileKind::Z4,
+            }))
         );
     }
 }
