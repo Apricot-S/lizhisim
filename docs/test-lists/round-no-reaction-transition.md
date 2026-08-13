@@ -65,6 +65,7 @@ request、応答、優先順位をまだモデル化しないため、反応な�
 - 2026-08-14: `no_reaction_advances_actor_from_seat_two_to_seat_three`を追加した。`Round<FourPlayer, DapaiCompleted>`だけに`no_reaction(self) -> Round<FourPlayer, ZimoPending>`を追加し、seat 2の打牌後にseat 3へ進むことをgreenにした。`FirstZimoOrigin`は局共通のrule contextとして`Round`が保持し、親第一打の特例は同値と親actor・`first_turn_eligible`の組合せだけで判定する。初回・通常巡目を別typestateにせず、共通の`zimo`・打牌遷移を重複させない。
 - 2026-08-14: `no_reaction_advances_every_seat_in_fixed_order`を追加した。各seatを親として実際に`zimo`と`dapai`を行い、反応なし後のactor列を`[1, 2, 3, 0]`と一assertionで比較した。seat 2からseat 3の最小例に対する三角測量であり、既存の剰余演算による実装でgreenとなった。
 - 2026-08-14: `no_reaction_preserves_bipai_and_players`を追加した。打牌後の`Bipai`と全playerをcloneした組と、`no_reaction`後の組を一assertionで比較し、actor以外の共通状態を値のまま移送する既存実装でgreenとなった。
+- 2026-08-14: `no_reaction_advances_actor_from_seat_two_to_seat_three`を削除した。`no_reaction_advances_every_seat_in_fixed_order`が同じ実遷移列でseat 2からseat 3を含む全4通りとseat 3からseat 0の境界を検証するため、単独testを残しても独立した契約を増やさない。
 
 ## Completion review
 

@@ -506,21 +506,6 @@ mod tests {
     }
 
     #[test]
-    fn no_reaction_advances_actor_from_seat_two_to_seat_three() {
-        let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round: Round<FourPlayer, ZimoPending> =
-            Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
-                .zimo()
-                .unwrap()
-                .dapai(Dapai::Moqie(TileKind::P5))
-                .unwrap()
-                .no_reaction();
-
-        assert_eq!(*round.actor(), Seat::<FourPlayer>::ALL[3]);
-    }
-
-    #[test]
     fn no_reaction_advances_every_seat_in_fixed_order() {
         let next_actors = Seat::<FourPlayer>::ALL.map(|zhuangjia| {
             let (tiles, tile_set) = red_three_tiles();
