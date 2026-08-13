@@ -156,6 +156,11 @@ playerごとの状態を組み合わせて判定する。暗槓、北抜き等�
 
 `Round` を nullable field の集合で表現しない。Phase ごとに必要な data と合法な遷移を分ける。
 
+`FirstZimoOrigin`は親の初回ツモ方式を表す局共通のrule contextとして`Round`が保持する。
+親第一打の特例は`FirstZimoOrigin::InitialDeal`、親actor、`Player::first_turn_eligible()`を組み合わせて
+判定する。第一打後はplayerのflagによってこの条件が成立しない。初回と通常巡目を別typestateにせず、
+共通の`zimo`・打牌遷移を重複させない。
+
 配牌済み`Bipai`、player set固有の`Player`集合、現在actor、親は進行中の全phaseで必要なため、
 phase payloadではなく`Round<P, State>`が直接所有する。`State`は`zimopai`、打牌原因、reactor集合など
 そのphaseだけに存在するdataを保持する。共通dataも不変値ではなく、消費型遷移が必要なfieldを更新して

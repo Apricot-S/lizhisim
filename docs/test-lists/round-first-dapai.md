@@ -42,7 +42,7 @@
 
 ### Origin and first-turn state
 
-- [x] `Round`開始時に指定した`FirstZimoOrigin`を、ツモ後typestateが保持する。
+- [x] `Round`開始時に指定した`FirstZimoOrigin`を、最初のツモ後typestateだけが保持する。
 - [x] initial deal由来の親第一打で`Shouqie(zimopai)`を選ぶと、`Bingpai` countsを変更せず`zimopai`を捨て、`Sipai::moqie = false`になる。
 - [x] initial deal由来でもactorが親でなければ、`Shouqie(zimopai)`の特例を適用しない。
 - [x] initial deal由来の親第一打で`Moqie`を指定すると、型付きerrorで拒否する。

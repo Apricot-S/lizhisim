@@ -35,8 +35,8 @@ request、応答、優先順位をまだモデル化しないため、反応な�
 
 ### 反応なしから次手番へ
 
-- [ ] **Selected:** 打牌者がseat 2のとき、反応なし遷移後のactorはseat 3であり、戻り値はツモ前typestateである。
-- [ ] 四つの開始seatすべてで、反応なし遷移は固定seat順に一つ進み、seat 3の次はseat 0になる。
+- [x] 打牌者がseat 2のとき、反応なし遷移後のactorはseat 3であり、戻り値はツモ前typestateである。
+- [ ] **Selected:** 四つの開始seatすべてで、反応なし遷移は固定seat順に一つ進み、seat 3の次はseat 0になる。
 - [ ] 反応なし遷移は`Bipai`と全playerの状態を変更しない。
 - [ ] 反応なし遷移後の通常`zimo`は、次actorに牌山の次の通常ツモ牌を渡す。
 
@@ -54,13 +54,15 @@ request、応答、優先順位をまだモデル化しないため、反応な�
 
 ## Current
 
-- Selected: 打牌者がseat 2のとき、反応なし遷移後のactorはseat 3であり、戻り値はツモ前typestateである。
+- Selected: 四つの開始seatすべてで、反応なし遷移は固定seat順に一つ進み、seat 3の次はseat 0になる。
 - Phase: Not started
-- Why: 反応なしの遷移が次の通常`zimo`へ接続する最小境界であり、固定seat順のactor更新だけを観測できるため。
+- Why: seat 2からseat 3への最小例で`no_reaction`と通常巡目の`ZimoPending`への遷移を固定したため、次は全seatの循環とwrap-aroundを三角測量する。
 
 ## Cycle log
 
 - 2026-08-14: `Round`の最初の`Dapai`縦切りの後継として作成した。副露・和了・call windowを先行実装せず、反応なしという解決済み結果から次actorのツモ前typestateへ移る最小遷移を先に固定する。最初のtestはseat 2からseat 3への一例に限定し、次項目で四seatの循環を三角測量する。
+- 2026-08-14: `no_reaction`未定義によるcompile errorをredとして確認した。`FirstZimoOrigin`は親の第一ツモだけに使うrule差分用の型であり、通常巡目の取得元へ一般化しない。
+- 2026-08-14: `no_reaction_advances_actor_from_seat_two_to_seat_three`を追加した。`Round<FourPlayer, DapaiCompleted>`だけに`no_reaction(self) -> Round<FourPlayer, ZimoPending>`を追加し、seat 2の打牌後にseat 3へ進むことをgreenにした。`FirstZimoOrigin`は局共通のrule contextとして`Round`が保持し、親第一打の特例は同値と親actor・`first_turn_eligible`の組合せだけで判定する。初回・通常巡目を別typestateにせず、共通の`zimo`・打牌遷移を重複させない。
 
 ## Completion review
 

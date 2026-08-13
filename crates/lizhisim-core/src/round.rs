@@ -14,6 +14,7 @@ pub struct Round<P: PlayerSet + BipaiSpec, State> {
     players: P::Players,
     actor: Seat<P>,
     zhuangjia: Seat<P>,
+    first_zimo_origin: FirstZimoOrigin,
     state: State,
 }
 
@@ -23,13 +24,10 @@ pub enum FirstZimoOrigin {
     LiveWall,
 }
 
-pub struct ZimoPending {
-    origin: FirstZimoOrigin,
-}
+pub struct ZimoPending;
 
 pub struct ZimoCompleted {
     zimopai: TileKind,
-    origin: FirstZimoOrigin,
 }
 
 pub struct DapaiCompleted;
@@ -49,6 +47,10 @@ impl<P: PlayerSet + BipaiSpec, State> Round<P, State> {
 
     pub fn zhuangjia(&self) -> &Seat<P> {
         &self.zhuangjia
+    }
+
+    pub fn first_zimo_origin(&self) -> FirstZimoOrigin {
+        self.first_zimo_origin
     }
 }
 
@@ -78,9 +80,8 @@ impl Round<FourPlayer, ZimoPending> {
             players,
             actor: zhuangjia,
             zhuangjia,
-            state: ZimoPending {
-                origin: first_zimo_origin,
-            },
+            first_zimo_origin,
+            state: ZimoPending,
         }
     }
 
@@ -92,10 +93,8 @@ impl Round<FourPlayer, ZimoPending> {
             players: self.players,
             actor: self.actor,
             zhuangjia: self.zhuangjia,
-            state: ZimoCompleted {
-                zimopai,
-                origin: self.state.origin,
-            },
+            first_zimo_origin: self.first_zimo_origin,
+            state: ZimoCompleted { zimopai },
         })
     }
 }
@@ -105,23 +104,20 @@ impl Round<FourPlayer, ZimoCompleted> {
         self.state.zimopai
     }
 
-    pub fn first_zimo_origin(&self) -> FirstZimoOrigin {
-        self.state.origin
-    }
-
     pub fn dapai(self, dapai: Dapai) -> Result<Round<FourPlayer, DapaiCompleted>, DapaiError> {
         let Self {
             bipai,
             players,
             actor,
             zhuangjia,
+            first_zimo_origin,
             state,
         } = self;
 
         let actor_index = actor.index();
         let player_dapai = match dapai {
             Dapai::Moqie(_)
-                if state.origin == FirstZimoOrigin::InitialDeal
+                if first_zimo_origin == FirstZimoOrigin::InitialDeal
                     && actor == zhuangjia
                     && players[actor_index].first_turn_eligible() =>
             {
@@ -129,7 +125,7 @@ impl Round<FourPlayer, ZimoCompleted> {
             }
             Dapai::Moqie(tile_kind) => PlayerDapai::Moqie(tile_kind),
             Dapai::Shouqie(tile_kind)
-                if state.origin == FirstZimoOrigin::InitialDeal
+                if first_zimo_origin == FirstZimoOrigin::InitialDeal
                     && actor == zhuangjia
                     && players[actor_index].first_turn_eligible()
                     && tile_kind == state.zimopai =>
@@ -156,8 +152,25 @@ impl Round<FourPlayer, ZimoCompleted> {
             players,
             actor,
             zhuangjia,
+            first_zimo_origin,
             state: DapaiCompleted,
         })
+    }
+}
+
+impl Round<FourPlayer, DapaiCompleted> {
+    pub fn no_reaction(self) -> Round<FourPlayer, ZimoPending> {
+        let actor_index = self.actor.index();
+        let next_actor = Seat::<FourPlayer>::ALL[(actor_index + 1) % Seat::<FourPlayer>::ALL.len()];
+
+        Round {
+            bipai: self.bipai,
+            players: self.players,
+            actor: next_actor,
+            zhuangjia: self.zhuangjia,
+            first_zimo_origin: self.first_zimo_origin,
+            state: ZimoPending,
+        }
     }
 }
 
@@ -386,6 +399,7 @@ mod tests {
             players,
             actor: _,
             zhuangjia,
+            first_zimo_origin,
             state,
         } = round;
         let round = Round {
@@ -393,6 +407,7 @@ mod tests {
             players,
             actor: Seat::<FourPlayer>::ALL[1],
             zhuangjia,
+            first_zimo_origin,
             state,
         };
 
@@ -475,6 +490,7 @@ mod tests {
             players,
             actor: _,
             zhuangjia,
+            first_zimo_origin,
             state,
         } = round;
         let dapai_actor = Seat::<FourPlayer>::ALL[1];
@@ -483,6 +499,7 @@ mod tests {
             players,
             actor: dapai_actor,
             zhuangjia,
+            first_zimo_origin,
             state,
         };
 
@@ -514,5 +531,20 @@ mod tests {
                 .map(Player::first_turn_eligible),
             [true, true, false, true]
         );
+    }
+
+    #[test]
+    fn no_reaction_advances_actor_from_seat_two_to_seat_three() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round: Round<FourPlayer, ZimoPending> =
+            Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
+                .zimo()
+                .unwrap()
+                .dapai(Dapai::Moqie(TileKind::P5))
+                .unwrap()
+                .no_reaction();
+
+        assert_eq!(*round.actor(), Seat::<FourPlayer>::ALL[3]);
     }
 }
