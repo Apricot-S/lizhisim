@@ -59,7 +59,12 @@ preset metadataを所有する。解決後にcoreが実行時検証で使う37�
 policy値を抽出して渡し、coreはschema、preset identity、出典、内容hashを参照しない。
 詳細は[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)を参照する。
 
-親へ14枚を配る方式と、親へ13枚を配って第一`Zimo`を行う方式は、[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)に従い、内部ではどちらも`RoundStarted`後の最初の`Zimo`へ正規化する。設定は最初の牌がinitial deal由来かlive wall由来かを表し、`moqie`を別のrule optionとして重複設定しない。
+親へ14枚を配る方式と、親へ13枚を配って第一`Zimo`を行う方式は、
+[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)と
+[ADR-0016](../adr/0016-initial-deal-shouqie-action.md)に従い、内部ではどちらも`RoundStarted`後の
+最初の`Zimo`へ正規化する。設定は最初の牌がinitial deal由来かlive wall由来かを表す。
+initial deal由来の親第一打では`Moqie`を提示せず、分離された`zimopai`を含む14枚を
+`Shouqie`の対象とする。`moqie`を独立したrule optionとして重複設定しない。
 
 ### 3.2 行為
 

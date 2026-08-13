@@ -117,13 +117,20 @@ index 130から、それぞれ2ずつ戻る。取得時点と可視性は`Round`
 
 牌山生成はadapterの責務だが、生成後の牌山は`TileKind`の完全な列としてcoreに渡す。seedのみの保存はRNG実装版が固定されている場合に限る。
 
-親へ14枚を配るruleも、親へ13枚を配って第一`Zimo`を行うruleも、coreでは`bingpai`最大13枚と分離した`zimopai`へ正規化する。initial deal由来の14枚目はcanonical event上の最初の`Zimo`にするが、その直後に同じ牌を`Dapai`してもlive wall由来の`zimopai`を捨てたとは扱わない。詳細は[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)に従う。
+親へ14枚を配るruleも、親へ13枚を配って第一`Zimo`を行うruleも、coreでは`bingpai`最大13枚と
+分離した`zimopai`へ正規化する。initial deal由来の14枚目はcanonical event上の最初の`Zimo`に
+するが、親第一打の合法actionには`Moqie`を含めない。`Shouqie`が`bingpai`と`zimopai`を合わせた
+14枚を対象とし、`zimopai`と同じ`TileKind`を選んだ場合は`bingpai`のcountsを変更せず
+`zimopai`を手切する。live wall由来の`zimopai`を捨てる`Moqie`とは区別する。詳細は
+[ADR-0012](../adr/0012-normalize-dealer-first-draw.md)と
+[ADR-0016](../adr/0016-initial-deal-shouqie-action.md)に従う。
 
 第一打および第一巡に依存する条件を`He::is_empty()`から推定しない。第一打前に暗槓または北抜きが
-行われても`He`は空のままであり、状態の意味を復元できないためである。playerごとの「まだ第一打前か」と、
-Round共通の「第一巡の無 interruption 条件が保たれているか」を明示的な状態として分ける。天和、地和、
-人和、ダブル立直は、現在phaseとこれらの状態を組み合わせて判定する。暗槓、北抜き、副露等が各状態を
-失わせる条件はrule variationとして検証し、対応するaction遷移が原子的に更新する。
+行われても`He`は空のままであり、状態の意味を復元できないためである。各playerが第一巡の資格を
+保持するかを`first_turn_eligible`として持つ。通常の`Dapai`ではactorだけをfalseにし、副露など
+第一巡を中断するactionでは全playerをfalseにする。天和、地和、人和、ダブル立直は、現在phaseと
+playerごとの状態を組み合わせて判定する。暗槓、北抜き等が資格を失わせる条件はrule variationとして
+検証し、対応するaction遷移が原子的に更新する。
 
 `Sipai`は`TileKind`と`moqie`だけを保持し、各要素へ立直宣言牌flagを持たせない。立直宣言牌は一人につき
 高々一枚であり、追記専用の`He`における位置をplayerの`LizhiState`から参照する。位置は裸の整数ではなく、

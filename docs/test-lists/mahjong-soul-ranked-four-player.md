@@ -126,7 +126,7 @@
 - [ ] `Daminggang`成立後は`Chi`または`Peng`後の打牌待ちではなく、嶺上ツモ待ちtypestateへ遷移する。
 - [ ] 各遷移は元のtypestateを消費し、同じツモ牌、打牌、または副露を二重適用できない。
 - [ ] `RoundStarted`後、initial deal由来の最初の`Zimo`を発行し、親だけに`Dapai`要求を発行して中断する。
-- [ ] initial deal由来の牌を最初に`Dapai`した場合、`moqie = false`として記録する。
+- [ ] initial deal由来の親第一打では`Moqie`を候補に含めず、`zimopai`と同じ牌種も`Shouqie`として提示・記録する。
 - [ ] live wall由来の`zimopai`を直後に`Dapai`した場合、`moqie = true`として記録する。
 - [ ] 要求はrequest ID、table ID、actor、観測schema、合法action、continuation tokenを持つ。
 - [ ] `Observation<Seat>`は他seatの`bingpai`と未公開`TileKind`の個数を含まない。

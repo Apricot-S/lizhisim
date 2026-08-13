@@ -1,8 +1,9 @@
 # ADR-0012: 親の14枚配牌を最初の`Zimo`へ正規化する
 
-- Status: Accepted
+- Status: Superseded
 - Date: 2026-08-09
 - Deciders: Project owner
+- Superseded by: [ADR-0016](0016-initial-deal-shouqie-action.md)
 
 ## Context
 

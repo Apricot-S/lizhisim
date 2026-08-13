@@ -25,10 +25,11 @@
 | [0009](0009-minimized-game-record-evidence.md) | Superseded | 牌譜を保存せず承認済み最小fixtureへ変換する |
 | [0010](0010-mahjong-soul-record-conformance.md) | Superseded | `majsoul-record`を外部入力として二段階検証する |
 | [0011](0011-one-pass-majsoul-conformance.md) | Accepted | `majsoul-record`を1パスで逐次conformance検証する |
-| [0012](0012-normalize-dealer-first-draw.md) | Accepted | 親の14枚配牌を最初の`Zimo`へ正規化する |
+| [0012](0012-normalize-dealer-first-draw.md) | Superseded | 親の14枚配牌を最初の`Zimo`へ正規化する |
 | [0013](0013-tile-kind-without-copy-identity.md) | Accepted | 赤牌を含む37種類の`TileKind`を使い牌の個別identityを持たない |
 | [0014](0014-facade-and-core-crates.md) | Accepted | `lizhisim`をre-export facade、`lizhisim-core`を実装所有crateとする |
 | [0015](0015-rule-and-domain-tile-ownership.md) | Accepted | 牌構成設定をrules、実行時牌上限をcoreが所有する |
+| [0016](0016-initial-deal-shouqie-action.md) | Accepted | 14枚配牌の親第一打は`Shouqie`だけを提示する |
 
 ## Template
 
