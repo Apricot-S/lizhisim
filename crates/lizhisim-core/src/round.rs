@@ -4,7 +4,7 @@
 
 use crate::action::{Dapai, DapaiError};
 use crate::bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
-use crate::player::Player;
+use crate::player::{Player, PlayerDapai};
 use crate::player_set::{FourPlayer, PlayerSet};
 use crate::seat::Seat;
 use crate::tile::TileKind;
@@ -110,13 +110,6 @@ impl Round<FourPlayer, ZimoCompleted> {
     }
 
     pub fn dapai(self, dapai: Dapai) -> Result<Round<FourPlayer, DapaiCompleted>, DapaiError> {
-        let moqie = match dapai {
-            Dapai::Moqie(_) => {
-                self.state.origin == FirstZimoOrigin::LiveWall || !self.bipai.is_after_first_zimo()
-            }
-            Dapai::Shouqie(_) => false,
-        };
-
         let Self {
             bipai,
             mut players,
@@ -126,9 +119,24 @@ impl Round<FourPlayer, ZimoCompleted> {
         } = self;
 
         let actor_index = actor.index();
+        let player_dapai = match dapai {
+            Dapai::Moqie(tile_kind) => PlayerDapai::Moqie(tile_kind),
+            Dapai::Shouqie(tile_kind)
+                if state.origin == FirstZimoOrigin::InitialDeal
+                    && actor == zhuangjia
+                    && players[actor_index].first_turn_eligible()
+                    && tile_kind == state.zimopai =>
+            {
+                PlayerDapai::ShouqieFromZimopai(tile_kind)
+            }
+            Dapai::Shouqie(tile_kind) => PlayerDapai::ShouqieFromBingpai {
+                tile_kind,
+                zimopai: state.zimopai,
+            },
+        };
         players.swap(0, actor_index);
         let [player, player1, player2, player3] = players;
-        let player = player.dapai(dapai, state.zimopai, moqie)?;
+        let player = player.dapai(player_dapai)?;
         let mut players = [player, player1, player2, player3];
         players.swap(0, actor_index);
 
@@ -301,7 +309,7 @@ mod tests {
     }
 
     #[test]
-    fn initial_deal_zimopai_dapai_is_not_moqie() {
+    fn initial_deal_zimopai_can_be_shouqie() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let round = Round::new(
@@ -311,18 +319,63 @@ mod tests {
         )
         .zimo()
         .unwrap();
+        let bingpai_counts = *round.players()[2].bingpai().counts();
 
-        let sipai = round
-            .dapai(Dapai::Moqie(TileKind::P5))
-            .ok()
-            .and_then(|round| round.players()[2].he().last().cloned());
+        let result = round.dapai(Dapai::Shouqie(TileKind::P5)).ok().map(|round| {
+            (
+                *round.players()[2].bingpai().counts(),
+                round.players()[2].he().last().cloned(),
+            )
+        });
 
         assert_eq!(
-            sipai,
-            Some(Sipai {
-                tile_kind: TileKind::P5,
-                moqie: false,
-            })
+            result,
+            Some((
+                bingpai_counts,
+                Some(Sipai {
+                    tile_kind: TileKind::P5,
+                    moqie: false,
+                }),
+            ))
+        );
+    }
+
+    #[test]
+    fn initial_deal_zimopai_shouqie_exception_requires_zhuangjia_actor() {
+        let (mut tiles, tile_set) = red_three_tiles();
+        tiles.swap(52, 120);
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            FirstZimoOrigin::InitialDeal,
+        )
+        .zimo()
+        .unwrap();
+        let Round {
+            bipai,
+            players,
+            actor: _,
+            zhuangjia,
+            state,
+        } = round;
+        let round = Round {
+            bipai,
+            players,
+            actor: Seat::<FourPlayer>::ALL[1],
+            zhuangjia,
+            state,
+        };
+
+        let result = round.dapai(Dapai::Shouqie(TileKind::Z4));
+
+        assert_eq!(
+            result.map(|_| ()),
+            Err(DapaiError::Bingpai(
+                crate::bingpai::BingpaiError::TileNotPresent {
+                    tile_kind: TileKind::Z4,
+                }
+            ))
         );
     }
 
@@ -360,7 +413,7 @@ mod tests {
         .zimo()
         .unwrap();
 
-        let first_dapai_round = round.dapai(Dapai::Moqie(TileKind::P5)).unwrap();
+        let first_dapai_round = round.dapai(Dapai::Shouqie(TileKind::P5)).unwrap();
 
         assert_eq!(
             first_dapai_round
@@ -369,40 +422,5 @@ mod tests {
                 .map(Player::first_turn_eligible),
             [true, true, false, true]
         );
-    }
-
-    #[test]
-    fn later_zimopai_dapai_is_moqie_when_initial_deal_origin_remains() {
-        let (tiles, tile_set) = red_three_tiles();
-        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(
-            bipai,
-            Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::InitialDeal,
-        )
-        .zimo()
-        .unwrap();
-        let Round {
-            bipai,
-            players,
-            actor,
-            zhuangjia,
-            state,
-        } = round;
-        let (bipai, _) = bipai.zimo().unwrap();
-        let round = Round {
-            bipai,
-            players,
-            actor,
-            zhuangjia,
-            state,
-        };
-
-        let moqie = round
-            .dapai(Dapai::Moqie(TileKind::P5))
-            .ok()
-            .and_then(|round| round.players()[2].he().last().map(|sipai| sipai.moqie));
-
-        assert_eq!(moqie, Some(true));
     }
 }

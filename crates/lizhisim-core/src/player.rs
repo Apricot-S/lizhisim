@@ -2,12 +2,21 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use crate::action::{Dapai, DapaiError};
+use crate::action::DapaiError;
 use crate::bingpai::Bingpai;
 use crate::he::{He, Sipai};
 use crate::player_set::{FourPlayer, PlayerSet};
 use crate::seat::Seat;
 use crate::tile::TileKind;
+
+pub(crate) enum PlayerDapai {
+    Moqie(TileKind),
+    ShouqieFromBingpai {
+        tile_kind: TileKind,
+        zimopai: TileKind,
+    },
+    ShouqieFromZimopai(TileKind),
+}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Player<P> {
@@ -52,12 +61,7 @@ impl<P> Player<P> {
         self
     }
 
-    pub(crate) fn dapai(
-        self,
-        dapai: Dapai,
-        zimopai: TileKind,
-        moqie: bool,
-    ) -> Result<Self, DapaiError> {
+    pub(crate) fn dapai(self, dapai: PlayerDapai) -> Result<Self, DapaiError> {
         let Self {
             seat,
             bingpai,
@@ -66,9 +70,22 @@ impl<P> Player<P> {
         } = self;
 
         let (bingpai, sipai) = match dapai {
-            Dapai::Moqie(tile_kind) => (bingpai, Sipai { tile_kind, moqie }),
-            Dapai::Shouqie(tile_kind) => (
+            PlayerDapai::Moqie(tile_kind) => (
+                bingpai,
+                Sipai {
+                    tile_kind,
+                    moqie: true,
+                },
+            ),
+            PlayerDapai::ShouqieFromBingpai { tile_kind, zimopai } => (
                 bingpai.with_removed(tile_kind)?.with_added(zimopai)?,
+                Sipai {
+                    tile_kind,
+                    moqie: false,
+                },
+            ),
+            PlayerDapai::ShouqieFromZimopai(tile_kind) => (
+                bingpai,
                 Sipai {
                     tile_kind,
                     moqie: false,
@@ -199,7 +216,10 @@ mod tests {
         );
 
         let player = player
-            .dapai(Dapai::Shouqie(TileKind::M1), TileKind::P5, false)
+            .dapai(PlayerDapai::ShouqieFromBingpai {
+                tile_kind: TileKind::M1,
+                zimopai: TileKind::P5,
+            })
             .unwrap();
 
         assert_eq!(

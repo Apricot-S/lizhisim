@@ -43,8 +43,9 @@
 ### Origin and first-turn state
 
 - [x] `Round`開始時に指定した`FirstZimoOrigin`を、ツモ後typestateが保持する。
-- [ ] **Selected:** initial deal由来の親第一打で`Shouqie(zimopai)`を選ぶと、`Bingpai` countsを変更せず`zimopai`を捨て、`Sipai::moqie = false`になる。
-- [ ] initial deal由来の親第一打で`Moqie`を指定すると、型付きerrorで拒否する。
+- [x] initial deal由来の親第一打で`Shouqie(zimopai)`を選ぶと、`Bingpai` countsを変更せず`zimopai`を捨て、`Sipai::moqie = false`になる。
+- [x] initial deal由来でもactorが親でなければ、`Shouqie(zimopai)`の特例を適用しない。
+- [ ] **Selected:** initial deal由来の親第一打で`Moqie`を指定すると、型付きerrorで拒否する。
 - [x] live wall由来の親の最初の`zimopai`を`Moqie`すると、`Sipai::moqie = true`になる。
 - [x] 第一打前に暗槓または北抜きがあっても、`He`の空判定ではなくplayerごとの`first_turn_eligible`を参照する。
 - [x] 最初の`Dapai`後は、そのplayerの`first_turn_eligible`がfalseになる。
@@ -95,9 +96,9 @@
 
 ## Current
 
-- Selected: initial deal由来の親第一打で`Shouqie(zimopai)`を選ぶと、`Bingpai` countsを変更せず`zimopai`を捨て、`Sipai::moqie = false`になる。
+- Selected: initial deal由来の親第一打で`Moqie`を指定すると、型付きerrorで拒否する。
 - Phase: Not started
-- Why: ADR-0016で訂正した14枚配牌の親第一打を最小のcore遷移で固定し、旧仕様のorigin依存`moqie`補正を置き換える。
+- Why: `Shouqie(zimopai)`の成功経路を固定したため、同じ文脈で旧仕様の`Moqie`を受理しないことをcore境界で検証する。
 
 ## Cycle log
 
@@ -122,6 +123,8 @@
 - 2026-08-13: `shouqie_moves_one_tile_kind_from_bingpai_to_zimopai`を追加した。`Player::dapai`の`Shouqie`が指定`Bingpai`を1枚減らし、文脈の`zimopai`を1枚加える契約を単体testで固定した。
 - 2026-08-13: 親の14枚配牌における第一打の仕様認識を訂正し、ADR-0016へ記録した。旧仕様の`initial_deal`由来`Moqie`を`moqie = false`へ補正する項目を廃止した。新仕様では合法候補に`Moqie`を含めず、分離された`zimopai`も`Shouqie`の対象とする。`Moqie`は常に`moqie = true`、`Shouqie`は常に`moqie = false`とし、既存の`initial_deal_zimopai_dapai_is_not_moqie`とorigin依存補正testは後続実装で置き換える。
 - 2026-08-13: 第一巡中断時の状態をRound共通flagではなくplayerごとの`first_turn_eligible`へ統一した。通常の`Dapai`はactorだけをfalseにし、`fulu`等のinterruptionは全playerをfalseにする。以前追加した対象playerだけを外部からfalseにするtestは、具体的な中断actionのtestで置き換える。
+- 2026-08-13: `initial_deal_zimopai_can_be_shouqie`へ旧testを置き換えた。redでは`Shouqie(P5)`が`Bingpai`に存在しないため失敗した。`Round`がorigin、actorの`first_turn_eligible`、`zimopai`との一致から検証済み`PlayerDapai`へ変換し、`ShouqieFromZimopai`が`Bingpai`を変更せず`moqie = false`の`Sipai`を追加してgreenにした。refactorで`Sipai::moqie`をaction由来へ統一し、旧origin補正専用の`Bipai::is_after_first_zimo`とtestを削除した。
+- 2026-08-13: `initial_deal_zimopai_shouqie_exception_requires_zhuangjia_actor`を追加した。redではinitial deal originと第一巡資格だけで非親actorにも`ShouqieFromZimopai`特例が適用された。特例guardへ`actor == zhuangjia`を追加し、残り枚数ではなく親第一打というdomain条件を直接表現してgreenにした。
 
 ## Completion review
 
