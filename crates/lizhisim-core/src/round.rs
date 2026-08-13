@@ -431,6 +431,22 @@ mod tests {
     }
 
     #[test]
+    fn moqie_preserves_actor_bingpai_counts() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
+            .zimo()
+            .unwrap();
+        let bingpai_counts = *round.players()[2].bingpai().counts();
+
+        let result = round
+            .dapai(Dapai::Moqie(TileKind::P5))
+            .map(|round| *round.players()[2].bingpai().counts());
+
+        assert_eq!(result, Ok(bingpai_counts));
+    }
+
+    #[test]
     fn first_dapai_clears_actor_first_turn_eligibility() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();

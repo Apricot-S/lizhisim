@@ -53,7 +53,7 @@
 
 ### live wall等の`zimopai`からの`Moqie`
 
-- [ ] `zimopai`を捨てると、actorの`Bingpai` countsは変わらない。
+- [x] `zimopai`を捨てると、actorの`Bingpai` countsは変わらない。
 - [ ] `zimopai`を捨てると、actorの`He`末尾へ同じ`TileKind`が追加される。
 - [ ] 成功後のtypestateは`zimopai`を所有しない。
 - [ ] 成功後の反応待ちphaseのactorは打牌者である。
@@ -96,9 +96,9 @@
 
 ## Current
 
-- Selected: `zimopai`を捨てると、actorの`Bingpai` countsは変わらない。
+- Selected: `zimopai`を捨てると、actorの`He`末尾へ同じ`TileKind`が追加される。
 - Phase: Not started
-- Why: initial deal由来の親第一打で`Moqie`をcore境界から拒否できたため、次はlive wall等の通常`Moqie`における`Bingpai`不変を検証する。
+- Why: live wall由来の通常`Moqie`でactorの`Bingpai` counts全体が不変であることを固定したため、次は`He`への牌種追加を検証する。
 
 ## Cycle log
 
@@ -126,6 +126,7 @@
 - 2026-08-13: `initial_deal_zimopai_can_be_shouqie`へ旧testを置き換えた。redでは`Shouqie(P5)`が`Bingpai`に存在しないため失敗した。`Round`がorigin、actorの`first_turn_eligible`、`zimopai`との一致から検証済み`PlayerDapai`へ変換し、`ShouqieFromZimopai`が`Bingpai`を変更せず`moqie = false`の`Sipai`を追加してgreenにした。refactorで`Sipai::moqie`をaction由来へ統一し、旧origin補正専用の`Bipai::is_after_first_zimo`とtestを削除した。
 - 2026-08-13: `initial_deal_zimopai_shouqie_exception_requires_zhuangjia_actor`を追加した。redではinitial deal originと第一巡資格だけで非親actorにも`ShouqieFromZimopai`特例が適用された。特例guardへ`actor == zhuangjia`を追加し、残り枚数ではなく親第一打というdomain条件を直接表現してgreenにした。
 - 2026-08-13: `initial_deal_first_dapai_rejects_moqie`を追加した。`MoqieUnavailableForInitialDealFirstDapai`を型付きerrorとして追加し、initial deal由来・親actor・第一巡資格の条件を満たす`Moqie`を`Player`更新前に拒否してgreenにした。
+- 2026-08-13: `moqie_preserves_actor_bingpai_counts`を追加した。既存の`PlayerDapai::Moqie`は`Bingpai`を変更しないため、counts全体を比較する回帰testとしてgreenを確認した。
 
 ## Completion review
 
