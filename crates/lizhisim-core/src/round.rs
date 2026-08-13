@@ -463,6 +463,37 @@ mod tests {
     }
 
     #[test]
+    fn dapai_completed_actor_is_dapai_actor() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let zhuangjia = Seat::<FourPlayer>::ALL[2];
+        let round = Round::new(bipai, zhuangjia, FirstZimoOrigin::LiveWall)
+            .zimo()
+            .unwrap();
+        let Round {
+            bipai,
+            players,
+            actor: _,
+            zhuangjia,
+            state,
+        } = round;
+        let dapai_actor = Seat::<FourPlayer>::ALL[1];
+        let round = Round {
+            bipai,
+            players,
+            actor: dapai_actor,
+            zhuangjia,
+            state,
+        };
+
+        let result = round
+            .dapai(Dapai::Moqie(TileKind::P5))
+            .map(|round| *round.actor());
+
+        assert_eq!(result, Ok(dapai_actor));
+    }
+
+    #[test]
     fn first_dapai_clears_actor_first_turn_eligibility() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
