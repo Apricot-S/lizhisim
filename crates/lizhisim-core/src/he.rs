@@ -29,16 +29,32 @@ impl He {
         Self { sipai: Vec::new() }
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.sipai.is_empty()
-    }
-
     pub fn last(&self) -> Option<&Sipai> {
         self.sipai.last()
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &Sipai> {
+        self.sipai.iter()
     }
 
     pub(crate) fn with_appended(mut self, sipai: Sipai) -> Result<Self, HeFull> {
         self.sipai.push(sipai).map_err(|_| HeFull)?;
         Ok(self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn iter_exposes_appended_sipai() {
+        let sipai = Sipai {
+            tile_kind: TileKind::M1,
+            moqie: false,
+        };
+        let he = He::new().with_appended(sipai.clone()).unwrap();
+
+        assert_eq!(he.iter().collect::<std::vec::Vec<_>>(), vec![&sipai]);
     }
 }

@@ -57,7 +57,7 @@
 
 ### `He`の観測
 
-- [ ] `He::is_empty()`を廃止し、`He`の空・非空をiteratorなどの要素観測APIから判定できる。
+- [x] `He::is_empty()`を廃止し、`He`の空・非空をiteratorなどの要素観測APIから判定できる。
 
 ### `Bingpai`からの`Dapai`
 
@@ -88,7 +88,7 @@
 
 - Selected: 最初の`Dapai`後は、そのplayerの第一打前flagがfalseになる。
 - Phase: Not started
-- Why: 第一打前flagを`Player`が所有する基盤を追加したため、次は通常の`Dapai`でactor自身のflagだけを更新する。
+- Why: `He`の観測APIを確定したため、次は通常の`Dapai`でactor自身の第一打前flagだけを更新する。
 
 ## Cycle log
 
@@ -107,6 +107,7 @@
 - 2026-08-13: 上位設計を再確認し、旧状態回収はprotocol/scheduler境界のpending continuationが担い、`Round::dapai`のerror payloadへ旧`Round`を含める必須要件ではないと整理した。旧状態回収用のtransition型とprepared型を削除し、消費型の`Result<NewState, DapaiError>`へ簡素化する。
 - 2026-08-13: `live_wall_zimopai_dapai_is_moqie`を追加した。`FirstZimoOrigin::LiveWall`の最初の`zimopai`を摸切すると`Sipai::moqie = true`になる対照testで、initial deal由来との差を固定した。既存のorigin-based導出でgreenとなった。
 - 2026-08-13: `player_tracks_first_dapai_pending_independently_of_empty_he`を追加した。配牌直後の`He`が空でも、第一打前の事実を独立した`Player`状態として観測できる契約を追加した。`angang`/`babei` actionは未実装のため、打牌後のflag更新は次項目へ分離した。
+- 2026-08-13: `He::is_empty()`を削除し、`He::iter()`を追加した。空`He`の判定と追加済み`Sipai`の列挙をiteratorで検証し、第一打前状態の判定が`He`の専用空判定APIへ依存しないようにした。
 
 ## Completion review
 

@@ -147,7 +147,7 @@ mod tests {
             bingpai.into_iter().next().unwrap(),
         );
 
-        assert!(player.he().is_empty());
+        assert_eq!(player.he().iter().next(), None);
     }
 
     #[test]
@@ -161,8 +161,8 @@ mod tests {
         );
 
         assert_eq!(
-            (player.he().is_empty(), player.first_dapai_pending()),
-            (true, true)
+            (player.he().iter().next(), player.first_dapai_pending()),
+            (None, true)
         );
     }
 }
