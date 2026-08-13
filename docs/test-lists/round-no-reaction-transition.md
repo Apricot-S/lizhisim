@@ -8,7 +8,7 @@
 - Status: Active
 - Requirements: `CORE-001`, `CORE-006`, `CORE-007`, `CORE-008`
 - ADR / design: [ADR-0001](../adr/0001-event-driven-typed-continuations.md)、[domain model](../design/domain-model.md)
-- Related lists: [`Round`の最初の`Dapai`](round-first-dapai.md)、[雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md)
+- Related lists: [`Round`の最初の`Dapai`](round-first-dapai.md)、[`Round`の最小荒牌平局](round-exhaustive-draw.md)、[雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md)
 - Rule sources / clauses: 通常打牌後の次手番は打牌者の次のseatである。副露・和了候補と競合解決はこのlistでは扱わない。
 
 ## Scope

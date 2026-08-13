@@ -10,6 +10,7 @@
 - [最小Player aggregateとRound初期遷移](round-player-initial-state.md) — 配牌結果のseat別所有と、局開始から最初のツモ後までのtypestate。
 - [`Round`の最初の`Dapai`](round-first-dapai.md) — 打牌元、`Zimo` origin、第一巡状態、`Bingpai`・`He`の原子的更新。
 - [`Round`の反応なし遷移](round-no-reaction-transition.md) — 打牌後に反応なしで解決し、次actorのツモ前typestateへ進む最小遷移。
+- [`Round`の最小荒牌平局](round-exhaustive-draw.md) — 通常ツモ牌枯渇を、流局精算前の局終端へ変換する最小遷移。
 
 新規作成時は [template](../templates/test-list.md) を複製し、[開発手順書](../development-guide.md) の `test list -> one -> red -> green -> refactor` に従う。
 
