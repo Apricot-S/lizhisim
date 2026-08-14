@@ -32,6 +32,39 @@ pub struct ZimoCompleted {
 
 pub struct DapaiCompleted;
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum RoundOutcome {
+    HuangpaiPingju,
+}
+
+pub enum NoReactionResult {
+    NextZimo(Box<Round<FourPlayer, ZimoPending>>),
+    RoundEnded(RoundOutcome),
+}
+
+impl NoReactionResult {
+    pub fn into_next_zimo_pending(self) -> Option<Round<FourPlayer, ZimoPending>> {
+        match self {
+            Self::NextZimo(round) => Some(*round),
+            Self::RoundEnded(_) => None,
+        }
+    }
+
+    pub fn next_zimo_pending(&self) -> Option<&Round<FourPlayer, ZimoPending>> {
+        match self {
+            Self::NextZimo(round) => Some(round),
+            Self::RoundEnded(_) => None,
+        }
+    }
+
+    pub fn round_outcome(&self) -> Option<RoundOutcome> {
+        match self {
+            Self::NextZimo(_) => None,
+            Self::RoundEnded(round_outcome) => Some(*round_outcome),
+        }
+    }
+}
+
 impl<P: PlayerSet + BipaiSpec, State> Round<P, State> {
     pub fn bipai(&self) -> &Bipai<P, QipaiCompleted> {
         &self.bipai
@@ -159,18 +192,22 @@ impl Round<FourPlayer, ZimoCompleted> {
 }
 
 impl Round<FourPlayer, DapaiCompleted> {
-    pub fn no_reaction(self) -> Round<FourPlayer, ZimoPending> {
+    pub fn no_reaction(self) -> NoReactionResult {
+        if self.bipai.remaining_count() == 0 {
+            return NoReactionResult::RoundEnded(RoundOutcome::HuangpaiPingju);
+        }
+
         let actor_index = self.actor.index();
         let next_actor = Seat::<FourPlayer>::ALL[(actor_index + 1) % Seat::<FourPlayer>::ALL.len()];
 
-        Round {
+        NoReactionResult::NextZimo(Box::new(Round {
             bipai: self.bipai,
             players: self.players,
             actor: next_actor,
             zhuangjia: self.zhuangjia,
             first_zimo_origin: self.first_zimo_origin,
             state: ZimoPending,
-        }
+        }))
     }
 }
 
@@ -387,7 +424,7 @@ mod tests {
         let (mut tiles, tile_set) = red_three_tiles();
         tiles.swap(53, 120);
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(
+        let transition = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
             FirstZimoOrigin::InitialDeal,
@@ -396,14 +433,17 @@ mod tests {
         .unwrap()
         .dapai(Dapai::Shouqie(TileKind::P5))
         .unwrap()
-        .no_reaction()
-        .zimo()
-        .unwrap();
-
-        let result = round.dapai(Dapai::Shouqie(TileKind::Z4));
+        .no_reaction();
+        let result = transition
+            .into_next_zimo_pending()
+            .unwrap()
+            .zimo()
+            .unwrap()
+            .dapai(Dapai::Shouqie(TileKind::Z4))
+            .map(|_| ());
 
         assert_eq!(
-            result.map(|_| ()),
+            result,
             Err(DapaiError::Bingpai(
                 crate::bingpai::BingpaiError::TileNotPresent {
                     tile_kind: TileKind::Z4,
@@ -511,22 +551,23 @@ mod tests {
             let (tiles, tile_set) = red_three_tiles();
             let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
 
-            *Round::new(bipai, zhuangjia, FirstZimoOrigin::LiveWall)
+            Round::new(bipai, zhuangjia, FirstZimoOrigin::LiveWall)
                 .zimo()
                 .unwrap()
                 .dapai(Dapai::Moqie(TileKind::P5))
                 .unwrap()
                 .no_reaction()
-                .actor()
+                .next_zimo_pending()
+                .map(|round| *round.actor())
         });
 
         assert_eq!(
             next_actors,
             [
-                Seat::<FourPlayer>::ALL[1],
-                Seat::<FourPlayer>::ALL[2],
-                Seat::<FourPlayer>::ALL[3],
-                Seat::<FourPlayer>::ALL[0],
+                Some(Seat::<FourPlayer>::ALL[1]),
+                Some(Seat::<FourPlayer>::ALL[2]),
+                Some(Seat::<FourPlayer>::ALL[3]),
+                Some(Seat::<FourPlayer>::ALL[0]),
             ]
         );
     }
@@ -541,9 +582,14 @@ mod tests {
             .dapai(Dapai::Moqie(TileKind::P5))
             .unwrap();
         let before = (round.bipai().clone(), round.players().clone());
-        let round = round.no_reaction();
+        let after = match round.no_reaction() {
+            NoReactionResult::NextZimo(round) => {
+                Some((round.bipai().clone(), round.players().clone()))
+            }
+            NoReactionResult::RoundEnded(_) => None,
+        };
 
-        assert_eq!((round.bipai().clone(), round.players().clone()), before);
+        assert_eq!(after, Some(before));
     }
 
     #[test]
@@ -551,18 +597,51 @@ mod tests {
         let (mut tiles, tile_set) = red_three_tiles();
         tiles.swap(53, 120);
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
+        let result = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
             .zimo()
             .unwrap()
             .dapai(Dapai::Moqie(TileKind::P5))
             .unwrap()
-            .no_reaction()
-            .zimo()
-            .unwrap();
+            .no_reaction();
+        let actor_and_zimopai = match result {
+            NoReactionResult::NextZimo(round) => round
+                .zimo()
+                .ok()
+                .map(|round| (*round.actor(), round.zimopai())),
+            NoReactionResult::RoundEnded(_) => None,
+        };
 
         assert_eq!(
-            (*round.actor(), round.zimopai()),
-            (Seat::<FourPlayer>::ALL[3], TileKind::Z4)
+            actor_and_zimopai,
+            Some((Seat::<FourPlayer>::ALL[3], TileKind::Z4))
+        );
+    }
+
+    #[test]
+    fn no_reaction_after_all_live_wall_tiles_returns_huangpai_pingju() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let mut transition = NoReactionResult::NextZimo(Box::new(Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            FirstZimoOrigin::LiveWall,
+        )));
+
+        for _ in 0..70 {
+            transition = match transition {
+                NoReactionResult::NextZimo(round) => round
+                    .zimo()
+                    .unwrap()
+                    .dapai(Dapai::Moqie(TileKind::P5))
+                    .unwrap()
+                    .no_reaction(),
+                NoReactionResult::RoundEnded(_) => break,
+            };
+        }
+
+        assert_eq!(
+            transition.round_outcome(),
+            Some(RoundOutcome::HuangpaiPingju)
         );
     }
 }

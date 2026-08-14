@@ -284,6 +284,10 @@ Extend(NextRoundSpec, ExtensionReason)
 Finish(TableMatchResult)
 ```
 
+`Round`自身は局内の確定事実として`RoundOutcome`を返す。たとえば通常ツモ牌枯渇は
+`RoundOutcome::HuangpaiPingju`であり、点数移動、本場、供託、場・局番、連荘、次局は含めない。
+`TableMatchState`が`RoundSettlement`でそれらを適用する。
+
 アガリ止め、聴牌止め、トップ条件、飛び、規定場、延長上限、同点は `MatchTerminationPolicy` が判断する。局 engine 内へ特定サービス名の分岐を置かない。
 
 ## 11. イベント

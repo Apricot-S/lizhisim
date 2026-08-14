@@ -25,7 +25,7 @@ event、replay、stable hashは実装しない。これらはrule設定と`Round
 ## Responsibility boundary
 
 - `Bipai`は通常ツモ可能枚数と、取得不能時の`LiveWallExhausted`を管理する。
-- `Round`は打牌後の反応なしを解決した通常ツモ待機で、live wallが尽きた場合に荒牌平局の終端へ進める。
+- `Round`は打牌後の反応なしを解決し、次ツモ待機またはlive wall枯渇による荒牌平局の終端を返す。
 - 終端遷移は`Bipai`、`Player`、actorを部分更新として公開せず、荒牌平局という完了結果だけを返す。
 - live wallが残る場合に荒牌平局を確定できない。通常`zimo`との分岐は、同じツモ前状態の枚数で決める。
 - 副露・和了を導入した後も、最後の打牌へのcall window解決が反応なしだった場合だけ、この終端へ接続する。
@@ -34,8 +34,8 @@ event、replay、stable hashは実装しない。これらはrule設定と`Round
 
 ### 荒牌平局への到達
 
-- [ ] **Selected:** 通常ツモ牌70枚をすべてツモ・打牌・反応なしで消費した後、荒牌平局の終端値を返す。
-- [ ] 通常ツモ牌が1枚残るツモ前状態では、荒牌平局を確定できない。
+- [x] 通常ツモ牌70枚をすべてツモ・打牌・反応なしで消費した後、荒牌平局の終端値を返す。
+- [ ] **Selected:** 通常ツモ牌が1枚残るツモ前状態では、荒牌平局を確定できない。
 - [ ] 荒牌平局の終端値は、reasonとして通常ツモ牌枯渇を保持する。
 - [ ] 終端後に通常`zimo`、`Dapai`、反応なし遷移を提供しない。
 
@@ -54,13 +54,15 @@ event、replay、stable hashは実装しない。これらはrule設定と`Round
 
 ## Current
 
-- Selected: 通常ツモ牌70枚をすべてツモ・打牌・反応なしで消費した後、荒牌平局の終端値を返す。
+- Selected: 通常ツモ牌が1枚残るツモ前状態では、荒牌平局を確定できない。
 - Phase: Not started
-- Why: 既存の`zimo`、`dapai`、反応なし遷移を連結し、live wall枯渇を`BipaiError`のまま外へ漏らさず局の完了へ変換する最小の観測可能な縦切りであるため。
+- Why: 70回の通常ツモ・打牌・反応なし後の終端を固定したため、次は最後の通常ツモ前に終端を早すぎる時点で返さない境界を検証する。
 
 ## Cycle log
 
 - 2026-08-14: 副露・和了の前に一局の最小終端へ到達する後継listとして作成した。ルール固有の流局精算を先行させず、通常ツモ牌枯渇だけを荒牌平局の完了結果として表す。最初のtestは70回の通常ツモ・打牌・反応なしを経た終端に限定し、残り1枚の境界、reason、typestate、原子性を後続項目へ分割する。
+- 2026-08-14: 70回の通常ツモ・`Moqie`・反応なしを反復し、最後の反応なし結果が`RoundOutcome::HuangpaiPingju`となるtestを追加する。通常の反応なしと局終端を区別する戻り値型が未定義のため、まずcompile errorをredとして確認する。
+- 2026-08-14: `no_reaction_after_all_live_wall_tiles_returns_huangpai_pingju`を追加した。`NoReactionResult`を導入し、通常の反応なしは`NextZimo(Round<ZimoPending>)`、live wallが0枚の最後の打牌後は`RoundEnded(RoundOutcome::HuangpaiPingju)`を返すようにした。70回の通常ツモ・`Moqie`・反応なしを反復し、最後のoutcomeを一assertionで比較してgreenにした。`RoundOutcome`は局内の終局理由だけを表し、精算は後続の`TableMatchState`へ残す。
 
 ## Completion review
 
