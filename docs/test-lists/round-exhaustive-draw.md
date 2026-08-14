@@ -45,6 +45,8 @@ event、replay、stable hashは実装しない。これらはrule設定と`Round
 
 ### Later: 流局精算と半荘進行
 
+詳細は[`TableMatch`の局精算境界](table-match-round-settlement.md)で扱う。
+
 - [ ] 聴牌判定、形式聴牌、聴牌公開、ノーテン罰符を検証済みruleから適用する。
 - [ ] 親聴牌・流局種別・連荘ruleから次局specを決定する。
 - [ ] 流し満貫を和了、流局精算、不採用のいずれとして扱うかruleで決定する。

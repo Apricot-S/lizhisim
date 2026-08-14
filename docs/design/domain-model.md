@@ -289,6 +289,27 @@ Finish(TableMatchResult)
 `TableMatchState`へ移送できる。点数移動、本場、供託、場・局番、連荘、次局は含めず、
 `TableMatchState`が`RoundSettlement`でそれらを適用する。
 
+この境界は、次の概念的な一方向遷移とする。これは実装コードではない。
+
+```text
+TableMatchState<P> + Round<P, RoundEnded> + MatchRules
+  -> RoundSettlement<P>
+  -> Continue(NextRoundSpec<P>) | Extend(NextRoundSpec<P>, ExtensionReason) | Finish(TableMatchResult<P>)
+```
+
+`RoundSettlement`は終局理由、局終了時のplayer状態、対局のledger、検証済みの`MatchRules`から
+導出する結果である。少なくとも点数移動、本場・供託の更新、次局の親、局進行・終了判定に必要な事実を
+保持する。`RoundEnded`を消費して一度だけ作り、`TableMatchState`はこの結果を適用してからだけ次局を
+開始する。局をまたぐ点数、本場、供託、場・局番を`Round`へ複製しない。
+
+次局の牌山は`RoundSettlement`が生成しない。決定済みの`NextRoundSpec`を受けた開始境界が、記録済みの
+牌山または決定的な牌山生成結果を渡して次の`Round`を作る。これにより精算・対局進行と乱数・I/Oを
+分離する。
+
+荒牌平局の聴牌判定、ノーテン罰符、親聴牌による連荘、流し満貫などは、対応する`TableRules`と
+`MatchRules`が検証済みになるまで`RoundSettlement`へ仮の既定値を置かない。現在の
+`RoundOutcome::HuangpaiPingju`は精算前の局内事実であり、それだけで次局や対局終了を決めない。
+
 アガリ止め、聴牌止め、トップ条件、飛び、規定場、延長上限、同点は `MatchTerminationPolicy` が判断する。局 engine 内へ特定サービス名の分岐を置かない。
 
 ## 11. イベント
