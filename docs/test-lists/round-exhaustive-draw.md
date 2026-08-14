@@ -5,7 +5,7 @@
 - Owner: project owner / implementer
 - Created: 2026-08-14
 - Updated: 2026-08-14
-- Status: Active
+- Status: Completed
 - Requirements: `CORE-002`, `CORE-006`, `CORE-007`, `CORE-008`
 - ADR / design: [ADR-0001](../adr/0001-event-driven-typed-continuations.md)、[domain model](../design/domain-model.md)、[rules and presets](../design/rules-and-presets.md)
 - Related lists: [`Round`の反応なし遷移](round-no-reaction-transition.md)、[王牌・嶺上ツモ・宝牌表示](wangpai-replacement-draw-and-baopai.md)、[雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md)
@@ -41,8 +41,7 @@ event、replay、stable hashは実装しない。これらはrule設定と`Round
 
 ### 原子性とtypestate
 
-- [ ] **Selected:** 荒牌平局の終端遷移は、終局時の`Bipai`とplayerを`RoundEnded`へ完全に移送する。
-- [ ] 通常ツモ可能枚数が0でない`ZimoPending`から、荒牌平局の終端遷移を拒否する型付きerrorを返す。
+- [x] 荒牌平局の終端遷移は、終局時の`Bipai`とplayerを`RoundEnded`へ完全に移送する。
 
 ### Later: 流局精算と半荘進行
 
@@ -54,9 +53,9 @@ event、replay、stable hashは実装しない。これらはrule設定と`Round
 
 ## Current
 
-- Selected: 荒牌平局の終端遷移は、終局時の`Bipai`とplayerを`RoundEnded`へ完全に移送する。
-- Phase: Not started
-- Why: 終端 reason と終端後 API を型レビューで確認したため、次は終端前後の局内共通状態が値のまま移送されることを検証する。
+- Selected: なし（完了）
+- Phase: Complete
+- Why: 最小の一局遷移と荒牌平局終端を検証した。流局精算と半荘進行は次層の`TableMatchState` / `RoundSettlement`へ移す。
 
 ## Cycle log
 
@@ -66,11 +65,13 @@ event、replay、stable hashは実装しない。これらはrule設定と`Round
 - 2026-08-14: `no_reaction_with_one_live_wall_tile_returns_next_zimo`を追加した。69回の通常ツモ・`Moqie`・反応なし後の`NoReactionResult`から次ツモ待機を取得し、live wall残り枚数が1であることを一assertionで比較した。既存の`remaining_count() == 0`判定でgreenとなり、production実装の変更は不要だった。
 - 2026-08-14: `RoundOutcome::HuangpaiPingju`が通常ツモ牌枯渇による荒牌平局を直接表すことをAPI reviewで確認した。reasonは終端値のvariantであり、追加のtestは不要とした。
 - 2026-08-14: `Round<P, RoundEnded>`には`zimo`、`dapai`、`no_reaction`を実装せず、終端後の操作を型で表現不能にしていることをAPI reviewで確認した。コンパイラが保証するためcompile-fail testは追加しない。
+- 2026-08-14: `huangpai_pingju_moves_bipai_and_players_to_round_ended`を追加した。70回目の通常ツモと`Moqie`後の`Bipai`・全playerの組をcloneし、`no_reaction`が返す`RoundEnded`から得た同じ組と一assertionで比較した。既存の消費型遷移が値を完全移送しており、production実装の変更は不要だった。
+- 2026-08-14: `ZimoPending`から荒牌平局へ遷移して型付きerrorを返す項目を削除した。`no_reaction`は`DapaiCompleted`だけに存在し、`ZimoPending`から終端へ進むAPI自体を公開しないためである。この契約は「終端後に通常`zimo`、`Dapai`、反応なし遷移を提供しない」のAPI reviewと同じtypestate境界が保証しており、別のerror APIやtestを追加しても独立した振る舞いを検証しない。
 
 ## Completion review
 
-- [ ] すべての項目が完了または理由付きで移送されている。
-- [ ] live wall枯渇と荒牌平局終端の責務分担を確認した。
-- [ ] 終端に聴牌・点数・連荘・次局のrule値を混入させていない。
-- [ ] 終端遷移のerrorと部分更新非公開を確認した。
-- [ ] 流局精算、半荘進行、event、replay、stable hashを後続listへ移送した。
+- [x] すべての項目が完了または理由付きで移送されている。
+- [x] live wall枯渇と荒牌平局終端の責務分担を確認した。
+- [x] 終端に聴牌・点数・連荘・次局のrule値を混入させていない。
+- [x] 終端遷移のerrorと部分更新非公開を確認した。
+- [x] 流局精算、半荘進行、event、replay、stable hashを後続listへ移送した。

@@ -693,4 +693,45 @@ mod tests {
             Some(1)
         );
     }
+
+    #[test]
+    fn huangpai_pingju_moves_bipai_and_players_to_round_ended() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let mut transition = NoReactionResult::NextZimo(Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            FirstZimoOrigin::LiveWall,
+        ));
+
+        for _ in 0..69 {
+            transition = match transition {
+                NoReactionResult::NextZimo(round) => round
+                    .zimo()
+                    .unwrap()
+                    .dapai(Dapai::Moqie(TileKind::P5))
+                    .unwrap()
+                    .no_reaction(),
+                NoReactionResult::RoundEnded(_) => break,
+            };
+        }
+
+        let round = match transition {
+            NoReactionResult::NextZimo(round) => round
+                .zimo()
+                .unwrap()
+                .dapai(Dapai::Moqie(TileKind::P5))
+                .unwrap(),
+            NoReactionResult::RoundEnded(_) => unreachable!(),
+        };
+        let before = (round.bipai().clone(), round.players().clone());
+        let after = match round.no_reaction() {
+            NoReactionResult::NextZimo(_) => None,
+            NoReactionResult::RoundEnded(round) => {
+                Some((round.bipai().clone(), round.players().clone()))
+            }
+        };
+
+        assert_eq!(after, Some(before));
+    }
 }
