@@ -663,4 +663,34 @@ mod tests {
             Some(RoundOutcome::HuangpaiPingju)
         );
     }
+
+    #[test]
+    fn no_reaction_with_one_live_wall_tile_returns_next_zimo() {
+        let (tiles, tile_set) = red_three_tiles();
+        let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
+        let mut transition = NoReactionResult::NextZimo(Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            FirstZimoOrigin::LiveWall,
+        ));
+
+        for _ in 0..69 {
+            transition = match transition {
+                NoReactionResult::NextZimo(round) => round
+                    .zimo()
+                    .unwrap()
+                    .dapai(Dapai::Moqie(TileKind::P5))
+                    .unwrap()
+                    .no_reaction(),
+                NoReactionResult::RoundEnded(_) => break,
+            };
+        }
+
+        assert_eq!(
+            transition
+                .next_zimo_pending()
+                .map(|round| round.bipai().remaining_count()),
+            Some(1)
+        );
+    }
 }
