@@ -65,7 +65,7 @@ all-last、延長、飛び、順位精算は、対応する検証済みruleと�
 
 - 2026-08-14: `Round`の荒牌平局終端後の後続topicとして作成した。`RoundEnded`を局外ledgerへ一度だけ適用する境界、精算後だけに対局進行・終了判定を置くこと、次局の牌山生成を精算から分離することを設計として固定した。rule値が未確認のため、implementationのSelected項目は置かない。
 - 2026-08-14: 最初の対象としてseat別ledgerの状態境界を選択した。精算規則や終了条件はこのcycleへ混ぜない。
-- 2026-08-14: `TableMatchState<FourPlayer>`、`Points`、`Ben`、`RoundIndex`、`Lizhibang`を追加した。4席分のledgerを`[Points; FourPlayer::PLAYER_COUNT]`で保持し、長さ不一致を型で表現不能にした。`PlayerSet::PLAYER_COUNT`を追加し、`Seat<FourPlayer>`とledgerの長さを同じ定数へ寄せた。`Players`の具体型を`player.rs`側に置いて循環依存を避けた。状態の各値が局開始時の明示入力であり、`Round`から推測されないことをテストした。次のcycleでは`RoundEnded`の一回消費を扱う。
+- 2026-08-14: `TableMatchState<FourPlayer>`、`Points`、`Ben`、`RoundIndex`、`Lizhibang`を追加した。4席分の点数を`[Points; FourPlayer::PLAYER_COUNT]`で保持し、長さ不一致を型で表現不能にした。`PlayerSet::PLAYER_COUNT`と`PlayerSet::Points`を追加し、`Seat<FourPlayer>`と点数配列の長さを同じ定数へ寄せた。`Players`と`Points`の具体型を`player.rs`側に置き、`Points`値型を`table_match`から独立させて循環・逆方向の依存を避けた。状態の各値が局開始時の明示入力であり、`Round`から推測されないことをテストした。次のcycleでは`RoundEnded`の一回消費を扱う。
 
 ## Completion review
 

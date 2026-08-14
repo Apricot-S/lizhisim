@@ -6,19 +6,6 @@ use crate::player_set::PlayerSet;
 use crate::seat::Seat;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct Points(i32);
-
-impl Points {
-    pub const fn new(value: i32) -> Self {
-        Self(value)
-    }
-
-    pub const fn value(self) -> i32 {
-        self.0
-    }
-}
-
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Chang {
     Dong,
     Nan,
@@ -71,7 +58,7 @@ pub struct TableMatchState<P: PlayerSet> {
     ben: Ben,
     lizhibang: Lizhibang,
     zhuangjia: Seat<P>,
-    points: P::PointLedger,
+    points: P::Points,
 }
 
 impl<P: PlayerSet> TableMatchState<P> {
@@ -81,7 +68,7 @@ impl<P: PlayerSet> TableMatchState<P> {
         ben: Ben,
         lizhibang: Lizhibang,
         zhuangjia: Seat<P>,
-        points: P::PointLedger,
+        points: P::Points,
     ) -> Self {
         Self {
             chang,
@@ -113,7 +100,7 @@ impl<P: PlayerSet> TableMatchState<P> {
         self.zhuangjia
     }
 
-    pub fn points(&self) -> &P::PointLedger {
+    pub fn points(&self) -> &P::Points {
         &self.points
     }
 }
@@ -121,6 +108,7 @@ impl<P: PlayerSet> TableMatchState<P> {
 #[cfg(test)]
 mod tests {
     use crate::player_set::FourPlayer;
+    use crate::points::Points;
 
     use super::*;
 
