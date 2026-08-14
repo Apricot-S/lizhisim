@@ -27,6 +27,6 @@ pub use round::{
 };
 pub use score::Score;
 pub use seat::{Seat, SeatIndexOutOfRange};
-pub use table_match::{Ben, Chang, Lizhibang, RoundIndex, TableMatchState};
+pub use table_match::{Ben, Chang, Lizhibang, RoundIndex, RoundSettlement, TableMatchState};
 pub use tile::TileKind;
 pub use tile_set::{TileSet, TileSetError};

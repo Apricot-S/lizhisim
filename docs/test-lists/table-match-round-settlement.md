@@ -33,7 +33,7 @@ all-last、延長、飛び、順位精算は、対応する検証済みruleと�
 ### 状態と入力境界
 
 - [x] `TableMatchState<P>`はplayer setと同じ長さのseat別scoresを保持する。
-- [ ] `RoundEnded`は一度だけ`RoundSettlement`へ消費でき、同じ局を二重精算できない。
+- [x] `RoundEnded`は一度だけ`RoundSettlement`へ消費でき、同じ局を二重精算できない。
 - [ ] 局開始時の点数、親、場・局番、本場、供託は明示入力であり、`Round`から推測しない。
 
 ### 精算と進行
@@ -57,15 +57,16 @@ all-last、延長、飛び、順位精算は、対応する検証済みruleと�
 
 ## Current
 
-- Selected: `RoundEnded`は一度だけ`RoundSettlement`へ消費でき、同じ局を二重精算できない。
+- Selected: 局開始時の点数、親、場・局番、本場、供託は明示入力であり、`Round`から推測しない。
 - Phase: Planned
-- Why: seat別scoresの明示入力境界を実装した。次は`RoundEnded`の消費を精算結果の生成へ接続する。
+- Why: `RoundEnded`と`TableMatchState`を消費して`RoundSettlement`を作る型境界を実装した。次は局開始入力と`Round`の責務を明確に分離する。
 
 ## Cycle log
 
 - 2026-08-14: `Round`の荒牌平局終端後の後続topicとして作成した。`RoundEnded`を局外の対局進行状態へ一度だけ適用する境界、精算後だけに対局進行・終了判定を置くこと、次局の牌山生成を精算から分離することを設計として固定した。rule値が未確認のため、implementationのSelected項目は置かない。
 - 2026-08-14: 最初の対象としてseat別scoresの状態境界を選択した。精算規則や終了条件はこのcycleへ混ぜない。
 - 2026-08-14: `TableMatchState<FourPlayer>`、`Score`、`Ben`、`RoundIndex`、`Lizhibang`を追加した。4席分の点数を`[Score; FourPlayer::PLAYER_COUNT]`で保持し、長さ不一致を型で表現不能にした。`PlayerSet::PLAYER_COUNT`と`PlayerSet::Scores`を追加し、`Seat<FourPlayer>`と点数配列の長さを同じ定数へ寄せた。`Players`と`Scores`の具体型を`player.rs`側に置き、`Score`値型を`table_match`から独立させて循環・逆方向の依存を避けた。状態の各値が局開始時の明示入力であり、`Round`から推測されないことをテストした。次のcycleでは`RoundEnded`の一回消費を扱う。
+- 2026-08-14: `RoundSettlement<P>`を追加し、`TableMatchState::into_round_settlement(self, Round<P, RoundEnded>)`で両方を消費するようにした。荒牌平局で終端した`Round`を渡し、outcome を参照できることをテストした。`RoundEnded`は`Copy`でも`Clone`でもないため、同じ値を二重精算に渡せない。精算規則や対局状態の更新はこのcycleに含めない。
 
 ## Completion review
 
