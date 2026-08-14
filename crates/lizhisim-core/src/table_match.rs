@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use crate::player_set::{FourPlayer, PlayerSet};
+use crate::player_set::PlayerSet;
 use crate::seat::Seat;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -66,35 +66,31 @@ impl Lizhibang {
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct TableMatchState<P: PlayerSet> {
-    points: [Points; FourPlayer::PLAYER_COUNT],
     chang: Chang,
     round_index: RoundIndex,
-    zhuangjia: Seat<P>,
     ben: Ben,
     lizhibang: Lizhibang,
+    zhuangjia: Seat<P>,
+    points: P::PointLedger,
 }
 
-impl TableMatchState<FourPlayer> {
+impl<P: PlayerSet> TableMatchState<P> {
     pub fn new(
-        points: [Points; FourPlayer::PLAYER_COUNT],
         chang: Chang,
         round_index: RoundIndex,
-        zhuangjia: Seat<FourPlayer>,
         ben: Ben,
         lizhibang: Lizhibang,
+        zhuangjia: Seat<P>,
+        points: P::PointLedger,
     ) -> Self {
         Self {
-            points,
             chang,
             round_index,
-            zhuangjia,
             ben,
             lizhibang,
+            zhuangjia,
+            points,
         }
-    }
-
-    pub fn points(&self) -> &[Points; FourPlayer::PLAYER_COUNT] {
-        &self.points
     }
 
     pub fn chang(&self) -> Chang {
@@ -105,10 +101,6 @@ impl TableMatchState<FourPlayer> {
         self.round_index
     }
 
-    pub fn zhuangjia(&self) -> Seat<FourPlayer> {
-        self.zhuangjia
-    }
-
     pub fn ben(&self) -> Ben {
         self.ben
     }
@@ -116,10 +108,20 @@ impl TableMatchState<FourPlayer> {
     pub fn lizhibang(&self) -> Lizhibang {
         self.lizhibang
     }
+
+    pub fn zhuangjia(&self) -> Seat<P> {
+        self.zhuangjia
+    }
+
+    pub fn points(&self) -> &P::PointLedger {
+        &self.points
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::player_set::FourPlayer;
+
     use super::*;
 
     fn points(values: [i32; FourPlayer::PLAYER_COUNT]) -> [Points; FourPlayer::PLAYER_COUNT] {
@@ -129,12 +131,12 @@ mod tests {
     #[test]
     fn table_match_state_keeps_one_point_entry_for_each_four_player_seat() {
         let state = TableMatchState::new(
-            points([25_000, 25_000, 25_000, 25_000]),
             Chang::Dong,
             RoundIndex::new(0),
-            Seat::ALL[0],
             Ben::new(0),
             Lizhibang::new(0),
+            Seat::ALL[0],
+            points([25_000, 25_000, 25_000, 25_000]),
         );
 
         assert_eq!(

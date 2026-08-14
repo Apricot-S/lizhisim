@@ -29,6 +29,7 @@ pub struct Player<P> {
 impl PlayerSet for FourPlayer {
     const PLAYER_COUNT: usize = 4;
     type Players = [Player<FourPlayer>; Self::PLAYER_COUNT];
+    type PointLedger = [crate::table_match::Points; Self::PLAYER_COUNT];
 }
 
 impl<P> Player<P> {

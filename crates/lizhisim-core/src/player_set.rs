@@ -9,6 +9,7 @@ mod private {
 pub trait PlayerSet: private::Sealed {
     const PLAYER_COUNT: usize;
     type Players;
+    type PointLedger;
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]

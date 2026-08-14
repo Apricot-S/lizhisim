@@ -8,10 +8,18 @@ use thiserror::Error;
 
 use crate::player_set::{FourPlayer, PlayerSet};
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, Eq, Hash, PartialEq)]
 pub struct Seat<P> {
     index: u8,
     player_set: PhantomData<fn() -> P>,
+}
+
+impl<P> Copy for Seat<P> {}
+
+impl<P> Clone for Seat<P> {
+    fn clone(&self) -> Self {
+        *self
+    }
 }
 
 #[derive(Debug, Error, PartialEq)]
