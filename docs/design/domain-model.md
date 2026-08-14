@@ -42,7 +42,7 @@ primitive obsession を避け、少なくとも次を区別する。
 
 - `ExperimentId`, `CompetitionId`, `TableMatchId`, `RoundId`, `RequestId`, `CallWindowId`
 - `ParticipantId`, `TeamId`, `ModelId`, `Seat<P>`
-- `Points`, `PlacementPoint`, `RankPoint`, `PenaltyPoint`
+- `Score`, `PlacementPoint`, `RankPoint`, `PenaltyPoint`
 - `RuleSetId`, `RuleContentHash`, `SchemaVersion`, `ModelArtifactHash`
 - `EventSequence`, `RngKey`, `StateHash`
 
@@ -267,11 +267,11 @@ HuleEvaluationPort
 
 ## 10. 対局進行
 
-`TableMatchState<P>` は終了していない `Round` と、次の `Round` を開始するための ledger を分ける。
+`TableMatchState<P>` は終了していない `Round` と、次の `Round` を開始するための対局進行状態を分ける。
 
 - 現在の場風と親
 - 本場と供託
-- seat points
+- seat scores
 - match rule snapshot
 - completed round summaries
 - termination context
@@ -297,7 +297,7 @@ TableMatchState<P> + Round<P, RoundEnded> + MatchRules
   -> Continue(NextRoundSpec<P>) | Extend(NextRoundSpec<P>, ExtensionReason) | Finish(TableMatchResult<P>)
 ```
 
-`RoundSettlement`は終局理由、局終了時のplayer状態、対局のledger、検証済みの`MatchRules`から
+`RoundSettlement`は終局理由、局終了時のplayer状態、対局進行状態、検証済みの`MatchRules`から
 導出する結果である。少なくとも点数移動、本場・供託の更新、次局の親、局進行・終了判定に必要な事実を
 保持する。`RoundEnded`を消費して一度だけ作り、`TableMatchState`はこの結果を適用してからだけ次局を
 開始する。局をまたぐ点数、本場、供託、場・局番を`Round`へ複製しない。

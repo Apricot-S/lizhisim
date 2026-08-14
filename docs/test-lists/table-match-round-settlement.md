@@ -13,7 +13,7 @@
 
 ## Scope
 
-`Round<P, RoundEnded>`を消費し、局外のledgerを更新して次局または`TableMatch`終端を選ぶ
+`Round<P, RoundEnded>`を消費し、局外の対局進行状態を更新して次局または`TableMatch`終端を選ぶ
 `TableMatchState`と`RoundSettlement`の境界を扱う。`Round`は局内事実だけを保持し、点数、場・局番、
 本場、供託、連荘、対局終了を保持しない。
 
@@ -32,7 +32,7 @@ all-last、延長、飛び、順位精算は、対応する検証済みruleと�
 
 ### 状態と入力境界
 
-- [x] `TableMatchState<P>`はplayer setと同じ長さのseat別ledgerを保持する。
+- [x] `TableMatchState<P>`はplayer setと同じ長さのseat別scoresを保持する。
 - [ ] `RoundEnded`は一度だけ`RoundSettlement`へ消費でき、同じ局を二重精算できない。
 - [ ] 局開始時の点数、親、場・局番、本場、供託は明示入力であり、`Round`から推測しない。
 
@@ -59,13 +59,13 @@ all-last、延長、飛び、順位精算は、対応する検証済みruleと�
 
 - Selected: `RoundEnded`は一度だけ`RoundSettlement`へ消費でき、同じ局を二重精算できない。
 - Phase: Planned
-- Why: seat別ledgerの明示入力境界を実装した。次は`RoundEnded`の消費を精算結果の生成へ接続する。
+- Why: seat別scoresの明示入力境界を実装した。次は`RoundEnded`の消費を精算結果の生成へ接続する。
 
 ## Cycle log
 
-- 2026-08-14: `Round`の荒牌平局終端後の後続topicとして作成した。`RoundEnded`を局外ledgerへ一度だけ適用する境界、精算後だけに対局進行・終了判定を置くこと、次局の牌山生成を精算から分離することを設計として固定した。rule値が未確認のため、implementationのSelected項目は置かない。
-- 2026-08-14: 最初の対象としてseat別ledgerの状態境界を選択した。精算規則や終了条件はこのcycleへ混ぜない。
-- 2026-08-14: `TableMatchState<FourPlayer>`、`Points`、`Ben`、`RoundIndex`、`Lizhibang`を追加した。4席分の点数を`[Points; FourPlayer::PLAYER_COUNT]`で保持し、長さ不一致を型で表現不能にした。`PlayerSet::PLAYER_COUNT`と`PlayerSet::Points`を追加し、`Seat<FourPlayer>`と点数配列の長さを同じ定数へ寄せた。`Players`と`Points`の具体型を`player.rs`側に置き、`Points`値型を`table_match`から独立させて循環・逆方向の依存を避けた。状態の各値が局開始時の明示入力であり、`Round`から推測されないことをテストした。次のcycleでは`RoundEnded`の一回消費を扱う。
+- 2026-08-14: `Round`の荒牌平局終端後の後続topicとして作成した。`RoundEnded`を局外の対局進行状態へ一度だけ適用する境界、精算後だけに対局進行・終了判定を置くこと、次局の牌山生成を精算から分離することを設計として固定した。rule値が未確認のため、implementationのSelected項目は置かない。
+- 2026-08-14: 最初の対象としてseat別scoresの状態境界を選択した。精算規則や終了条件はこのcycleへ混ぜない。
+- 2026-08-14: `TableMatchState<FourPlayer>`、`Score`、`Ben`、`RoundIndex`、`Lizhibang`を追加した。4席分の点数を`[Score; FourPlayer::PLAYER_COUNT]`で保持し、長さ不一致を型で表現不能にした。`PlayerSet::PLAYER_COUNT`と`PlayerSet::Scores`を追加し、`Seat<FourPlayer>`と点数配列の長さを同じ定数へ寄せた。`Players`と`Scores`の具体型を`player.rs`側に置き、`Score`値型を`table_match`から独立させて循環・逆方向の依存を避けた。状態の各値が局開始時の明示入力であり、`Round`から推測されないことをテストした。次のcycleでは`RoundEnded`の一回消費を扱う。
 
 ## Completion review
 

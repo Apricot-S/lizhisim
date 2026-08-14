@@ -8,8 +8,8 @@ mod bipai;
 mod he;
 mod player;
 mod player_set;
-mod points;
 mod round;
+mod score;
 mod seat;
 mod table_match;
 mod tile;
@@ -21,11 +21,11 @@ pub use bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
 pub use he::{He, HeFull, Sipai};
 pub use player::Player;
 pub use player_set::{FourPlayer, PlayerSet};
-pub use points::Points;
 pub use round::{
     DapaiCompleted, FirstZimoOrigin, NoReactionResult, Round, RoundEnded, RoundOutcome,
     ZimoCompleted, ZimoPending,
 };
+pub use score::Score;
 pub use seat::{Seat, SeatIndexOutOfRange};
 pub use table_match::{Ben, Chang, Lizhibang, RoundIndex, TableMatchState};
 pub use tile::TileKind;

@@ -3,9 +3,9 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct Points(i32);
+pub struct Score(i32);
 
-impl Points {
+impl Score {
     pub const fn new(value: i32) -> Self {
         Self(value)
     }

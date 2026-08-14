@@ -6,7 +6,7 @@ use crate::action::DapaiError;
 use crate::bingpai::Bingpai;
 use crate::he::{He, Sipai};
 use crate::player_set::{FourPlayer, PlayerSet};
-use crate::points::Points;
+use crate::score::Score;
 use crate::seat::Seat;
 use crate::tile::TileKind;
 
@@ -30,7 +30,7 @@ pub struct Player<P> {
 impl PlayerSet for FourPlayer {
     const PLAYER_COUNT: usize = 4;
     type Players = [Player<FourPlayer>; Self::PLAYER_COUNT];
-    type Points = [Points; Self::PLAYER_COUNT];
+    type Scores = [Score; Self::PLAYER_COUNT];
 }
 
 impl<P> Player<P> {

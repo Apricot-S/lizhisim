@@ -58,7 +58,7 @@ pub struct TableMatchState<P: PlayerSet> {
     ben: Ben,
     lizhibang: Lizhibang,
     zhuangjia: Seat<P>,
-    points: P::Points,
+    scores: P::Scores,
 }
 
 impl<P: PlayerSet> TableMatchState<P> {
@@ -68,7 +68,7 @@ impl<P: PlayerSet> TableMatchState<P> {
         ben: Ben,
         lizhibang: Lizhibang,
         zhuangjia: Seat<P>,
-        points: P::Points,
+        scores: P::Scores,
     ) -> Self {
         Self {
             chang,
@@ -76,7 +76,7 @@ impl<P: PlayerSet> TableMatchState<P> {
             ben,
             lizhibang,
             zhuangjia,
-            points,
+            scores,
         }
     }
 
@@ -100,37 +100,37 @@ impl<P: PlayerSet> TableMatchState<P> {
         self.zhuangjia
     }
 
-    pub fn points(&self) -> &P::Points {
-        &self.points
+    pub fn scores(&self) -> &P::Scores {
+        &self.scores
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::player_set::FourPlayer;
-    use crate::points::Points;
+    use crate::score::Score;
 
     use super::*;
 
-    fn points(values: [i32; FourPlayer::PLAYER_COUNT]) -> [Points; FourPlayer::PLAYER_COUNT] {
-        values.map(Points::new)
+    fn scores(values: [i32; FourPlayer::PLAYER_COUNT]) -> [Score; FourPlayer::PLAYER_COUNT] {
+        values.map(Score::new)
     }
 
     #[test]
-    fn table_match_state_keeps_one_point_entry_for_each_four_player_seat() {
+    fn table_match_state_keeps_one_score_for_each_four_player_seat() {
         let state = TableMatchState::new(
             Chang::Dong,
             RoundIndex::new(0),
             Ben::new(0),
             Lizhibang::new(0),
             Seat::ALL[0],
-            points([25_000, 25_000, 25_000, 25_000]),
+            scores([25_000, 25_000, 25_000, 25_000]),
         );
 
         assert_eq!(
             (
-                state.points().len(),
-                state.points().map(|point| point.value()),
+                state.scores().len(),
+                state.scores().map(|score| score.value()),
                 state.chang(),
                 state.zhuangjia(),
                 state.ben(),
