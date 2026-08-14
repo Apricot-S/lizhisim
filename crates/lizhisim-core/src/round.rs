@@ -32,20 +32,24 @@ pub struct ZimoCompleted {
 
 pub struct DapaiCompleted;
 
+pub struct RoundEnded {
+    outcome: RoundOutcome,
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum RoundOutcome {
     HuangpaiPingju,
 }
 
 pub enum NoReactionResult {
-    NextZimo(Box<Round<FourPlayer, ZimoPending>>),
-    RoundEnded(RoundOutcome),
+    NextZimo(Round<FourPlayer, ZimoPending>),
+    RoundEnded(Round<FourPlayer, RoundEnded>),
 }
 
 impl NoReactionResult {
     pub fn into_next_zimo_pending(self) -> Option<Round<FourPlayer, ZimoPending>> {
         match self {
-            Self::NextZimo(round) => Some(*round),
+            Self::NextZimo(round) => Some(round),
             Self::RoundEnded(_) => None,
         }
     }
@@ -60,7 +64,7 @@ impl NoReactionResult {
     pub fn round_outcome(&self) -> Option<RoundOutcome> {
         match self {
             Self::NextZimo(_) => None,
-            Self::RoundEnded(round_outcome) => Some(*round_outcome),
+            Self::RoundEnded(round) => Some(round.round_outcome()),
         }
     }
 }
@@ -194,20 +198,35 @@ impl Round<FourPlayer, ZimoCompleted> {
 impl Round<FourPlayer, DapaiCompleted> {
     pub fn no_reaction(self) -> NoReactionResult {
         if self.bipai.remaining_count() == 0 {
-            return NoReactionResult::RoundEnded(RoundOutcome::HuangpaiPingju);
+            return NoReactionResult::RoundEnded(Round {
+                bipai: self.bipai,
+                players: self.players,
+                actor: self.actor,
+                zhuangjia: self.zhuangjia,
+                first_zimo_origin: self.first_zimo_origin,
+                state: RoundEnded {
+                    outcome: RoundOutcome::HuangpaiPingju,
+                },
+            });
         }
 
         let actor_index = self.actor.index();
         let next_actor = Seat::<FourPlayer>::ALL[(actor_index + 1) % Seat::<FourPlayer>::ALL.len()];
 
-        NoReactionResult::NextZimo(Box::new(Round {
+        NoReactionResult::NextZimo(Round {
             bipai: self.bipai,
             players: self.players,
             actor: next_actor,
             zhuangjia: self.zhuangjia,
             first_zimo_origin: self.first_zimo_origin,
             state: ZimoPending,
-        }))
+        })
+    }
+}
+
+impl Round<FourPlayer, RoundEnded> {
+    pub fn round_outcome(&self) -> RoundOutcome {
+        self.state.outcome
     }
 }
 
@@ -621,11 +640,11 @@ mod tests {
     fn no_reaction_after_all_live_wall_tiles_returns_huangpai_pingju() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let mut transition = NoReactionResult::NextZimo(Box::new(Round::new(
+        let mut transition = NoReactionResult::NextZimo(Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
             FirstZimoOrigin::LiveWall,
-        )));
+        ));
 
         for _ in 0..70 {
             transition = match transition {

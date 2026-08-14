@@ -20,8 +20,8 @@ pub use he::{He, HeFull, Sipai};
 pub use player::Player;
 pub use player_set::{FourPlayer, PlayerSet};
 pub use round::{
-    DapaiCompleted, FirstZimoOrigin, NoReactionResult, Round, RoundOutcome, ZimoCompleted,
-    ZimoPending,
+    DapaiCompleted, FirstZimoOrigin, NoReactionResult, Round, RoundEnded, RoundOutcome,
+    ZimoCompleted, ZimoPending,
 };
 pub use seat::{Seat, SeatIndexOutOfRange};
 pub use tile::TileKind;
