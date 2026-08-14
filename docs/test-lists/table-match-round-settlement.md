@@ -5,7 +5,7 @@
 - Owner: project owner / implementer
 - Created: 2026-08-14
 - Updated: 2026-08-14
-- Status: Planned
+- Status: In progress
 - Requirements: `MATCH-001`, `MATCH-002`, `MATCH-003`, `MATCH-004`, `CORE-006`, `CORE-007`
 - ADR / design: [ADR-0002](../adr/0002-versioned-rule-layers.md)、[ADR-0003](../adr/0003-separate-competition-domain.md)、[domain model](../design/domain-model.md)、[rules and presets](../design/rules-and-presets.md)
 - Related lists: [`Round`の最小荒牌平局](round-exhaustive-draw.md)、[雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md)
@@ -32,7 +32,7 @@ all-last、延長、飛び、順位精算は、対応する検証済みruleと�
 
 ### 状態と入力境界
 
-- [ ] `TableMatchState<P>`はplayer setと同じ長さのseat別ledgerを保持する。
+- [x] `TableMatchState<P>`はplayer setと同じ長さのseat別ledgerを保持する。
 - [ ] `RoundEnded`は一度だけ`RoundSettlement`へ消費でき、同じ局を二重精算できない。
 - [ ] 局開始時の点数、親、場・局番、本場、供託は明示入力であり、`Round`から推測しない。
 
@@ -57,13 +57,15 @@ all-last、延長、飛び、順位精算は、対応する検証済みruleと�
 
 ## Current
 
-- Selected: None
-- Phase: Design complete; implementation not started
-- Why: `Round`の最小縦切り完了後に、局内状態と対局進行の責務境界を固定した。最初の実装項目は、対応する`MatchRules`の検証範囲と同時に選択する。
+- Selected: `RoundEnded`は一度だけ`RoundSettlement`へ消費でき、同じ局を二重精算できない。
+- Phase: Planned
+- Why: seat別ledgerの明示入力境界を実装した。次は`RoundEnded`の消費を精算結果の生成へ接続する。
 
 ## Cycle log
 
 - 2026-08-14: `Round`の荒牌平局終端後の後続topicとして作成した。`RoundEnded`を局外ledgerへ一度だけ適用する境界、精算後だけに対局進行・終了判定を置くこと、次局の牌山生成を精算から分離することを設計として固定した。rule値が未確認のため、implementationのSelected項目は置かない。
+- 2026-08-14: 最初の対象としてseat別ledgerの状態境界を選択した。精算規則や終了条件はこのcycleへ混ぜない。
+- 2026-08-14: `TableMatchState<FourPlayer>`、`Points`、`Ben`、`RoundIndex`、`Lizhibang`を追加した。4席分のledgerを`[Points; FourPlayer::PLAYER_COUNT]`で保持し、長さ不一致を型で表現不能にした。`PlayerSet::PLAYER_COUNT`を追加し、`Seat<FourPlayer>`とledgerの長さを同じ定数へ寄せた。`Players`の具体型を`player.rs`側に置いて循環依存を避けた。状態の各値が局開始時の明示入力であり、`Round`から推測されないことをテストした。次のcycleでは`RoundEnded`の一回消費を扱う。
 
 ## Completion review
 

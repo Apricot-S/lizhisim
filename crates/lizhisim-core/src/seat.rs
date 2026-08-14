@@ -6,7 +6,7 @@ use core::marker::PhantomData;
 
 use thiserror::Error;
 
-use crate::player_set::FourPlayer;
+use crate::player_set::{FourPlayer, PlayerSet};
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct Seat<P> {
@@ -22,7 +22,8 @@ pub struct SeatIndexOutOfRange {
 }
 
 impl Seat<FourPlayer> {
-    pub const ALL: [Self; 4] = [Self::new(0), Self::new(1), Self::new(2), Self::new(3)];
+    pub const ALL: [Self; FourPlayer::PLAYER_COUNT] =
+        [Self::new(0), Self::new(1), Self::new(2), Self::new(3)];
 
     pub(crate) const fn index(self) -> usize {
         self.index as usize

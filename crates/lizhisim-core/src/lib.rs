@@ -10,6 +10,7 @@ mod player;
 mod player_set;
 mod round;
 mod seat;
+mod table_match;
 mod tile;
 mod tile_set;
 
@@ -24,5 +25,6 @@ pub use round::{
     ZimoCompleted, ZimoPending,
 };
 pub use seat::{Seat, SeatIndexOutOfRange};
+pub use table_match::{Ben, Chang, Lizhibang, Points, RoundIndex, TableMatchState};
 pub use tile::TileKind;
 pub use tile_set::{TileSet, TileSetError};

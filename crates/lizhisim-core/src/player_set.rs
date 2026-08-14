@@ -7,6 +7,7 @@ mod private {
 }
 
 pub trait PlayerSet: private::Sealed {
+    const PLAYER_COUNT: usize;
     type Players;
 }
 

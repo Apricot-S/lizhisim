@@ -26,6 +26,11 @@ pub struct Player<P> {
     first_turn_eligible: bool,
 }
 
+impl PlayerSet for FourPlayer {
+    const PLAYER_COUNT: usize = 4;
+    type Players = [Player<FourPlayer>; Self::PLAYER_COUNT];
+}
+
 impl<P> Player<P> {
     pub(crate) fn from_qipai(seat: Seat<P>, bingpai: Bingpai) -> Self {
         Self {
@@ -103,10 +108,6 @@ impl<P> Player<P> {
     }
 }
 
-impl PlayerSet for FourPlayer {
-    type Players = [Player<FourPlayer>; 4];
-}
-
 #[cfg(test)]
 mod tests {
     use crate::bingpai::BingpaiError;
@@ -153,7 +154,8 @@ mod tests {
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let (_, bingpai) = bipai.qipai();
         let players = Seat::<FourPlayer>::ALL
-            .into_iter()
+            .iter()
+            .copied()
             .zip(bingpai)
             .map(|(seat, bingpai)| Player::from_qipai(seat, bingpai))
             .collect::<Vec<_>>();
