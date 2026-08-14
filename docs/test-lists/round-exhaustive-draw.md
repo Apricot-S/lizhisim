@@ -67,6 +67,7 @@ event、replay、stable hashは実装しない。これらはrule設定と`Round
 - 2026-08-14: `Round<P, RoundEnded>`には`zimo`、`dapai`、`no_reaction`を実装せず、終端後の操作を型で表現不能にしていることをAPI reviewで確認した。コンパイラが保証するためcompile-fail testは追加しない。
 - 2026-08-14: `huangpai_pingju_moves_bipai_and_players_to_round_ended`を追加した。70回目の通常ツモと`Moqie`後の`Bipai`・全playerの組をcloneし、`no_reaction`が返す`RoundEnded`から得た同じ組と一assertionで比較した。既存の消費型遷移が値を完全移送しており、production実装の変更は不要だった。
 - 2026-08-14: `ZimoPending`から荒牌平局へ遷移して型付きerrorを返す項目を削除した。`no_reaction`は`DapaiCompleted`だけに存在し、`ZimoPending`から終端へ進むAPI自体を公開しないためである。この契約は「終端後に通常`zimo`、`Dapai`、反応なし遷移を提供しない」のAPI reviewと同じtypestate境界が保証しており、別のerror APIやtestを追加しても独立した振る舞いを検証しない。
+- 2026-08-14: 荒牌平局まで反復する3件のtestで固定の`P5`を`Moqie`するfixtureを、各`ZimoCompleted::zimopai()`を取得してから`Moqie`する共有helperへ置換した。これにより実際にツモした牌だけをモーチーし、同じ牌を5回以上捨てる不整合な局面を作らない。
 
 ## Completion review
 

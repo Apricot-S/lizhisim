@@ -256,6 +256,18 @@ mod tests {
         (tiles, tile_set)
     }
 
+    fn zimo_moqie(round: Round<FourPlayer, ZimoPending>) -> Round<FourPlayer, DapaiCompleted> {
+        let round = round.zimo().unwrap();
+        let zimopai = round.zimopai();
+        round.dapai(Dapai::Moqie(zimopai)).unwrap()
+    }
+
+    fn zimo_moqie_no_reaction(
+        round: Round<FourPlayer, ZimoPending>,
+    ) -> NoReactionResult<FourPlayer> {
+        zimo_moqie(round).no_reaction()
+    }
+
     #[test]
     fn round_starts_with_four_players() {
         let (tiles, tile_set) = red_three_tiles();
@@ -648,12 +660,7 @@ mod tests {
 
         for _ in 0..70 {
             transition = match transition {
-                NoReactionResult::NextZimo(round) => round
-                    .zimo()
-                    .unwrap()
-                    .dapai(Dapai::Moqie(TileKind::P5))
-                    .unwrap()
-                    .no_reaction(),
+                NoReactionResult::NextZimo(round) => zimo_moqie_no_reaction(round),
                 NoReactionResult::RoundEnded(_) => break,
             };
         }
@@ -676,12 +683,7 @@ mod tests {
 
         for _ in 0..69 {
             transition = match transition {
-                NoReactionResult::NextZimo(round) => round
-                    .zimo()
-                    .unwrap()
-                    .dapai(Dapai::Moqie(TileKind::P5))
-                    .unwrap()
-                    .no_reaction(),
+                NoReactionResult::NextZimo(round) => zimo_moqie_no_reaction(round),
                 NoReactionResult::RoundEnded(_) => break,
             };
         }
@@ -706,22 +708,13 @@ mod tests {
 
         for _ in 0..69 {
             transition = match transition {
-                NoReactionResult::NextZimo(round) => round
-                    .zimo()
-                    .unwrap()
-                    .dapai(Dapai::Moqie(TileKind::P5))
-                    .unwrap()
-                    .no_reaction(),
+                NoReactionResult::NextZimo(round) => zimo_moqie_no_reaction(round),
                 NoReactionResult::RoundEnded(_) => break,
             };
         }
 
         let round = match transition {
-            NoReactionResult::NextZimo(round) => round
-                .zimo()
-                .unwrap()
-                .dapai(Dapai::Moqie(TileKind::P5))
-                .unwrap(),
+            NoReactionResult::NextZimo(round) => zimo_moqie(round),
             NoReactionResult::RoundEnded(_) => unreachable!(),
         };
         let before = (round.bipai().clone(), round.players().clone());
