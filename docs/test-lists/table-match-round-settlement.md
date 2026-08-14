@@ -23,8 +23,10 @@ all-last、延長、飛び、順位精算は、対応する検証済みruleと�
 ## Responsibility boundary
 
 - `Round`は局内の終端事実と局終了時の`Bipai`・playerを`RoundEnded`として返す。
+- `Round`は局内の途中流局候補へ検証済み`RoundPolicy`をその場で適用し、採用時だけ`RoundEnded`を返す。不採用候補では通常の局内遷移を続ける。
 - `TableMatchState<P>`はseat別点数、場・局番、親、本場、供託、完了局summary、終了文脈を所有する。
 - `RoundSettlement<P>`は`RoundEnded`、`TableMatchState`、検証済み`MatchRules`から導出される一局分の更新結果である。
+- `RoundSettlement<P>`は河、副露、槓、第一巡を再検査せず、途中流局の採用可否を決めない。
 - 次局の牌山の生成とI/Oは精算の外側に置き、`NextRoundSpec<P>`に従う開始境界が決定済みの牌山を渡す。
 - `MatchTerminationPolicy`は精算後の状態だけを評価する。和了・流局の分岐へ終了判定を重複させない。
 
@@ -45,7 +47,8 @@ all-last、延長、飛び、順位精算は、対応する検証済みruleと�
 
 ### Rule-dependent follow-ups
 
-- [ ] 荒牌平局の聴牌・ノーテン罰符・親聴牌連荘を検証済みruleから適用する。
+- [ ] `Round`が荒牌平局の聴牌seatと流し満貫資格を確定し、`RoundSettlement`がノーテン罰符・親聴牌連荘を検証済みruleから適用する。
+- [ ] `Round`が途中流局候補へ`RoundPolicy`を適用し、不採用時は継続、採用時だけ確定した流局種別を`RoundEnded`へ含める。
 - [ ] 和了支払、複数和了、本場、供託を`RoundSettlement`へ反映する。
 - [ ] 飛び、all-last、延長、アガリ止め、聴牌止め、同点を`MatchTerminationPolicy`で検証する。
 - [ ] オカ、ウマ、残供託、順位と`TableMatchResult<P>`を精算する。
@@ -67,10 +70,12 @@ all-last、延長、飛び、順位精算は、対応する検証済みruleと�
 - 2026-08-14: 最初の対象としてseat別scoresの状態境界を選択した。精算規則や終了条件はこのcycleへ混ぜない。
 - 2026-08-14: `TableMatchState<FourPlayer>`、`Score`、`Ben`、`RoundIndex`、`Lizhibang`を追加した。4席分の点数を`[Score; FourPlayer::PLAYER_COUNT]`で保持し、長さ不一致を型で表現不能にした。`PlayerSet::PLAYER_COUNT`と`PlayerSet::Scores`を追加し、`Seat<FourPlayer>`と点数配列の長さを同じ定数へ寄せた。`Players`と`Scores`の具体型を`player.rs`側に置き、`Score`値型を`table_match`から独立させて循環・逆方向の依存を避けた。状態の各値が局開始時の明示入力であり、`Round`から推測されないことをテストした。次のcycleでは`RoundEnded`の一回消費を扱う。
 - 2026-08-14: `RoundSettlement<P>`を追加し、`TableMatchState::into_round_settlement(self, Round<P, RoundEnded>)`で両方を消費するようにした。荒牌平局で終端した`Round`を渡し、outcome を参照できることをテストした。`RoundEnded`は`Copy`でも`Clone`でもないため、同じ値を二重精算に渡せない。精算規則や対局状態の更新はこのcycleに含めない。
+- 2026-08-14: module責務の設計reviewで、途中流局候補は`Round`内部で検出し、検証済み`TableRules`から射影した不変の`RoundPolicy`を成立時点で適用すると決めた。不採用候補では局を停止せず通常遷移を続け、採用時だけ確定outcomeを持つ`RoundEnded`を返す。`RoundSettlement`は候補を再判定せず、確定outcomeの支払い・連荘・本場・供託・次局への効果だけを扱う。
 
 ## Completion review
 
 - [ ] すべての精算ruleが検証済み`MatchRules`へ対応付けられている。
 - [ ] `Round`と`TableMatchState`で点数・場・局番・本場・供託を二重所有していない。
+- [ ] 途中流局の候補検出と`RoundPolicy`適用は`Round`内、確定outcomeの対局上の効果は`RoundSettlement`内に一意に置かれている。
 - [ ] 二重精算、部分更新、未精算の次局開始を型または検証で防ぐ。
 - [ ] `TableMatchResult<P>`、event、replay、stable hashの境界を確認した。

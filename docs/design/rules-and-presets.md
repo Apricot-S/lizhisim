@@ -59,6 +59,11 @@ preset metadataを所有する。解決後にcoreが実行時検証で使う37�
 policy値を抽出して渡し、coreはschema、preset identity、出典、内容hashを参照しない。
 詳細は[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)を参照する。
 
+局内状態を参照する行為競合、途中流局、流し満貫などの項目は、検証済み`TableRules`から
+`RoundPolicy<P>`へ射影して`Round`開始時に渡す。`RoundPolicy`は局中に差し替えない。
+`Round`は局内状態から候補を検出した直後にこのpolicyを適用し、採用時だけ確定outcomeとして
+`RoundEnded`を返す。不採用の途中流局候補を外側へ通知して局を一時停止する方式にはしない。
+
 親へ14枚を配る方式と、親へ13枚を配って第一`Zimo`を行う方式は、
 [ADR-0012](../adr/0012-normalize-dealer-first-draw.md)と
 [ADR-0016](../adr/0016-initial-deal-shouqie-action.md)に従い、内部ではどちらも`RoundStarted`後の
@@ -91,6 +96,15 @@ initial deal由来の親第一打では`Moqie`を提示せず、分離された`
 - 流し満貫を和了/流局精算/不採用のどれとして扱うか
 - 聴牌の定義、形式聴牌、自己の牌を使い切った待ち
 - 聴牌公開、ノーテン罰符
+
+途中流局の候補検出は、必要な河、副露、槓、第一巡、call windowを所有する`Round`内の純粋な判定とする。
+候補検出だけでは局を終了せず、対応する`RoundPolicy`項目が採用する場合に限り`RoundEnded`へ遷移する。
+不採用の場合は、四風連打等の候補が成立する形でも打牌完了・call window解決後の通常遷移を続ける。
+九種九牌のようにplayerの選択を必要とする途中流局は、policyが有効な場合だけ合法actionへ含める。
+三家和はronのcall window解決中に、頭ハネ・複数ロン・途中流局のpolicyと合わせて一意に解決する。
+
+`RoundEnded`へ含める流局種別、聴牌seat、流し満貫の資格seatはpolicy適用後の確定した局内事実とする。
+`RoundSettlement`はこれらを再判定せず、支払い、連荘、本場、供託、次局への効果だけを扱う。
 
 ### 3.4 役と和了制限
 
@@ -146,6 +160,7 @@ initial deal由来の親第一打では`Moqie`を提示せず、分離された`
 | 同点 | 起家順、同順位、順位点分配、追加局 |
 | 精算 | オカ、ウマ/順位点、残供託、1000点単位変換 |
 
+`MatchRules`は確定済みの和了・荒牌平局・途中流局outcomeを入力とし、途中流局の採用可否を決めない。
 終了判定は `RoundSettlement` 適用後の一か所で行い、和了処理と流局処理に重複させない。
 
 ## 5. CompetitionPolicy と RankingPolicy

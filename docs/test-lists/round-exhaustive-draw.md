@@ -18,9 +18,9 @@
 解決するため、配牌から70回の通常ツモと打牌を経て一局の終端へ到達できる。
 
 このlistの荒牌平局は「通常ツモ可能なlive wallが0枚である」という事実だけを表す。
-聴牌判定、聴牌公開、ノーテン罰符、流し満貫、親聴牌による連荘、供託、本場、次局生成、半荘終了、
-event、replay、stable hashは実装しない。これらはrule設定と`RoundSettlement`、`TableMatch`を導入する
-後続listで扱う。
+聴牌判定、聴牌公開、流し満貫資格と`RoundPolicy`適用は、後続の`Round`用listで扱う。
+ノーテン罰符、親聴牌による連荘、供託、本場、次局生成、半荘終了は`RoundSettlement`と
+`TableMatch`の後続listで扱う。event、replay、stable hashもこのlistでは実装しない。
 
 ## Responsibility boundary
 
@@ -47,9 +47,10 @@ event、replay、stable hashは実装しない。これらはrule設定と`Round
 
 詳細は[`TableMatch`の局精算境界](table-match-round-settlement.md)で扱う。
 
-- [ ] 聴牌判定、形式聴牌、聴牌公開、ノーテン罰符を検証済みruleから適用する。
+- [ ] `Round`が聴牌判定、形式聴牌、聴牌公開の局内事実を検証済みruleから確定する。
+- [ ] `RoundSettlement`が確定した聴牌seatへノーテン罰符と連荘ruleを適用する。
 - [ ] 親聴牌・流局種別・連荘ruleから次局specを決定する。
-- [ ] 流し満貫を和了、流局精算、不採用のいずれとして扱うかruleで決定する。
+- [ ] `Round`が流し満貫資格を局内状態から判定し、`RoundPolicy`で和了、流局精算、不採用のいずれかを確定する。
 - [ ] 本場、供託、得点、順位、半荘終了を`RoundSettlement`後に一か所で決定する。
 - [ ] 荒牌平局のcanonical event、observation、replay、終端state hashをversion付きで記録する。
 

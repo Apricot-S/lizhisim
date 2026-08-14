@@ -166,6 +166,16 @@ phase payloadではなく`Round<P, State>`が直接所有する。`State`は`zim
 そのphaseだけに存在するdataを保持する。共通dataも不変値ではなく、消費型遷移が必要なfieldを更新して
 次の`Round`へ値で移送する。
 
+途中流局や複数和了解決など、局内状態を参照しなければ判定できないruleは`Round`の遷移内で評価する。
+`Round`は`TableRules`全体ではなく、検証済み設定から射影した不変の`RoundPolicy<P>`を局開始時に受け取り、
+局終了まで同じ値を保持する。`RoundPolicy`は新しいversioned rule layerではなく、core実行に必要な
+`TableRules`項目だけを含む値であり、preset identity、出典、service名を含めない。
+
+四風連打、四家立直、四槓散了、三家和などの形を満たすかという候補検出と、その候補を採用するかという
+policy適用を分ける。候補は`Round`内部の一時的な判定結果に留め、採用しないruleでは通常の次phaseへ
+そのまま進む。採用する場合だけ確定した`RoundOutcome`を持つ`Round<P, RoundEnded>`を返す。
+候補検出を理由に外側へ中断を返したり、`RoundSettlement`へ採用可否を問い合わせたりしない。
+
 player setごとのmarkerと`Player`集合型は`player_set` moduleに置く。牌山配列だけを扱う`BipaiSpec`へ
 追加せず、sealed `PlayerSet`が
 associated typeとして所有し、四人用は`[Player<FourPlayer>; 4]`、将来の三人用は
@@ -245,7 +255,9 @@ resolve_call_window(rules, cause, responses)
   -> NoCall | HuleCalls | FuluCall | DrawOutcome
 ```
 
-ロン同士、ロンとポン、ポンとチーの優先順位、頭ハネ/複数ロン/三家和流局はここで決める。queue 到着時刻は引数に含めない。
+`rules`には検証済み`RoundPolicy`を用いる。ロン同士、ロンとポン、ポンとチーの優先順位、
+頭ハネ/複数ロン/三家和流局はここで決める。三家和の形を満たしてもpolicyが採用しなければ、
+途中流局の`DrawOutcome`は返さず、policyで選択された和了解決を返す。queue 到着時刻は引数に含めない。
 
 ## 9. `hule`・`xiangting` port
 
@@ -289,6 +301,10 @@ Finish(TableMatchResult)
 `TableMatchState`へ移送できる。点数移動、本場、供託、場・局番、連荘、次局は含めず、
 `TableMatchState`が`RoundSettlement`でそれらを適用する。
 
+`RoundEnded`のoutcomeは`RoundPolicy`適用後の確定結果である。途中流局の候補を表す値ではなく、
+不採用ruleで一旦`RoundEnded`を返して外側から同じ局を再開する設計にはしない。`RoundSettlement`は
+河、副露、槓、第一巡などの局内状態を再検査せず、途中流局の採用可否も決めない。
+
 この境界は、次の概念的な一方向遷移とする。これは実装コードではない。
 
 ```text
@@ -306,8 +322,11 @@ TableMatchState<P> + Round<P, RoundEnded> + MatchRules
 牌山または決定的な牌山生成結果を渡して次の`Round`を作る。これにより精算・対局進行と乱数・I/Oを
 分離する。
 
-荒牌平局の聴牌判定、ノーテン罰符、親聴牌による連荘、流し満貫などは、対応する`TableRules`と
-`MatchRules`が検証済みになるまで`RoundSettlement`へ仮の既定値を置かない。現在の
+荒牌平局時の聴牌seat、流し満貫の資格、途中流局種別など、局内状態からしか導出できない事実は
+`Round`が確定して`RoundEnded`へ含める。流し満貫を採用するか、和了相当・流局精算のどちらとして
+分類するかも`TableRules`由来の`RoundPolicy`で局内outcomeを確定する。一方、ノーテン罰符の支払い、
+親聴牌や流局種別による連荘、本場・供託、次局は`RoundSettlement`が`MatchRules`と確定outcomeから
+決める。対応するruleが検証済みになるまで、いずれの層にも仮の既定値を置かない。現在の
 `RoundOutcome::HuangpaiPingju`は精算前の局内事実であり、それだけで次局や対局終了を決めない。
 
 アガリ止め、聴牌止め、トップ条件、飛び、規定場、延長上限、同点は `MatchTerminationPolicy` が判断する。局 engine 内へ特定サービス名の分岐を置かない。
