@@ -41,20 +41,20 @@ pub enum RoundOutcome {
     HuangpaiPingju,
 }
 
-pub enum NoReactionResult {
-    NextZimo(Round<FourPlayer, ZimoPending>),
-    RoundEnded(Round<FourPlayer, RoundEnded>),
+pub enum NoReactionResult<P: PlayerSet + BipaiSpec> {
+    NextZimo(Round<P, ZimoPending>),
+    RoundEnded(Round<P, RoundEnded>),
 }
 
-impl NoReactionResult {
-    pub fn into_next_zimo_pending(self) -> Option<Round<FourPlayer, ZimoPending>> {
+impl<P: PlayerSet + BipaiSpec> NoReactionResult<P> {
+    pub fn into_next_zimo_pending(self) -> Option<Round<P, ZimoPending>> {
         match self {
             Self::NextZimo(round) => Some(round),
             Self::RoundEnded(_) => None,
         }
     }
 
-    pub fn next_zimo_pending(&self) -> Option<&Round<FourPlayer, ZimoPending>> {
+    pub fn next_zimo_pending(&self) -> Option<&Round<P, ZimoPending>> {
         match self {
             Self::NextZimo(round) => Some(round),
             Self::RoundEnded(_) => None,
@@ -196,7 +196,7 @@ impl Round<FourPlayer, ZimoCompleted> {
 }
 
 impl Round<FourPlayer, DapaiCompleted> {
-    pub fn no_reaction(self) -> NoReactionResult {
+    pub fn no_reaction(self) -> NoReactionResult<FourPlayer> {
         if self.bipai.remaining_count() == 0 {
             return NoReactionResult::RoundEnded(Round {
                 bipai: self.bipai,
@@ -224,7 +224,7 @@ impl Round<FourPlayer, DapaiCompleted> {
     }
 }
 
-impl Round<FourPlayer, RoundEnded> {
+impl<P: PlayerSet + BipaiSpec> Round<P, RoundEnded> {
     pub fn round_outcome(&self) -> RoundOutcome {
         self.state.outcome
     }
