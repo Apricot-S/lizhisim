@@ -244,7 +244,7 @@ mod tests {
     use super::*;
 
     fn red_three_tiles() -> ([TileKind; 136], TileSet) {
-        let tile_set = TileSet::red_three_four_player();
+        let tile_set = crate::test_support::red_three_four_player();
 
         let mut tiles = [TileKind::M1; 136];
         let mut cursor = 0;

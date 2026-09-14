@@ -13,5 +13,3 @@ categories.workspace = true
 
 [dependencies]
 thiserror.workspace = true
-
-lizhisim-core.workspace = true

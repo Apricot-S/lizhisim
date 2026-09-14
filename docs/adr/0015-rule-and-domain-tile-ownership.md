@@ -1,6 +1,7 @@
 # ADR-0015: 牌構成設定と実行時牌上限の所有crateを分離する
 
-- Status: Accepted
+- Status: Superseded
+- Superseded by: [ADR-0017](0017-core-depends-on-rules.md)
 - Date: 2026-08-09
 - Deciders: Project owner
 - Relates to: [ADR-0014](0014-facade-and-core-crates.md)

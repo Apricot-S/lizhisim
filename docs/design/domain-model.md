@@ -54,12 +54,13 @@ primitive obsession を避け、少なくとも次を区別する。
 
 `TileKind`は通常の34種類に赤`5m`、赤`5p`、赤`5s`を加えた37種類とする。同じ`TileKind`の複数枚は個別identityを持たず、個数またはmultisetとして表す。core domainに`TileCopy`を置かない。
 
-`TileSet`は`lizhisim-core`が所有する検証済み実行値であり、37種類それぞれの卓内最大枚数と
-総牌数を保持する。rawな赤牌設定、preset metadata、出典は保持しない。`lizhisim-rules`が
-設定をsemantic validationした後、coreの検証済みconstructorを通して`TileSet`を生成する。
-詳細は[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)を参照する。
+`TileKind`と`TileSet`は`lizhisim-core`が所有する。
+`TileSet`は37種類それぞれの卓内最大枚数と総牌数を保持する検証済み実行値であり、
+rawな赤牌設定、preset metadata、出典は保持しない。rulesが設定をsemantic validationした後、
+coreの`TileSet::try_from(&RuleSpec)`が検証済み設定を直接参照して生成する。
+詳細は[ADR-0017](../adr/0017-core-depends-on-rules.md)を参照する。
 
-実装は`lizhisim-core/src/tile_set.rs`に置き、`bingpai.rs`や将来の`bipai.rs`の内部型にしない。
+実装は`lizhisim-core/src/tile_set.rs`に置き、`bingpai.rs`や`bipai.rs`の内部型にしない。
 `TileSet`は牌種ごとの上限参照に加え、`Bipai`の完全なmultiset、配牌後の各領域、replay時の
 tile conservationを照合する共通基準である。
 
@@ -93,8 +94,8 @@ index 52から最初の`Zimo`として正規化する。したがって通常の
 0とし、上位遷移から初期表示commandを適用した場合だけ1にする。`baopai_indicators`はindex 131から
 2ずつ戻る牌をread-only iteratorとして返す。
 表示牌の参照自体は公開枚数、通常ツモ位置、嶺上ツモ位置を変更しない。
-表ドラの有効・無効とcommand適用時点は`Bipai`で判断しない。rules crateはraw設定を検証してcore所有の
-小さなpolicy値へ変換し、coreの`Round`がpolicyから初期・追加表示を指示する。麻雀ruleの実行意味論を
+表ドラの有効・無効とcommand適用時点は`Bipai`で判断しない。rules crateはraw設定を検証し、
+coreの`Round`がrules所有のpolicyを直接参照して初期・追加表示を指示する。麻雀ruleの実行意味論を
 orchestration等の上位crateへ移さない。
 `Bipai`は表ドラと裏ドラを別々のcrate-private read-only iteratorとして提供する。どちらも同じ
 `baopai_indicator_count`から枚数を導出し、裏ドラ専用のcountやcursorは持たない。表ドラはindex 131、裏ドラは

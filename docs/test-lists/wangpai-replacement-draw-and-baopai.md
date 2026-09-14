@@ -127,7 +127,7 @@ index列は用途ごとの論理順であり、物理的な幢の上下をcanoni
 - [ ] `Round`は裏ドラ適用資格のある和了でだけ、公開済み表ドラ表示牌と同数の裏ドラ表示牌を取得する。
 - [ ] 表ドラ無効ruleでは、`Round`は`qipai`後に初期表示commandを適用しない。
 - [ ] 表ドラ有効ruleでは、`Round`は`qipai`後に初期表示commandを一回適用する。
-- [ ] `Round`はservice名ではなく、rules crateから渡されたcore所有の解決済み表ドラpolicyだけを参照する。
+- [ ] `Round`はservice名ではなく、rules crate所有の検証済み表ドラpolicyを直接参照する。
 - [ ] `Round`は槓種別とruleから、追加表示と`lingshang_zimo`のどちらを先に行うか決定する。
 - [ ] `Angang`用のrule順序を`Jiagang`または`Daminggang`へ暗黙に流用しない。
 - [ ] 「嶺上ツモ前」になる槓種別・ruleでは、追加表示を完了するまで`lingshang_zimo`へ進めない。

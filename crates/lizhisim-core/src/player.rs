@@ -122,7 +122,7 @@ mod tests {
     use super::*;
 
     fn red_three_tiles() -> ([TileKind; 136], TileSet) {
-        let tile_set = TileSet::red_three_four_player();
+        let tile_set = crate::test_support::red_three_four_player();
         let mut tiles = [TileKind::M1; 136];
         let mut cursor = 0;
 
@@ -269,7 +269,7 @@ mod tests {
         counts[TileKind::P5.index()] = 1;
         let player = Player::from_qipai(
             Seat::<FourPlayer>::ALL[0],
-            Bingpai::from_validated_counts(counts, TileSet::red_three_four_player()),
+            Bingpai::from_validated_counts(counts, crate::test_support::red_three_four_player()),
         );
 
         let sipai = [

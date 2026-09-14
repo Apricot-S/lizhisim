@@ -27,10 +27,10 @@ impl Bingpai {
     }
 
     #[cfg(test)]
-    pub(crate) const fn red_three_four_player() -> Self {
+    pub(crate) fn red_three_four_player() -> Self {
         Self {
             counts: [0; 37],
-            tile_set: TileSet::red_three_four_player(),
+            tile_set: crate::test_support::red_three_four_player(),
         }
     }
 
@@ -69,7 +69,30 @@ impl Bingpai {
 
 #[cfg(test)]
 mod tests {
+    use lizhisim_rules::{HongBaopaiConfig, RawRuleSpec, RuleSpec};
+
     use super::*;
+
+    #[test]
+    fn rules_with_zero_red_tiles_reject_red_tile_in_core() {
+        let rules = RuleSpec::try_from(RawRuleSpec {
+            hong_baopai: HongBaopaiConfig {
+                m0_count: 0,
+                p0_count: 0,
+                s0_count: 0,
+            },
+        })
+        .unwrap();
+        let bingpai = Bingpai::empty(TileSet::try_from(&rules).unwrap());
+
+        assert_eq!(
+            bingpai.with_added(TileKind::M0),
+            Err(BingpaiError::TileCountExceeded {
+                tile_kind: TileKind::M0,
+                max_count: 0,
+            }),
+        );
+    }
 
     #[test]
     fn empty_bingpai_has_zero_of_every_tile_kind() {

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
+use lizhisim_rules::RuleSpec;
 use thiserror::Error;
 
 use crate::tile::TileKind;
@@ -49,21 +50,6 @@ const fn validate_combined_five_count(
 }
 
 impl TileSet {
-    #[cfg(test)]
-    pub(crate) const fn red_three_four_player() -> Self {
-        let mut counts = [4; 37];
-        counts[TileKind::M0.index()] = 1;
-        counts[TileKind::M5.index()] = 3;
-        counts[TileKind::P0.index()] = 1;
-        counts[TileKind::P5.index()] = 3;
-        counts[TileKind::S0.index()] = 1;
-        counts[TileKind::S5.index()] = 3;
-        Self {
-            counts,
-            total_count: 136,
-        }
-    }
-
     pub const fn try_from_counts(counts: [u8; 37]) -> Result<Self, TileSetError> {
         let mut index = 0;
         let mut total_count = 0;
@@ -104,6 +90,22 @@ impl TileSet {
 
     pub const fn total_count(&self) -> u8 {
         self.total_count
+    }
+}
+
+impl TryFrom<&RuleSpec> for TileSet {
+    type Error = TileSetError;
+
+    fn try_from(rules: &RuleSpec) -> Result<Self, Self::Error> {
+        let hong_baopai = rules.hong_baopai();
+        let mut counts = [4; 37];
+        counts[TileKind::M0.index()] = hong_baopai.m0_count;
+        counts[TileKind::M5.index()] = 4 - hong_baopai.m0_count;
+        counts[TileKind::P0.index()] = hong_baopai.p0_count;
+        counts[TileKind::P5.index()] = 4 - hong_baopai.p0_count;
+        counts[TileKind::S0.index()] = hong_baopai.s0_count;
+        counts[TileKind::S5.index()] = 4 - hong_baopai.s0_count;
+        Self::try_from_counts(counts)
     }
 }
 
@@ -202,6 +204,95 @@ mod tests {
                 actual_count: 5,
                 max_count: 4,
             }),
+        );
+    }
+}
+
+#[cfg(test)]
+mod rule_tests {
+    use lizhisim_rules::{HongBaopaiConfig, RawRuleSpec};
+
+    use super::*;
+
+    fn raw(m0_count: u8, p0_count: u8, s0_count: u8) -> RawRuleSpec {
+        RawRuleSpec {
+            hong_baopai: HongBaopaiConfig {
+                m0_count,
+                p0_count,
+                s0_count,
+            },
+        }
+    }
+
+    #[test]
+    fn rule_spec_resolves_zero_hong_baopai_to_four_base_fives() {
+        let rule_spec = RuleSpec::try_from(raw(0, 0, 0)).unwrap();
+        let tile_set = TileSet::try_from(&rule_spec).unwrap();
+
+        assert_eq!(
+            [
+                tile_set.max_count(TileKind::M0),
+                tile_set.max_count(TileKind::M5),
+                tile_set.max_count(TileKind::P0),
+                tile_set.max_count(TileKind::P5),
+                tile_set.max_count(TileKind::S0),
+                tile_set.max_count(TileKind::S5),
+            ],
+            [0, 4, 0, 4, 0, 4],
+        );
+    }
+
+    #[test]
+    fn rule_spec_resolves_red_three_to_three_base_fives() {
+        let tile_set = TileSet::try_from(&RuleSpec::try_from(raw(1, 1, 1)).unwrap()).unwrap();
+
+        assert_eq!(
+            [
+                tile_set.max_count(TileKind::M0),
+                tile_set.max_count(TileKind::M5),
+                tile_set.max_count(TileKind::P0),
+                tile_set.max_count(TileKind::P5),
+                tile_set.max_count(TileKind::S0),
+                tile_set.max_count(TileKind::S5),
+            ],
+            [1, 3, 1, 3, 1, 3],
+        );
+    }
+
+    #[test]
+    fn rule_spec_resolves_mahjong_soul_four_player_red_three_to_136_tiles() {
+        let tile_set = TileSet::try_from(&RuleSpec::try_from(raw(1, 1, 1)).unwrap()).unwrap();
+
+        assert_eq!(tile_set.total_count(), 136);
+    }
+
+    #[test]
+    fn rule_spec_resolves_mahjong_soul_four_player_non_five_tiles_to_four() {
+        let tile_set = TileSet::try_from(&RuleSpec::try_from(raw(1, 1, 1)).unwrap()).unwrap();
+        let non_five_counts = TileKind::ALL[..34]
+            .iter()
+            .copied()
+            .filter(|tile_kind| !matches!(tile_kind, TileKind::M5 | TileKind::P5 | TileKind::S5))
+            .map(|tile_kind| tile_set.max_count(tile_kind))
+            .collect::<Vec<_>>();
+
+        assert_eq!(non_five_counts, vec![4; 31]);
+    }
+
+    #[test]
+    fn rule_spec_resolves_four_hong_baopai_to_zero_base_fives() {
+        let tile_set = TileSet::try_from(&RuleSpec::try_from(raw(4, 4, 4)).unwrap()).unwrap();
+
+        assert_eq!(
+            [
+                tile_set.max_count(TileKind::M0),
+                tile_set.max_count(TileKind::M5),
+                tile_set.max_count(TileKind::P0),
+                tile_set.max_count(TileKind::P5),
+                tile_set.max_count(TileKind::S0),
+                tile_set.max_count(TileKind::S5),
+            ],
+            [4, 0, 4, 0, 4, 0],
         );
     }
 }

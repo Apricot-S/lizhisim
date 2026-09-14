@@ -4,14 +4,14 @@
 
 - Owner: project owner / implementer
 - Created: 2026-08-09
-- Updated: 2026-08-09
+- Updated: 2026-09-15
 - Status: Active
 - Requirements: `CORE-001`, `CORE-006`, `RULE-001`, `RULE-002`, `NFR-001`, `NFR-003`
-- ADR / design: [ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md), [domain model](../design/domain-model.md), [rules and presets](../design/rules-and-presets.md)
+- ADR / design: [ADR-0017](../adr/0017-core-depends-on-rules.md), [domain model](../design/domain-model.md), [rules and presets](../design/rules-and-presets.md)
 
 ## Scope
 
-`lizhisim-core`所有の検証済み`TileSet`、`lizhisim-rules`によるraw牌設定の解決、
+`lizhisim-core`所有の検証済み`TileSet`、`lizhisim-rules`によるraw牌設定の検証とcoreによる解決、
 `Bingpai`と四人用`Bipai`による共通牌構成の利用を扱う。
 
 役、行為、支払、対局進行等のrule設定、三人麻雀固有の牌構成、牌山shuffleは扱わない。
@@ -20,7 +20,7 @@
 ## Design constraints
 
 - `TileSet`は`lizhisim-core/src/tile_set.rs`が所有する。
-- `lizhisim-rules`は`lizhisim-core`へ依存し、逆依存は禁止する。
+- `lizhisim-core`は`lizhisim-rules`へ依存し、逆依存は禁止する。
 - `TileSet`はraw設定、preset identity、出典、内容hashを保持しない。
 - `TileSet`のcount順は`TileKind`の内部index順とする。
 - `Bingpai`と`Bipai`は同じ`TileSet`を検証基準に使う。
@@ -42,7 +42,7 @@
 
 ### Minimal `lizhisim-rules` boundary
 
-- [x] `lizhisim-rules` crateは`lizhisim-core`へだけ依存して最小scaffoldを構築できる。
+- [x] `lizhisim-rules` crateは`lizhisim-core`へ依存せずbuildできる（ADR-0017で更新）。
 - [x] facade `lizhisim`はrulesとcoreの公開APIをre-exportする。
 - [x] `M0`のraw枚数を独立に0〜4で受け付ける。
 - [x] `P0`のraw枚数を独立に0〜4で受け付ける。
@@ -188,7 +188,7 @@
 
 - 2026-08-13: 全Rust testを三角測量後の重複という観点で再評価した。`Bingpai`のM1反復4回、M0/M5単独追加、P0/S0の色違い例は、設定上限0/1/3/4と5枚目拒否、およびM0/M5共存を検証する残存testが同じ一般化前の誤実装を検出するため削除した。M0/M5の両追加順は、片方だけでは検出できない順序依存の回帰を拒否する独立した契約として維持した。`TileSet`の空count `is_ok` smoke testは、具体的なcountを構築して`max_count`と`total_count`を検証するtestに包含されるため削除した。M/P/Sごとに別fieldまたは別validation分岐を持つtest、境界、具体的error payloadも独立した契約として維持した。
 
-- [x] coreとrulesの依存方向がADR-0015に一致する。
+- [x] coreとrulesの依存方向がADR-0017に一致する。
 - [x] `TileSet`を`Bingpai`と`Bipai`が共通利用する。
 - [x] 赤牌0、1、4枚の境界を確認した。
 - [x] errorと失敗時不変性を確認した。

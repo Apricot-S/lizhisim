@@ -51,8 +51,8 @@ roster、stage、schedule、table assignment、standing、ranking、advancement 
 ```text
 applications / runtime
     -> competition, orchestration, inference protocol
-        -> rules, domain ports
-            -> domain values and transitions
+        -> domain ports, values and transitions
+            -> rules
 
 adapters -> corresponding ports
 domain -X-> adapters, async runtime, storage, GPU
@@ -187,7 +187,7 @@ event は少なくとも experiment、competition、table match、round の stre
 | 候補 crate | 責務 |
 |---|---|
 | `lizhisim-core` | 値型、typestate、純粋遷移、domain port。現在作成済み |
-| `lizhisim-rules` | raw設定schema、検証、解決済みrule、preset registry。domain実行値は`lizhisim-core`の型へ変換する |
+| `lizhisim-rules` | raw設定schema、検証、解決済みrule、preset registry。coreに依存しない。現在作成済み |
 | `lizhisim-protocol` | 観測、action、request/response、event schema |
 | `lizhisim-engine` | 論理卓 scheduler と continuation runtime |
 | `lizhisim-inference` | batching broker と backend port |
@@ -200,9 +200,10 @@ event は少なくとも experiment、competition、table match、round の stre
 
 `lizhisim-core`より先のcrate分割は、循環依存を避ける必要とwalking skeletonの変更頻度・compile costを確認してからADRで確定する。
 
-牌構成については[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)に従い、raw設定と
-`ValidatedRuleSet<P>`を`lizhisim-rules`、実行時の`TileSet`を`lizhisim-core`が所有する。
-依存方向は`lizhisim-rules -> lizhisim-core`とし、coreからrulesへの逆依存を禁止する。
+牌構成については[ADR-0017](../adr/0017-core-depends-on-rules.md)に従い、raw設定、
+`ValidatedRuleSet<P>`をrules、`TileKind`、`TileSet`をcoreが所有する。
+依存方向は`lizhisim-core -> lizhisim-rules`とし、rulesからcoreへの依存を禁止する。
+coreはrulesの検証済み型を直接利用し、`TileSet::try_from(&RuleSpec)`で牌構成を解決する。
 `TileSet`は`Bingpai`と`Bipai`から独立した`tile_set` moduleに置く。
 
 ## 10. 拡張境界
@@ -222,3 +223,4 @@ event は少なくとも experiment、competition、table match、round の stre
 - [ADR-0006: Rust toolchain、初期 workspace、CI baselineを固定する](../adr/0006-rust-toolchain-workspace-and-ci.md)
 - [ADR-0014: facadeとcore crateを分離する](../adr/0014-facade-and-core-crates.md)
 - [ADR-0015: 牌構成設定と実行時牌上限の所有crateを分離する](../adr/0015-rule-and-domain-tile-ownership.md)
+- [ADR-0017: coreが独立したrulesを直接利用する](../adr/0017-core-depends-on-rules.md)

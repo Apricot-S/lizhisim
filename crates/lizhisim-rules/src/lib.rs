@@ -6,4 +6,6 @@
 
 mod rule_spec;
 
-pub use rule_spec::{HongBaopaiConfig, RawRuleSpec, RuleSpec, RuleSpecError};
+pub use rule_spec::{
+    HongBaopaiConfig, HongBaopaiConfigField, RawRuleSpec, RuleSpec, RuleSpecError,
+};

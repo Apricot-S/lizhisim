@@ -51,16 +51,17 @@ Source evidence
 ### 3.1.1 crate ownership
 
 `lizhisim-rules`はrawな牌設定、schema、semantic validation、`ValidatedRuleSet<P>`、
-preset metadataを所有する。解決後にcoreが実行時検証で使う37種類の最大枚数は、
-`lizhisim-core`所有の`TileSet`へ変換する。rules crateがdomain型を使うのは、このような
-検証済み実行値を生成する境界に限定する。
+preset metadataを所有する。`TileKind`と検証済み牌構成`TileSet`はcoreが所有する。
+rulesはcoreに依存しない。coreがrulesへ依存し、検証済み設定を直接利用する。
+現在は`RuleSpec::hong_baopai`が共有参照を提供し、coreの`TileSet::try_from(&RuleSpec)`が
+37種類の牌数を解決する。rulesの検証エラーは牌種でなく`HongBaopaiConfigField`で対象fieldを示す。
 
-`ValidatedRuleSet<P>`全体をcore遷移へ渡さない。卓内runtimeが必要な`TileSet`や小さな
-policy値を抽出して渡し、coreはschema、preset identity、出典、内容hashを参照しない。
-詳細は[ADR-0015](../adr/0015-rule-and-domain-tile-ownership.md)を参照する。
+core専用policyへの変換は要求しない。coreはrules所有の検証済み設定・policyを直接参照する。
+raw入力のvalidationはrulesで行い、coreの遷移はpreset名や出典ではなく設定値に基づいて決定する。
+詳細は[ADR-0017](../adr/0017-core-depends-on-rules.md)を参照する。
 
 局内状態を参照する行為競合、途中流局、流し満貫などの項目は、検証済み`TableRules`から
-`RoundPolicy<P>`へ射影して`Round`開始時に渡す。`RoundPolicy`は局中に差し替えない。
+rules所有の`RoundPolicy<P>`へ射影して`Round`開始時に渡す。`RoundPolicy`は局中に差し替えない。
 `Round`は局内状態から候補を検出した直後にこのpolicyを適用し、採用時だけ確定outcomeとして
 `RoundEnded`を返す。不採用の途中流局候補を外側へ通知して局を一時停止する方式にはしない。
 
@@ -333,4 +334,4 @@ match_rules:
 
 ### Raw入力と検証済み設定の境界
 
-`RawRuleSpec`はTOMLなど外部入力をserdeでdecodeした未検証の値を表す。構文・型のdecode後、`RuleSpec`へ変換する際にsemantic validationを行う。`RuleSpec`だけが`TileSet`解決やruntimeへ渡す設定を提供し、外部入力型をdomain遷移へ直接渡さない。
+`RawRuleSpec`はTOMLなど外部入力をserdeでdecodeした未検証の値を表す。構文・型のdecode後、`RuleSpec`へ変換する際にsemantic validationを行う。`RuleSpec`だけが検証済み設定を提供し、coreの`TileSet::try_from(&RuleSpec)`が牌構成を解決する。外部入力型をdomain遷移へ直接渡さない。

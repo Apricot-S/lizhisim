@@ -4,7 +4,12 @@
 
 use thiserror::Error;
 
-use lizhisim_core::{TileKind, TileSet, TileSetError};
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum HongBaopaiConfigField {
+    M0Count,
+    P0Count,
+    S0Count,
+}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct HongBaopaiConfig {
@@ -25,27 +30,25 @@ pub struct RuleSpec {
 
 #[derive(Debug, Error, PartialEq)]
 pub enum RuleSpecError {
-    #[error("{hong_baopai:?} count {actual_count} exceeds maximum {max_count}")]
+    #[error("{field:?} count {actual_count} exceeds maximum {max_count}")]
     HongBaopaiCountOutOfRange {
-        hong_baopai: TileKind,
+        field: HongBaopaiConfigField,
         actual_count: u8,
         max_count: u8,
     },
-    #[error("failed to resolve tile set: {0}")]
-    TileSet(#[from] TileSetError),
 }
 
 impl HongBaopaiConfig {
     const fn validate(&self) -> Result<(), RuleSpecError> {
-        match validate_hong_baopai_count(TileKind::M0, self.m0_count) {
+        match validate_hong_baopai_count(HongBaopaiConfigField::M0Count, self.m0_count) {
             Ok(()) => {}
             Err(error) => return Err(error),
         }
-        match validate_hong_baopai_count(TileKind::P0, self.p0_count) {
+        match validate_hong_baopai_count(HongBaopaiConfigField::P0Count, self.p0_count) {
             Ok(()) => {}
             Err(error) => return Err(error),
         }
-        match validate_hong_baopai_count(TileKind::S0, self.s0_count) {
+        match validate_hong_baopai_count(HongBaopaiConfigField::S0Count, self.s0_count) {
             Ok(()) => {}
             Err(error) => return Err(error),
         }
@@ -54,12 +57,12 @@ impl HongBaopaiConfig {
 }
 
 const fn validate_hong_baopai_count(
-    hong_baopai: TileKind,
+    field: HongBaopaiConfigField,
     actual_count: u8,
 ) -> Result<(), RuleSpecError> {
     if actual_count > 4 {
         return Err(RuleSpecError::HongBaopaiCountOutOfRange {
-            hong_baopai,
+            field,
             actual_count,
             max_count: 4,
         });
@@ -80,17 +83,8 @@ impl TryFrom<RawRuleSpec> for RuleSpec {
 }
 
 impl RuleSpec {
-    pub fn resolve_tile_set(&self) -> Result<TileSet, RuleSpecError> {
-        let mut counts = [4; 37];
-
-        counts[TileKind::M0.index()] = self.hong_baopai.m0_count;
-        counts[TileKind::M5.index()] = 4 - self.hong_baopai.m0_count;
-        counts[TileKind::P0.index()] = self.hong_baopai.p0_count;
-        counts[TileKind::P5.index()] = 4 - self.hong_baopai.p0_count;
-        counts[TileKind::S0.index()] = self.hong_baopai.s0_count;
-        counts[TileKind::S5.index()] = 4 - self.hong_baopai.s0_count;
-
-        TileSet::try_from_counts(counts).map_err(RuleSpecError::TileSet)
+    pub const fn hong_baopai(&self) -> &HongBaopaiConfig {
+        &self.hong_baopai
     }
 }
 
@@ -143,7 +137,7 @@ mod tests {
         assert_eq!(
             RuleSpec::try_from(raw(5, 0, 0)),
             Err(RuleSpecError::HongBaopaiCountOutOfRange {
-                hong_baopai: TileKind::M0,
+                field: HongBaopaiConfigField::M0Count,
                 actual_count: 5,
                 max_count: 4,
             }),
@@ -155,7 +149,7 @@ mod tests {
         assert_eq!(
             RuleSpec::try_from(raw(0, 5, 0)),
             Err(RuleSpecError::HongBaopaiCountOutOfRange {
-                hong_baopai: TileKind::P0,
+                field: HongBaopaiConfigField::P0Count,
                 actual_count: 5,
                 max_count: 4,
             }),
@@ -167,94 +161,10 @@ mod tests {
         assert_eq!(
             RuleSpec::try_from(raw(0, 0, 5)),
             Err(RuleSpecError::HongBaopaiCountOutOfRange {
-                hong_baopai: TileKind::S0,
+                field: HongBaopaiConfigField::S0Count,
                 actual_count: 5,
                 max_count: 4,
             }),
-        );
-    }
-
-    #[test]
-    fn rule_spec_resolves_zero_hong_baopai_to_four_base_fives() {
-        let rule_spec = RuleSpec::try_from(raw(0, 0, 0)).unwrap();
-        let tile_set = rule_spec.resolve_tile_set().unwrap();
-
-        assert_eq!(
-            [
-                tile_set.max_count(TileKind::M0),
-                tile_set.max_count(TileKind::M5),
-                tile_set.max_count(TileKind::P0),
-                tile_set.max_count(TileKind::P5),
-                tile_set.max_count(TileKind::S0),
-                tile_set.max_count(TileKind::S5),
-            ],
-            [0, 4, 0, 4, 0, 4],
-        );
-    }
-
-    #[test]
-    fn rule_spec_resolves_red_three_to_three_base_fives() {
-        let tile_set = RuleSpec::try_from(raw(1, 1, 1))
-            .unwrap()
-            .resolve_tile_set()
-            .unwrap();
-
-        assert_eq!(
-            [
-                tile_set.max_count(TileKind::M0),
-                tile_set.max_count(TileKind::M5),
-                tile_set.max_count(TileKind::P0),
-                tile_set.max_count(TileKind::P5),
-                tile_set.max_count(TileKind::S0),
-                tile_set.max_count(TileKind::S5),
-            ],
-            [1, 3, 1, 3, 1, 3],
-        );
-    }
-
-    #[test]
-    fn rule_spec_resolves_mahjong_soul_four_player_red_three_to_136_tiles() {
-        let tile_set = RuleSpec::try_from(raw(1, 1, 1))
-            .unwrap()
-            .resolve_tile_set()
-            .unwrap();
-
-        assert_eq!(tile_set.total_count(), 136);
-    }
-
-    #[test]
-    fn rule_spec_resolves_mahjong_soul_four_player_non_five_tiles_to_four() {
-        let tile_set = RuleSpec::try_from(raw(1, 1, 1))
-            .unwrap()
-            .resolve_tile_set()
-            .unwrap();
-        let non_five_counts = TileKind::ALL[..34]
-            .iter()
-            .copied()
-            .filter(|tile_kind| !matches!(tile_kind, TileKind::M5 | TileKind::P5 | TileKind::S5))
-            .map(|tile_kind| tile_set.max_count(tile_kind))
-            .collect::<Vec<_>>();
-
-        assert_eq!(non_five_counts, vec![4; 31]);
-    }
-
-    #[test]
-    fn rule_spec_resolves_four_hong_baopai_to_zero_base_fives() {
-        let tile_set = RuleSpec::try_from(raw(4, 4, 4))
-            .unwrap()
-            .resolve_tile_set()
-            .unwrap();
-
-        assert_eq!(
-            [
-                tile_set.max_count(TileKind::M0),
-                tile_set.max_count(TileKind::M5),
-                tile_set.max_count(TileKind::P0),
-                tile_set.max_count(TileKind::P5),
-                tile_set.max_count(TileKind::S0),
-                tile_set.max_count(TileKind::S5),
-            ],
-            [4, 0, 4, 0, 4, 0],
         );
     }
 }

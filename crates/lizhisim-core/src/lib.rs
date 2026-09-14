@@ -15,6 +15,9 @@ mod table_match;
 mod tile;
 mod tile_set;
 
+#[cfg(test)]
+mod test_support;
+
 pub use action::{Dapai, DapaiError};
 pub use bingpai::{Bingpai, BingpaiError};
 pub use bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
