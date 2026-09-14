@@ -7,6 +7,8 @@ use thiserror::Error;
 
 use crate::tile::TileKind;
 
+const MAX_COPIES_PER_TILE: u8 = 4;
+
 #[derive(Debug, Error, PartialEq)]
 pub enum TileSetError {
     #[error("tile kind {tile_kind:?} has {actual_count} copies, exceeding maximum {max_count}")]
@@ -38,12 +40,12 @@ const fn validate_combined_five_count(
     base_tile: TileKind,
 ) -> Result<(), TileSetError> {
     let actual_count = counts[hong_baopai.index()] + counts[base_tile.index()];
-    if actual_count > 4 {
+    if actual_count > MAX_COPIES_PER_TILE {
         return Err(TileSetError::CombinedFiveCountExceeded {
             hong_baopai,
             base_tile,
             actual_count,
-            max_count: 4,
+            max_count: MAX_COPIES_PER_TILE,
         });
     }
     Ok(())
@@ -54,11 +56,11 @@ impl TileSet {
         let mut index = 0;
         let mut total_count = 0;
         while index < counts.len() {
-            if counts[index] > 4 {
+            if counts[index] > MAX_COPIES_PER_TILE {
                 return Err(TileSetError::TileCountExceeded {
                     tile_kind: TileKind::ALL[index],
                     actual_count: counts[index],
-                    max_count: 4,
+                    max_count: MAX_COPIES_PER_TILE,
                 });
             }
             total_count += counts[index];
@@ -98,13 +100,13 @@ impl TryFrom<&RuleSpec> for TileSet {
 
     fn try_from(rules: &RuleSpec) -> Result<Self, Self::Error> {
         let hong_baopai = rules.hong_baopai();
-        let mut counts = [4; 37];
+        let mut counts = [MAX_COPIES_PER_TILE; 37];
         counts[TileKind::M0.index()] = hong_baopai.m0_count;
-        counts[TileKind::M5.index()] = 4 - hong_baopai.m0_count;
+        counts[TileKind::M5.index()] = MAX_COPIES_PER_TILE - hong_baopai.m0_count;
         counts[TileKind::P0.index()] = hong_baopai.p0_count;
-        counts[TileKind::P5.index()] = 4 - hong_baopai.p0_count;
+        counts[TileKind::P5.index()] = MAX_COPIES_PER_TILE - hong_baopai.p0_count;
         counts[TileKind::S0.index()] = hong_baopai.s0_count;
-        counts[TileKind::S5.index()] = 4 - hong_baopai.s0_count;
+        counts[TileKind::S5.index()] = MAX_COPIES_PER_TILE - hong_baopai.s0_count;
         Self::try_from_counts(counts)
     }
 }

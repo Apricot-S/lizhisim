@@ -107,6 +107,7 @@
 
 ## Cycle log
 
+- 2026-09-15: `tile_set.rs`の同一牌最大枚数を`MAX_COPIES_PER_TILE`へ定数化し、単体牌・赤牌合算・rule解決で同じ定義を参照するようrefactorした。振る舞い変更なし。
 - 2026-08-12: 四人用`Bipai`の完了監査を行った。`Bipai::try_new`が37種類の実countを`TileSet`と完全一致で検証し、不足・過剰を拒否する既存testにより、配牌前multiset一致を完了とした。配牌後とreplay checkpointのconservationは、牌の所有先となる`Player` / `Round`実装後に検証する。
 - 2026-08-11: Four-player `Bipai` integration のテストを完了。one-more fixture は M1 を4枚のまま赤牌設定を変更し、シャッフルで赤牌と通常5の順序が変わっても同じ multiset として受理する test へ修正した。workspace 46 core tests + 11 rules tests、Clippy、format、`git diff --check` が成功した。
 - 2026-08-10: 「赤牌0枚を通常5が4枚、赤牌が0枚の`TileSet`へ解決する」を選択し、M/P/S各0枚の解決結果を一assertionで検証する。既存の`RuleSpec::resolve_tile_set`がすでに契約を満たしていたため、redなしでgreenを確認した。
