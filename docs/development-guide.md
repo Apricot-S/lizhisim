@@ -6,6 +6,8 @@
 
 文書だけを変更する場合も、変更理由、要求 ID、文書間リンク、未決事項を確認する。設計が変わる場合は ADR を追加または supersede する。
 
+AIへの依頼は[タスクプロンプト](task-prompts.md)を参考に、今回の成果物と完了範囲を指定する。通常の調査・編集・検証は依頼範囲内で続行し、TDDの各サイクルを承認待ちの区切りにはしない。
+
 workspace のcrateは `{root}/crates/` 配下に置く。通常のcrateは独立した `README.md` を持ち、責務、依存方向、公開範囲を簡潔に記載する。プロジェクトのfacade crateだけは `readme.workspace = true` でworkspace rootのREADMEを使ってよい。workspace rootのREADMEはプロジェクト全体の説明に限定する。workspaceと全crateの初期versionは `0.0.1` とし、crate固有のversion変更が必要になるまでworkspace versionを基準にする。
 
 識別子を追加する前に [用語集](glossary.md) を確認する。対応する行がなければ「ユーザー決定待ち」表へ空欄で追加し、ユーザーがピンインまたは英語識別子を決めるまで production 名を作らない。日本語ローマ字やその場限りの英訳で仮置きしない。
@@ -145,6 +147,8 @@ test codeもrefactor対象であり、testを追加し続けるだけの履歴�
 この一つを test list でさらに小さく分ける。GPU、network、実 `hule` がなくても fake backend/port で core の形を検証できる。
 
 ## 5. テスト戦略
+
+選択したtest list項目に応じて以下を適用する。pure transitionの例示テストを最優先とし、ルール境界は表形式、広い入力空間はproperty test、状態機械はmodel-based testで検証する。同時ロン、鳴き競合、キャンセル、遅延応答、再送には決定的なスケジューラテストを用意する。replayはイベント列と終端状態の安定hashの両方を検証する。
 
 ### 5.1 Example tests
 
@@ -319,7 +323,7 @@ correctness test と分ける。固定 workload と環境 metadata を持ち、�
 
 ## 12. コマンド
 
-Phase 0 の検証:
+文書変更の基本検証:
 
 ```powershell
 git diff --check

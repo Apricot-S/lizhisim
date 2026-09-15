@@ -39,6 +39,7 @@
 13. [Phase 0 review](docs/phase-0-review.md)
 
 開発者・AI エージェント向けの作業規約は [AGENTS.md](AGENTS.md) を参照してください。
+AIへ作業を依頼するときは[タスクプロンプト](docs/task-prompts.md)の例を使えます。
 
 ## 設計上の中心原則
 

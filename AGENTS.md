@@ -1,25 +1,36 @@
 # AGENTS.md
 
-このファイルはリポジトリ全体に適用する作業規約である。人間と AI エージェントは、変更前にこのファイルと関連文書を読むこと。
+リポジトリ全体の作業規約。ここには常時必要な制約を置き、詳細手順は対象文書を参照する。
 
-## 1. 現在のフェーズ
+## 1. 作業範囲と進め方
 
-- 現在は **Phase 1: 決定的な一局walking skeleton** である。
-- 実装は選択中のtest list項目だけを対象に、`red -> green -> refactor`を一項目ずつ進める。未選択の振る舞い、新しいcrate/dependency、生成コード、実行可能なプロトタイプを先回りして追加しない。
+現在は **Phase 1: 決定的な一局walking skeleton** である。
+
+- 依頼された範囲を、必要な修正・検証・文書更新まで完了する。通常の調査、ローカル編集、検証、今回の変更に起因する失敗の修正は、各段階で再承認を求めず進める。
+- 実装は選択中のtest list項目だけを対象に、一項目ずつ `red -> green -> refactor` で進める。未選択の振る舞い、新しいcrate/dependency、生成コード、実行可能なプロトタイプを先回りして追加しない。
 - 設計中の例は擬似コードに留め、production実装の代わりとなるコンパイル可能な例を文書へ埋め込まない。
-- 既存の設計を変更するときは、影響する文書と ADR を同じ変更で更新する。
+- 既存設計を変更するときは、影響する文書とADRを同じ変更で更新する。
+- 判断が必要なのは、製品方針の変更、未決の麻雀用語、未確認の公式値など、既存の合意や資料で解決できない事項である。該当規約と必要な判断を具体的に示し、独立して進められる作業は続ける。
+- 最終報告には変更内容、検証結果、残る制約を簡潔に記す。未実行の検証を成功と扱わない。
 
-## 2. 読む順序
+## 2. 必要な文書を読む
 
-1. `README.md`
-2. `docs/vision.md`
-3. `docs/requirements.md`
-4. 対象領域の `docs/design/*.md`
-5. `docs/development-guide.md`
-6. `docs/adr/*.md`
-7. ルールを扱う場合は `docs/references/rule-sources.md`
+変更対象に応じて次の文書を読む。既に確認済みで変更のない文書の再読や、無関係な文書の一括読込は不要である。
 
-矛盾がある場合は、ユーザーの最新指示、`AGENTS.md`、Accepted ADR、設計文書、README の順に優先する。矛盾を黙って解釈せず、文書を修正するか質問する。
+| 作業 | 参照先 |
+|---|---|
+| プロジェクトの目的・スコープの把握 | [README](README.md)、[ビジョン](docs/vision.md)、[要求仕様](docs/requirements.md) |
+| 実装・テストの変更 | [開発手順書](docs/development-guide.md)、対象の[test list](docs/test-lists/README.md)、対象領域の設計文書 |
+| 責務・依存方向・状態遷移 | [アーキテクチャ](docs/design/architecture.md)、[ドメインモデル](docs/design/domain-model.md) |
+| ルール・プリセット・牌譜検証 | [ルール設計](docs/design/rules-and-presets.md)、[出典台帳](docs/references/rule-sources.md)、開発手順書の8節 |
+| 推論要求・応答・スケジューリング | [推論プロトコル](docs/design/inference-protocol.md) |
+| 半荘・大会・段位 | [大会設計](docs/design/competitions.md) |
+| 識別子の追加・変更 | [用語集](docs/glossary.md) |
+| 設計・CI・toolchainの変更 | [ADR一覧](docs/adr/README.md)から対象のAccepted ADR、関連設計文書 |
+
+対象文書が参照するADRも確認する。文書の誤字・リンク修正は、対象箇所と参照元の確認でよい。
+
+プロジェクト内の規範の優先順位は、ユーザーの最新指示、`AGENTS.md`、Accepted ADR、設計文書、READMEとする。矛盾は文書を修正して解消するか、判断が必要な点をユーザーへ示す。
 
 ## 3. 不変の製品方針
 
@@ -68,41 +79,22 @@
 - 外部応答を合法手集合と照合し、重複、期限切れ、未知 ID、不正 action を区別したエラーにする。
 - 公開スキーマとイベントには明示的な schema version を持たせる。
 
-## 7. TDD の必須手順
+## 7. TDD
 
-実装変更は必ず t-wada のサイクルで行う。
+実装変更には[開発手順書の3節](docs/development-guide.md#3-t-wada-tdd-の基本サイクル)を必須手順として適用する。
 
-1. `docs/test-lists/` に test list を作るか更新する。
-2. 未完了項目から 1 つだけ選び、現在の対象として印を付ける。
-3. 失敗する最小のテストを書き、意図した理由で失敗することを確認する（red）。
-4. そのテストだけを通す最小の実装を行う（green）。
-5. 全テストが green の状態で重複、名前、責務、型を改善する（refactor）。
-6. test list を更新し、次の 1 項目を選ぶ。
+- test listの一項目を `Current` にし、意図したred、最小green、全テストgreenでのrefactor、cycle log更新の順で進める。バグ修正も再現テストのredから始め、テストを実装へ合わせて弱めない。
+- 一つのtestは一観点・原則一assertionとする。不可分な例外はcycle logへ理由を記録してreviewする。fixture/setup確認を例外にしない。
+- 一例へのハードコードでもgreenになる場合は、次の一項目で三角測量する。同じredに複数例を混ぜない。
+- refactorではtest suiteも整理する。契約を包含する強いtestがある場合だけ不要なtestを削除し、独立した境界・error・分岐・過去のbugの検証を維持する。三角測量testの削除理由と契約の引継先はcycle logへ残す。
 
-複数の振る舞いを一度に red にしない。バグ修正では、再現テストの red を先に確認する。テストを実装へ合わせて弱めない。
+## 8. 検証
 
-- 一つの具体例へのハードコードでもgreenになる場合は、値や条件が異なる代表例をtest listの次項目として一つだけ選び、別の`red -> green`サイクルで三角測量する。現在のredへ複数例を追加しない。
-- 三角測量のために追加したtestは、一般化後のrefactorで再評価する。残るtestが同じ仕様と一般化前の誤実装を十分に検出し、境界値、異常系、過去のbug、重要な分岐の検証を失わない場合に限り削除できる。
-- 三角測量testを削除する場合は、追加目的、不要になった理由、契約を引き継ぐtestをtest listのcycle logへ記録する。
+検証対象ごとの方針は[開発手順書の5節](docs/development-guide.md#5-テスト戦略)、コマンドとCI運用は[12節](docs/development-guide.md#12-コマンド)を規範とする。
 
-- 一つのtestは一つの観点だけを検証する。`正常系と異常系`、`個数と変換`のような独立して失敗し得る観点を同じtestへ混在させない。
-- One assertion per testを原則とし、一つのtest functionではassertion macroを一回だけ使う。複数入力を同じ性質として検証する場合は結果を一つの値へ集約し、一回のassertionで比較する。
-- 複数assertionが不可分だと判断した例外は、分割できない理由をtest listのcycle logへ記録してreviewする。fixture/setup確認をassertion数の例外にしない。
-- refactorではproduction codeだけでなくtest suiteも見直す。より強いtestが同じ契約を包含し、削除しても独立した振る舞い、境界、error、分岐の検証を失わないtestは、不要になった時点で削除する。`len`、`is_ok`、`is_err`、列の先頭だけの検証を、全要素、具体的な値、具体的なerror、列全体の検証が包含する場合が該当する。
-- 同じproduction経路を通るだけでは重複とみなさない。異なる境界値、enum分岐、状態、error payload、rule variationを検証するtestは維持する。testは開発履歴として保存せず、履歴はtest listのcycle logへ記録する。
-
-## 8. 検証方針
-
-- pure transition の例示テストを最優先する。
-- ルール境界値は表形式テスト、広い入力空間は property test、状態機械は model-based test を使う。
-- `xiangting` と `hule` は契約テストと既知牌姿 corpus でアダプターを検証する。
-- 同時ロン、鳴き競合、キャンセル、遅延応答、再送は決定的なスケジューラテストを持つ。
-- replay にはイベント列だけでなく終端状態の安定 hash を検証する。
-- プリセットには出典上の差分を示す golden test を用意する。
-- 標準検証は `cargo fmt -- --check`、`cargo clippy -- -D warnings`、`cargo build --verbose`、`cargo test --verbose` とする。通常のCI jobはrepositoryの`rust-toolchain.toml`を使い、加えてnightlyの`cargo docs-rs`を実行する。
-- dependency auditは`deny.toml`を規範として、独立したGitHub Actions workflowで`cargo deny check`を実行する。
-- cargo-deny Actionの`rust-version`は`rust-toolchain.toml`の`channel`と一致させ、toolchain更新時に同じ変更で更新する。
-- Markdownは`markdownlint-cli2`、repository内の相対リンクは`lychee --offline`を使う独立したGitHub Actions workflowで検査する。外部URLの疎通はこのgateへ含めない。
+- 実装変更の標準検証は `cargo fmt -- --check`、`cargo clippy -- -D warnings`、`cargo build --verbose`、`cargo test --verbose` とする。
+- 文書変更は用語・要求ID・ADR参照・対象プリセット一覧・相対リンクの整合性と `git diff --check` を確認する。Markdown lintとoffline link checkはdocumentation workflowに従う。
+- 必須検証が成功した後、変更や失敗などの新たな根拠がなければ同じ検証を繰り返さない。文書だけの変更でRustの検証は不要である。
 
 ## 9. 文書と変更管理
 
