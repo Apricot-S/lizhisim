@@ -133,10 +133,12 @@ impl<P: PlayerSet + BipaiSpec> RoundSettlement<P> {
 
 #[cfg(test)]
 mod tests {
+    use lizhisim_rules::FirstZimoOrigin;
+
     use crate::action::Dapai;
     use crate::bipai::Bipai;
     use crate::player_set::FourPlayer;
-    use crate::round::{FirstZimoOrigin, NoReactionResult, Round, RoundEnded, RoundOutcome};
+    use crate::round::{NoReactionResult, Round, RoundEnded, RoundOutcome};
     use crate::score::Score;
     use crate::tile::TileKind;
     use crate::tile_set::TileSet;
@@ -165,8 +167,11 @@ mod tests {
     fn huangpai_pingju_round() -> Round<FourPlayer, RoundEnded> {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let mut transition =
-            NoReactionResult::NextZimo(Round::new(bipai, Seat::ALL[0], FirstZimoOrigin::LiveWall));
+        let mut transition = NoReactionResult::NextZimo(Round::new(
+            bipai,
+            Seat::ALL[0],
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
+        ));
 
         for _ in 0..70 {
             transition = match transition {

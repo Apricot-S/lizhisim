@@ -76,6 +76,7 @@ mod tests {
     #[test]
     fn rules_with_zero_red_tiles_reject_red_tile_in_core() {
         let rules = ValidatedRuleSet::try_from(RuleSet {
+            first_zimo_origin: lizhisim_rules::FirstZimoOrigin::Qipai,
             hong_baopai: HongBaopaiConfig {
                 m0_count: 0,
                 p0_count: 0,

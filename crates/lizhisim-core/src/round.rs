@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
+use lizhisim_rules::{FirstZimoOrigin, ValidatedRuleSet};
+
 use crate::action::{Dapai, DapaiError};
 use crate::bipai::{Bipai, BipaiError, BipaiSpec, QipaiCompleted, QipaiPending};
 use crate::player::{Player, PlayerDapai};
@@ -16,12 +18,6 @@ pub struct Round<P: PlayerSet + BipaiSpec, State> {
     zhuangjia: Seat<P>,
     first_zimo_origin: FirstZimoOrigin,
     state: State,
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum FirstZimoOrigin {
-    InitialDeal,
-    LiveWall,
 }
 
 pub struct ZimoPending;
@@ -99,7 +95,7 @@ impl Round<FourPlayer, ZimoPending> {
     pub(crate) fn new(
         bipai: Bipai<FourPlayer, QipaiPending>,
         zhuangjia: Seat<FourPlayer>,
-        first_zimo_origin: FirstZimoOrigin,
+        rules: &ValidatedRuleSet,
     ) -> Self {
         let (bipai, mut bingpai) = bipai.qipai();
         bingpai.rotate_right(zhuangjia.index());
@@ -117,7 +113,7 @@ impl Round<FourPlayer, ZimoPending> {
             players,
             actor: zhuangjia,
             zhuangjia,
-            first_zimo_origin,
+            first_zimo_origin: rules.first_zimo_origin(),
             state: ZimoPending,
         }
     }
@@ -154,7 +150,7 @@ impl Round<FourPlayer, ZimoCompleted> {
         let actor_index = actor.index();
         let player_dapai = match dapai {
             Dapai::Moqie(_)
-                if first_zimo_origin == FirstZimoOrigin::InitialDeal
+                if first_zimo_origin == FirstZimoOrigin::Qipai
                     && actor == zhuangjia
                     && players[actor_index].first_turn_eligible() =>
             {
@@ -162,7 +158,7 @@ impl Round<FourPlayer, ZimoCompleted> {
             }
             Dapai::Moqie(tile_kind) => PlayerDapai::Moqie(tile_kind),
             Dapai::Shouqie(tile_kind)
-                if first_zimo_origin == FirstZimoOrigin::InitialDeal
+                if first_zimo_origin == FirstZimoOrigin::Qipai
                     && actor == zhuangjia
                     && players[actor_index].first_turn_eligible()
                     && tile_kind == state.zimopai =>
@@ -275,7 +271,7 @@ mod tests {
         let round = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[0],
-            FirstZimoOrigin::InitialDeal,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
         );
 
         assert_eq!(
@@ -289,7 +285,11 @@ mod tests {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let zhuangjia = Seat::<FourPlayer>::ALL[2];
-        let round = Round::new(bipai, zhuangjia, FirstZimoOrigin::InitialDeal);
+        let round = Round::new(
+            bipai,
+            zhuangjia,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
+        );
 
         assert_eq!(round.actor(), &zhuangjia);
     }
@@ -301,7 +301,7 @@ mod tests {
         let round = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::InitialDeal,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
         );
         let [seat0, seat1, seat2, seat3] = round.players();
 
@@ -323,7 +323,7 @@ mod tests {
         let round = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[0],
-            FirstZimoOrigin::InitialDeal,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
         );
 
         assert_eq!(round.bipai().remaining_count(), 70);
@@ -334,7 +334,11 @@ mod tests {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let zhuangjia = Seat::<FourPlayer>::ALL[2];
-        let round = Round::new(bipai, zhuangjia, FirstZimoOrigin::InitialDeal);
+        let round = Round::new(
+            bipai,
+            zhuangjia,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
+        );
 
         let _: Round<FourPlayer, ZimoCompleted> = round.zimo().unwrap();
     }
@@ -346,7 +350,7 @@ mod tests {
         let round = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::InitialDeal,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
         );
 
         let round = round.zimo().unwrap();
@@ -361,7 +365,7 @@ mod tests {
         let round = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::InitialDeal,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
         );
 
         let round = round.zimo().unwrap();
@@ -377,7 +381,7 @@ mod tests {
         let round = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::InitialDeal,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
         );
 
         let round = round.zimo().unwrap();
@@ -389,15 +393,11 @@ mod tests {
     fn first_zimo_preserves_configured_origin() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(
-            bipai,
-            Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::InitialDeal,
-        );
-
+        let rules = crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai);
+        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], &rules);
         let round = round.zimo().unwrap();
 
-        assert_eq!(round.first_zimo_origin(), FirstZimoOrigin::InitialDeal);
+        assert_eq!(round.first_zimo_origin(), FirstZimoOrigin::Qipai);
     }
 
     #[test]
@@ -407,7 +407,7 @@ mod tests {
         let round = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::InitialDeal,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
         )
         .zimo()
         .unwrap();
@@ -439,7 +439,7 @@ mod tests {
         let round = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::InitialDeal,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
         )
         .zimo()
         .unwrap();
@@ -458,7 +458,7 @@ mod tests {
         let transition = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::InitialDeal,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
         )
         .zimo()
         .unwrap()
@@ -487,9 +487,13 @@ mod tests {
     fn live_wall_zimopai_dapai_is_moqie() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
-            .zimo()
-            .unwrap();
+        let round = Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
+        )
+        .zimo()
+        .unwrap();
 
         let sipai = round
             .dapai(Dapai::Moqie(TileKind::P5))
@@ -509,9 +513,13 @@ mod tests {
     fn moqie_preserves_actor_bingpai_counts() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
-            .zimo()
-            .unwrap();
+        let round = Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
+        )
+        .zimo()
+        .unwrap();
         let bingpai_counts = *round.players()[2].bingpai().counts();
 
         let result = round
@@ -525,9 +533,13 @@ mod tests {
     fn moqie_appends_zimopai_tile_kind_to_actor_he() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
-            .zimo()
-            .unwrap();
+        let round = Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
+        )
+        .zimo()
+        .unwrap();
 
         let result = round
             .dapai(Dapai::Moqie(TileKind::P5))
@@ -542,9 +554,13 @@ mod tests {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
         let zhuangjia = Seat::<FourPlayer>::ALL[2];
-        let round = Round::new(bipai, zhuangjia, FirstZimoOrigin::LiveWall)
-            .zimo()
-            .unwrap();
+        let round = Round::new(
+            bipai,
+            zhuangjia,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
+        )
+        .zimo()
+        .unwrap();
 
         let result = round
             .dapai(Dapai::Moqie(TileKind::P5))
@@ -560,7 +576,7 @@ mod tests {
         let round = Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::InitialDeal,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Qipai),
         )
         .zimo()
         .unwrap();
@@ -582,14 +598,18 @@ mod tests {
             let (tiles, tile_set) = red_three_tiles();
             let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
 
-            Round::new(bipai, zhuangjia, FirstZimoOrigin::LiveWall)
-                .zimo()
-                .unwrap()
-                .dapai(Dapai::Moqie(TileKind::P5))
-                .unwrap()
-                .no_reaction()
-                .next_zimo_pending()
-                .map(|round| *round.actor())
+            Round::new(
+                bipai,
+                zhuangjia,
+                &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
+            )
+            .zimo()
+            .unwrap()
+            .dapai(Dapai::Moqie(TileKind::P5))
+            .unwrap()
+            .no_reaction()
+            .next_zimo_pending()
+            .map(|round| *round.actor())
         });
 
         assert_eq!(
@@ -607,11 +627,15 @@ mod tests {
     fn no_reaction_preserves_bipai_and_players() {
         let (tiles, tile_set) = red_three_tiles();
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let round = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
-            .zimo()
-            .unwrap()
-            .dapai(Dapai::Moqie(TileKind::P5))
-            .unwrap();
+        let round = Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
+        )
+        .zimo()
+        .unwrap()
+        .dapai(Dapai::Moqie(TileKind::P5))
+        .unwrap();
         let before = (round.bipai().clone(), round.players().clone());
         let after = match round.no_reaction() {
             NoReactionResult::NextZimo(round) => {
@@ -628,12 +652,16 @@ mod tests {
         let (mut tiles, tile_set) = red_three_tiles();
         tiles.swap(53, 120);
         let bipai = Bipai::<FourPlayer>::try_new(tiles, tile_set).unwrap();
-        let result = Round::new(bipai, Seat::<FourPlayer>::ALL[2], FirstZimoOrigin::LiveWall)
-            .zimo()
-            .unwrap()
-            .dapai(Dapai::Moqie(TileKind::P5))
-            .unwrap()
-            .no_reaction();
+        let result = Round::new(
+            bipai,
+            Seat::<FourPlayer>::ALL[2],
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
+        )
+        .zimo()
+        .unwrap()
+        .dapai(Dapai::Moqie(TileKind::P5))
+        .unwrap()
+        .no_reaction();
         let actor_and_zimopai = match result {
             NoReactionResult::NextZimo(round) => round
                 .zimo()
@@ -655,7 +683,7 @@ mod tests {
         let mut transition = NoReactionResult::NextZimo(Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::LiveWall,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
         ));
 
         for _ in 0..70 {
@@ -678,7 +706,7 @@ mod tests {
         let mut transition = NoReactionResult::NextZimo(Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::LiveWall,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
         ));
 
         for _ in 0..69 {
@@ -703,7 +731,7 @@ mod tests {
         let mut transition = NoReactionResult::NextZimo(Round::new(
             bipai,
             Seat::<FourPlayer>::ALL[2],
-            FirstZimoOrigin::LiveWall,
+            &crate::test_support::rules_with_origin(FirstZimoOrigin::Bipai),
         ));
 
         for _ in 0..69 {

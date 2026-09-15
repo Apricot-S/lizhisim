@@ -47,7 +47,7 @@ TableState<P: PlayerSet, S: Phase>
 Placement<P: PlayerSet>
 ```
 
-これは将来像の擬似表現である。現在の`ValidatedRuleSet`は非genericで、各色の赤牌枚数0〜4だけを検証する（[ADR-0018](../adr/0018-rule-set-validation-names.md)）。const generic と trait のどちらを採用するかは walking skeleton で決める。要件は、四人用の順位配列を三人卓へ渡せないこと、無効 seat を作れないことである。
+これは将来像の擬似表現である。現在の`ValidatedRuleSet`は非genericで、各色の赤牌枚数0〜4を検証し、enumで限定した親の開始方式を保持する（[ADR-0018](../adr/0018-rule-set-validation-names.md)）。const generic と trait のどちらを採用するかは walking skeleton で決める。要件は、四人用の順位配列を三人卓へ渡せないこと、無効 seat を作れないことである。
 
 実験設定の読込み時は人数が runtime 値なので、境界 enum `AnyValidatedRuleSet = FourPlayer(...) | ThreePlayer(...)` で分岐し、分岐後の core は generic な検証済み型で動かす。player count は麻雀固有語ではないため英語を使い、`yonma`/`sanma` のローマ字表記は使わない。
 
@@ -172,8 +172,8 @@ playerごとの状態を組み合わせて判定する。暗槓、北抜き等�
 
 `Round` を nullable field の集合で表現しない。Phase ごとに必要な data と合法な遷移を分ける。
 
-`FirstZimoOrigin`は親の初回ツモ方式を表す局共通のrule contextとして`Round`が保持する。
-親第一打の特例は`FirstZimoOrigin::InitialDeal`、親actor、`Player::first_turn_eligible()`を組み合わせて
+`FirstZimoOrigin`はrules所有のenumで、親の開始方式を表す。`Round::new`が`&ValidatedRuleSet`から取得し、値をコピーして局中保持する（[ADR-0019](../adr/0019-first-zimo-origin-in-rules.md)）。
+親第一打の特例は`FirstZimoOrigin::Qipai`、親actor、`Player::first_turn_eligible()`を組み合わせて
 判定する。第一打後はplayerのflagによってこの条件が成立しない。初回と通常巡目を別typestateにせず、
 共通の`zimo`・打牌遷移を重複させない。
 

@@ -4,6 +4,15 @@
 
 use thiserror::Error;
 
+/// The zhuangjia's starting mode, before core normalizes the first zimo.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum FirstZimoOrigin {
+    /// Fourteen tiles are dealt; the separated tile remains part of qipai.
+    Qipai,
+    /// Thirteen tiles are dealt, followed by a zimo from bipai.
+    Bipai,
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum HongBaopaiConfigField {
     M0Count,
@@ -21,14 +30,17 @@ pub struct HongBaopaiConfig {
 /// User-authored rule configuration; values have not been validated.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RuleSet {
+    pub first_zimo_origin: FirstZimoOrigin,
     pub hong_baopai: HongBaopaiConfig,
 }
 
 /// Rule configuration validated through `TryFrom<RuleSet>`.
 ///
-/// Currently validates only the M/P/S red tile counts (0 through 4 each).
+/// Validates the M/P/S red tile counts (0 through 4 each) and preserves the
+/// starting mode, whose supported choices are enforced by `FirstZimoOrigin`.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ValidatedRuleSet {
+    first_zimo_origin: FirstZimoOrigin,
     hong_baopai: HongBaopaiConfig,
 }
 
@@ -82,11 +94,16 @@ impl TryFrom<RuleSet> for ValidatedRuleSet {
 
         Ok(Self {
             hong_baopai: raw.hong_baopai,
+            first_zimo_origin: raw.first_zimo_origin,
         })
     }
 }
 
 impl ValidatedRuleSet {
+    pub const fn first_zimo_origin(&self) -> FirstZimoOrigin {
+        self.first_zimo_origin
+    }
+
     pub const fn hong_baopai(&self) -> &HongBaopaiConfig {
         &self.hong_baopai
     }
@@ -98,6 +115,7 @@ mod tests {
 
     fn raw(m0_count: u8, p0_count: u8, s0_count: u8) -> RuleSet {
         RuleSet {
+            first_zimo_origin: FirstZimoOrigin::Qipai,
             hong_baopai: HongBaopaiConfig {
                 m0_count,
                 p0_count,

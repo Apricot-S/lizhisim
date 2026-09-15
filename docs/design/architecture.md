@@ -216,6 +216,8 @@ event は少なくとも experiment、competition、table match、round の stre
 依存方向は`lizhisim-core -> lizhisim-rules`とし、rulesからcoreへの依存を禁止する。
 coreはrulesの検証済み型を直接利用し、`TileSet::try_from(&ValidatedRuleSet)`で牌構成を解決する。
 `TileSet`は`Bingpai`と`Bipai`から独立した`tile_set` moduleに置く。
+親の開始方式`FirstZimoOrigin`もrulesが所有する。coreの`Round`は検証済み設定から値を受け取り、
+局中の打牌判定に利用する（[ADR-0019](../adr/0019-first-zimo-origin-in-rules.md)）。
 
 ## 10. 拡張境界
 

@@ -7,5 +7,6 @@
 mod rule_set;
 
 pub use rule_set::{
-    HongBaopaiConfig, HongBaopaiConfigField, RuleSet, RuleSetValidationError, ValidatedRuleSet,
+    FirstZimoOrigin, HongBaopaiConfig, HongBaopaiConfigField, RuleSet, RuleSetValidationError,
+    ValidatedRuleSet,
 };

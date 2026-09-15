@@ -218,6 +218,7 @@ mod rule_tests {
 
     fn raw(m0_count: u8, p0_count: u8, s0_count: u8) -> RuleSet {
         RuleSet {
+            first_zimo_origin: lizhisim_rules::FirstZimoOrigin::Qipai,
             hong_baopai: HongBaopaiConfig {
                 m0_count,
                 p0_count,

@@ -9,13 +9,15 @@
 
 ## Test list
 
+- [x] rulesの`Qipai`設定を検証後にRoundへ渡すと、最初のツモ後も開始方式が保持される。
+
 - [x] ユーザー設定RuleSetから検証したValidatedRuleSetをcoreで利用できる。
 
 - [x] coreが赤牌0枚の`ValidatedRuleSet`を`TileSet::try_from`で直接利用し、`Bingpai`への赤牌追加を拒否する。
 - [x] Cargoの依存グラフが`core -> rules`であり、rulesからcoreへの依存がない。
 - [x] 既存の型・牌構成・遷移testとfacadeのbuildが成功する。
 
-Current: なし（依存変更と名称変更の対象項目は完了）。
+Current: なし（親の開始方式の設定移動まで完了）。
 
 ## Cycle log
 
@@ -30,3 +32,8 @@ Current: なし（依存変更と名称変更の対象項目は完了）。
 - 2026-09-15: 既存の`rules_with_zero_red_tiles_reject_red_tile_in_core`を新名へ移し、`cargo test -p lizhisim-core rules_with_zero_red_tiles_reject_red_tile_in_core`で新公開型の未定義によるE0432をredとして確認した。
 - 2026-09-15: 型・re-export・呼出側を改名し、`cargo test --verbose`でcore 103 test、rules 6 testとdoc-testがgreen。refactorでmoduleを`rule_set`、test名・変数も新名へ統一した。既存testの観点・assertion・エラーpayloadは維持し、重複testは追加していない。過去のcycle logとADRの旧名は当時の記録として残す。
 - 2026-09-15: `cargo fmt -- --check`、`cargo clippy -- -D warnings`、`cargo build --verbose`が成功。現在の検証保証は各色の赤牌枚数0〜4であり、人数・capability・schemaの振る舞いは追加していない。
+
+- 2026-09-15: [ADR-0019](../adr/0019-first-zimo-origin-in-rules.md)に従い、Qipai設定からRoundへの保持を選択。既存の`first_zimo_preserves_configured_origin`を設定経由へ移し、`cargo test -p lizhisim-core first_zimo_preserves_configured_origin`でrulesの型未定義E0433、field未定義E0560、constructor引数不一致E0308のredを確認した。
+- 2026-09-15: rulesへ`FirstZimoOrigin::{Qipai, Bipai}`と設定field・accessorを追加し、Round生成時に検証済み設定から値を取得してgreen。enum移動・初期化の編集漏れを修正後、`cargo test --verbose`でcore 103 test、rules 6 testとdoc-testが成功した。
+- 2026-09-15: refactorでは赤3枚の検証済み設定fixtureを`rules_with_origin`へ集約した。既存のBipai設定の摸切受理とQipai設定の摸切拒否が両方式の固定化を検出するため、同じ観点のtestや三角測量testを追加しない。独立した牌移動・通常巡目・局終端・エラーpayloadのtestとassertionは維持した。
+- 2026-09-15: refactor後のformat、Clippy、build、全109 testとdoc-testが成功。Markdown lint・lycheeは未導入のため未実行とし、変更文書の相対リンク先を別途確認した。

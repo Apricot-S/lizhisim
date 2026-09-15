@@ -33,7 +33,7 @@ flowchart LR
 
 ユーザー設定を`RuleSet`、検証済み設定を`ValidatedRuleSet`、変換エラーを`RuleSetValidationError`とする。
 命名は[ADR-0018](../adr/0018-rule-set-validation-names.md)を参照する。
-以下は将来の完全なlifecycleであり、現在の非genericな`ValidatedRuleSet`はM/P/Sの赤牌枚数が各0〜4であることだけを保証する。
+以下は将来の完全なlifecycleであり、現在の非genericな`ValidatedRuleSet`はM/P/Sの赤牌枚数が各0〜4であることを保証し、enumで限定した親の開始方式を保持する。
 人数・capabilityの検証とserde/TOML adapterは未実装である。
 
 ```text
@@ -87,9 +87,14 @@ rules所有の`RoundPolicy<P>`へ射影して`Round`開始時に渡す。`RoundP
 親へ14枚を配る方式と、親へ13枚を配って第一`Zimo`を行う方式は、
 [ADR-0012](../adr/0012-normalize-dealer-first-draw.md)と
 [ADR-0016](../adr/0016-initial-deal-shouqie-action.md)に従い、内部ではどちらも`RoundStarted`後の
-最初の`Zimo`へ正規化する。設定は最初の牌がinitial deal由来かlive wall由来かを表す。
+最初の`Zimo`へ正規化する。設定は最初の牌が配牌由来（`FirstZimoOrigin::Qipai`）か壁牌由来（`FirstZimoOrigin::Bipai`）かを表す。
 initial deal由来の親第一打では`Moqie`を提示せず、分離された`zimopai`を含む14枚を
 `Shouqie`の対象とする。`moqie`を独立したrule optionとして重複設定しない。
+
+`FirstZimoOrigin`はrulesが所有し、`RuleSet.first_zimo_origin`で明示指定する。
+公開・検証後とも同じenumを使い、`ValidatedRuleSet::first_zimo_origin()`で取得する。
+`Round::new`は検証済み設定への共有参照を受け取り、開始方式の値をコピーして局中保持する。
+詳細は[ADR-0019](../adr/0019-first-zimo-origin-in-rules.md)を参照する。
 
 ### 3.2 行為
 
