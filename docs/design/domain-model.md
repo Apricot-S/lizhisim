@@ -47,7 +47,7 @@ TableState<P: PlayerSet, S: Phase>
 Placement<P: PlayerSet>
 ```
 
-これは擬似表現である。const generic と trait のどちらを採用するかは walking skeleton で決める。要件は、四人用の順位配列を三人卓へ渡せないこと、無効 seat を作れないことである。
+これは将来像の擬似表現である。現在の`ValidatedRuleSet`は非genericで、各色の赤牌枚数0〜4だけを検証する（[ADR-0018](../adr/0018-rule-set-validation-names.md)）。const generic と trait のどちらを採用するかは walking skeleton で決める。要件は、四人用の順位配列を三人卓へ渡せないこと、無効 seat を作れないことである。
 
 実験設定の読込み時は人数が runtime 値なので、境界 enum `AnyValidatedRuleSet = FourPlayer(...) | ThreePlayer(...)` で分岐し、分岐後の core は generic な検証済み型で動かす。player count は麻雀固有語ではないため英語を使い、`yonma`/`sanma` のローマ字表記は使わない。
 
@@ -72,7 +72,7 @@ primitive obsession を避け、少なくとも次を区別する。
 `TileKind`と`TileSet`は`lizhisim-core`が所有する。
 `TileSet`は37種類それぞれの卓内最大枚数と総牌数を保持する検証済み実行値であり、
 rawな赤牌設定、preset metadata、出典は保持しない。rulesが設定をsemantic validationした後、
-coreの`TileSet::try_from(&RuleSpec)`が検証済み設定を直接参照して生成する。
+coreの`TileSet::try_from(&ValidatedRuleSet)`が検証済み設定を直接参照して生成する。
 詳細は[ADR-0017](../adr/0017-core-depends-on-rules.md)を参照する。
 
 実装は`lizhisim-core/src/tile_set.rs`に置き、`bingpai.rs`や`bipai.rs`の内部型にしない。

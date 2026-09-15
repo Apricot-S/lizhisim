@@ -4,8 +4,8 @@
 
 //! Rule configuration and preset resolution for LizhiSim.
 
-mod rule_spec;
+mod rule_set;
 
-pub use rule_spec::{
-    HongBaopaiConfig, HongBaopaiConfigField, RawRuleSpec, RuleSpec, RuleSpecError,
+pub use rule_set::{
+    HongBaopaiConfig, HongBaopaiConfigField, RuleSet, RuleSetValidationError, ValidatedRuleSet,
 };

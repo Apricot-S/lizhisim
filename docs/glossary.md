@@ -117,8 +117,9 @@
 | 段位方針 | `RankingPolicy` | 参加資格、matching、段位 point、昇降段の意味論。 |
 | プリセット | `Preset` | 出典と版を持つ、検証済みまたは検証中の解決済み設定。 |
 | 可動 alias | `current alias` | 現行版を指す便宜名。実験記録には保存しない。 |
-| 生設定 | `RawRuleSpec` | file または外部入力から読んだ未検証の値。 |
-| 検証済み設定 | `ValidatedRuleSet<P>` | player set を含む全不変条件を満たし、実行可能な設定。 |
+| ユーザー設定 | `RuleSet` | ユーザーが構築する、または入力adapterが読み込む未検証のルール設定。 |
+| 検証済み設定 | `ValidatedRuleSet` | 現在は各色の赤牌枚数0〜4を保証する。将来の`ValidatedRuleSet<P>`ではplayer set・semantic・capabilityの全条件を検証する。 |
+| ルール設定検証エラー | `RuleSetValidationError` | `RuleSet`から検証済み設定への変換失敗。 |
 | ドメインイベント | `DomainEvent` | 既に起きた事実。命令ではなく過去形の意味を持つ。 |
 | 要求 | `Request<R>` | 外部効果または意思決定を求め、応答型 `R` を指定する値。 |
 | 中断点 | `Suspension<R, K>` | 応答 `R` と、再開先を表す継続 `K` を保持する停止状態。 |

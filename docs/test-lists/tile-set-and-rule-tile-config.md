@@ -59,7 +59,7 @@
 ### Configuration input adapters
 
 - [ ] TOML schemaは赤牌設定を`HongBaopaiConfig`相当の構造としてdecodeできる。
-- [ ] TOMLの赤牌枚数0〜4を`RawRuleSpec`へ変換できる。
+- [ ] TOMLの赤牌枚数0〜4を`RuleSet`へ変換できる。
 - [ ] TOMLの赤牌枚数5以上をschema validation errorとして拒否する。
 - [ ] TOML decode errorは入力位置または対象fieldを含む。
 - [ ] TOMLから解決した`TileSet`はRust APIから直接解決した結果と一致する。

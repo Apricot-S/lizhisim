@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // This file is part of https://github.com/Apricot-S/lizhisim
 
-use lizhisim_rules::RuleSpec;
+use lizhisim_rules::ValidatedRuleSet;
 use thiserror::Error;
 
 use crate::tile::TileKind;
@@ -95,10 +95,10 @@ impl TileSet {
     }
 }
 
-impl TryFrom<&RuleSpec> for TileSet {
+impl TryFrom<&ValidatedRuleSet> for TileSet {
     type Error = TileSetError;
 
-    fn try_from(rules: &RuleSpec) -> Result<Self, Self::Error> {
+    fn try_from(rules: &ValidatedRuleSet) -> Result<Self, Self::Error> {
         let hong_baopai = rules.hong_baopai();
         let mut counts = [MAX_COPIES_PER_TILE; 37];
         counts[TileKind::M0.index()] = hong_baopai.m0_count;
@@ -212,12 +212,12 @@ mod tests {
 
 #[cfg(test)]
 mod rule_tests {
-    use lizhisim_rules::{HongBaopaiConfig, RawRuleSpec};
+    use lizhisim_rules::{HongBaopaiConfig, RuleSet};
 
     use super::*;
 
-    fn raw(m0_count: u8, p0_count: u8, s0_count: u8) -> RawRuleSpec {
-        RawRuleSpec {
+    fn raw(m0_count: u8, p0_count: u8, s0_count: u8) -> RuleSet {
+        RuleSet {
             hong_baopai: HongBaopaiConfig {
                 m0_count,
                 p0_count,
@@ -227,9 +227,9 @@ mod rule_tests {
     }
 
     #[test]
-    fn rule_spec_resolves_zero_hong_baopai_to_four_base_fives() {
-        let rule_spec = RuleSpec::try_from(raw(0, 0, 0)).unwrap();
-        let tile_set = TileSet::try_from(&rule_spec).unwrap();
+    fn rule_set_resolves_zero_hong_baopai_to_four_base_fives() {
+        let rule_set = ValidatedRuleSet::try_from(raw(0, 0, 0)).unwrap();
+        let tile_set = TileSet::try_from(&rule_set).unwrap();
 
         assert_eq!(
             [
@@ -245,8 +245,9 @@ mod rule_tests {
     }
 
     #[test]
-    fn rule_spec_resolves_red_three_to_three_base_fives() {
-        let tile_set = TileSet::try_from(&RuleSpec::try_from(raw(1, 1, 1)).unwrap()).unwrap();
+    fn rule_set_resolves_red_three_to_three_base_fives() {
+        let tile_set =
+            TileSet::try_from(&ValidatedRuleSet::try_from(raw(1, 1, 1)).unwrap()).unwrap();
 
         assert_eq!(
             [
@@ -262,15 +263,17 @@ mod rule_tests {
     }
 
     #[test]
-    fn rule_spec_resolves_mahjong_soul_four_player_red_three_to_136_tiles() {
-        let tile_set = TileSet::try_from(&RuleSpec::try_from(raw(1, 1, 1)).unwrap()).unwrap();
+    fn rule_set_resolves_mahjong_soul_four_player_red_three_to_136_tiles() {
+        let tile_set =
+            TileSet::try_from(&ValidatedRuleSet::try_from(raw(1, 1, 1)).unwrap()).unwrap();
 
         assert_eq!(tile_set.total_count(), 136);
     }
 
     #[test]
-    fn rule_spec_resolves_mahjong_soul_four_player_non_five_tiles_to_four() {
-        let tile_set = TileSet::try_from(&RuleSpec::try_from(raw(1, 1, 1)).unwrap()).unwrap();
+    fn rule_set_resolves_mahjong_soul_four_player_non_five_tiles_to_four() {
+        let tile_set =
+            TileSet::try_from(&ValidatedRuleSet::try_from(raw(1, 1, 1)).unwrap()).unwrap();
         let non_five_counts = TileKind::ALL[..34]
             .iter()
             .copied()
@@ -282,8 +285,9 @@ mod rule_tests {
     }
 
     #[test]
-    fn rule_spec_resolves_four_hong_baopai_to_zero_base_fives() {
-        let tile_set = TileSet::try_from(&RuleSpec::try_from(raw(4, 4, 4)).unwrap()).unwrap();
+    fn rule_set_resolves_four_hong_baopai_to_zero_base_fives() {
+        let tile_set =
+            TileSet::try_from(&ValidatedRuleSet::try_from(raw(4, 4, 4)).unwrap()).unwrap();
 
         assert_eq!(
             [

@@ -31,9 +31,14 @@ flowchart LR
 
 ## 2. 設定の lifecycle
 
+ユーザー設定を`RuleSet`、検証済み設定を`ValidatedRuleSet`、変換エラーを`RuleSetValidationError`とする。
+命名は[ADR-0018](../adr/0018-rule-set-validation-names.md)を参照する。
+以下は将来の完全なlifecycleであり、現在の非genericな`ValidatedRuleSet`はM/P/Sの赤牌枚数が各0〜4であることだけを保証する。
+人数・capabilityの検証とserde/TOML adapterは未実装である。
+
 ```text
 Source evidence
-  -> RawRuleSpec
+  -> RuleSet
   -> schema validation
   -> semantic validation
   -> capability validation
@@ -67,7 +72,7 @@ Source evidence
 `lizhisim-rules`はrawな牌設定、schema、semantic validation、`ValidatedRuleSet<P>`、
 preset metadataを所有する。`TileKind`と検証済み牌構成`TileSet`はcoreが所有する。
 rulesはcoreに依存しない。coreがrulesへ依存し、検証済み設定を直接利用する。
-現在は`RuleSpec::hong_baopai`が共有参照を提供し、coreの`TileSet::try_from(&RuleSpec)`が
+現在は`ValidatedRuleSet::hong_baopai`が共有参照を提供し、coreの`TileSet::try_from(&ValidatedRuleSet)`が
 37種類の牌数を解決する。rulesの検証エラーは牌種でなく`HongBaopaiConfigField`で対象fieldを示す。
 
 core専用policyへの変換は要求しない。coreはrules所有の検証済み設定・policyを直接参照する。
@@ -348,4 +353,4 @@ match_rules:
 
 ### Raw入力と検証済み設定の境界
 
-`RawRuleSpec`はTOMLなど外部入力をserdeでdecodeした未検証の値を表す。構文・型のdecode後、`RuleSpec`へ変換する際にsemantic validationを行う。`RuleSpec`だけが検証済み設定を提供し、coreの`TileSet::try_from(&RuleSpec)`が牌構成を解決する。外部入力型をdomain遷移へ直接渡さない。
+`RuleSet`はユーザーが構築する未検証の値を表す。将来のTOML等の入力adapterもdecode後にこの型へ変換する。`ValidatedRuleSet`へ変換する際にsemantic validationを行う。`ValidatedRuleSet`だけが検証済み設定を提供し、coreの`TileSet::try_from(&ValidatedRuleSet)`が牌構成を解決する。外部入力型をdomain遷移へ直接渡さない。

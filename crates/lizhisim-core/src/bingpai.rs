@@ -69,13 +69,13 @@ impl Bingpai {
 
 #[cfg(test)]
 mod tests {
-    use lizhisim_rules::{HongBaopaiConfig, RawRuleSpec, RuleSpec};
+    use lizhisim_rules::{HongBaopaiConfig, RuleSet, ValidatedRuleSet};
 
     use super::*;
 
     #[test]
     fn rules_with_zero_red_tiles_reject_red_tile_in_core() {
-        let rules = RuleSpec::try_from(RawRuleSpec {
+        let rules = ValidatedRuleSet::try_from(RuleSet {
             hong_baopai: HongBaopaiConfig {
                 m0_count: 0,
                 p0_count: 0,

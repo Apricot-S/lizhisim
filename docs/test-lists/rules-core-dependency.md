@@ -9,11 +9,13 @@
 
 ## Test list
 
-- [x] coreが赤牌0枚の`RuleSpec`を`TileSet::try_from`で直接利用し、`Bingpai`への赤牌追加を拒否する。
+- [x] ユーザー設定RuleSetから検証したValidatedRuleSetをcoreで利用できる。
+
+- [x] coreが赤牌0枚の`ValidatedRuleSet`を`TileSet::try_from`で直接利用し、`Bingpai`への赤牌追加を拒否する。
 - [x] Cargoの依存グラフが`core -> rules`であり、rulesからcoreへの依存がない。
 - [x] 既存の型・牌構成・遷移testとfacadeのbuildが成功する。
 
-Current: なし（この依存変更の対象項目は完了）。
+Current: なし（依存変更と名称変更の対象項目は完了）。
 
 ## Cycle log
 
@@ -23,3 +25,8 @@ Current: なし（この依存変更の対象項目は完了）。
 - 2026-09-15: refactorで牌構成解決の既存5 testをcoreへ移し、赤3枚の共通fixtureを`RuleSpec`経由へ変更した。0枚・各1枚・各4枚・総数・通常牌の既存契約を維持し、coreのraw countによる除外牌testは異なる入力境界なので残した。
 - 2026-09-15: `cargo metadata --no-deps --format-version 1`でrulesは`thiserror`だけに依存し、coreがrulesへ通常依存することを確認した。Cargoは循環依存も検査する。
 - 2026-09-15: 標準のformat、Clippy、build、testが成功。core 103 test、rules 6 testがgreen。牌種・index・ルール値・schema・再現性の意味は変更していない。
+
+- 2026-09-15: [ADR-0018](../adr/0018-rule-set-validation-names.md)に従い、ユーザー設定を`RuleSet`、検証済み設定を`ValidatedRuleSet`、検証エラーを`RuleSetValidationError`へ改名する項目を選択した。
+- 2026-09-15: 既存の`rules_with_zero_red_tiles_reject_red_tile_in_core`を新名へ移し、`cargo test -p lizhisim-core rules_with_zero_red_tiles_reject_red_tile_in_core`で新公開型の未定義によるE0432をredとして確認した。
+- 2026-09-15: 型・re-export・呼出側を改名し、`cargo test --verbose`でcore 103 test、rules 6 testとdoc-testがgreen。refactorでmoduleを`rule_set`、test名・変数も新名へ統一した。既存testの観点・assertion・エラーpayloadは維持し、重複testは追加していない。過去のcycle logとADRの旧名は当時の記録として残す。
+- 2026-09-15: `cargo fmt -- --check`、`cargo clippy -- -D warnings`、`cargo build --verbose`が成功。現在の検証保証は各色の赤牌枚数0〜4であり、人数・capability・schemaの振る舞いは追加していない。

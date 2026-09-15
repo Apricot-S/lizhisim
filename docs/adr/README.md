@@ -17,6 +17,7 @@
 | イベント駆動・継続 | [0001](0001-event-driven-typed-continuations.md) |
 | ルールの層・大会分離 | [0002](0002-versioned-rule-layers.md)、[0003](0003-separate-competition-domain.md) |
 | 用語 | [0004](0004-pinyin-terminology-and-round.md) |
+| ルール設定型の名称 | [0018](0018-rule-set-validation-names.md) |
 | プリセット優先順位 | [0005](0005-mahjong-soul-first.md) |
 | toolchain・CI | [0006](0006-rust-toolchain-workspace-and-ci.md) |
 | 公式資料の記録 | [0008](0008-source-review-without-copying.md)（0007を置換） |
@@ -48,6 +49,7 @@ Superseded本文は経緯を調べるために残す。現在の実装判断で�
 | [0015](0015-rule-and-domain-tile-ownership.md) | Superseded | 牌構成設定をrules、実行時牌上限をcoreが所有する |
 | [0016](0016-initial-deal-shouqie-action.md) | Accepted | 14枚配牌の親第一打は`Shouqie`だけを提示する |
 | [0017](0017-core-depends-on-rules.md) | Accepted | coreが独立したrulesを直接利用する |
+| [0018](0018-rule-set-validation-names.md) | Accepted | ユーザー設定をRuleSet、検証済み設定をValidatedRuleSetとする |
 
 ## Template
 

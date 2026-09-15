@@ -214,7 +214,7 @@ event は少なくとも experiment、competition、table match、round の stre
 牌構成については[ADR-0017](../adr/0017-core-depends-on-rules.md)に従い、raw設定、
 `ValidatedRuleSet<P>`をrules、`TileKind`、`TileSet`をcoreが所有する。
 依存方向は`lizhisim-core -> lizhisim-rules`とし、rulesからcoreへの依存を禁止する。
-coreはrulesの検証済み型を直接利用し、`TileSet::try_from(&RuleSpec)`で牌構成を解決する。
+coreはrulesの検証済み型を直接利用し、`TileSet::try_from(&ValidatedRuleSet)`で牌構成を解決する。
 `TileSet`は`Bingpai`と`Bipai`から独立した`tile_set` moduleに置く。
 
 ## 10. 拡張境界
