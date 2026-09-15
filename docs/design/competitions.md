@@ -1,5 +1,18 @@
 # 大会・段位戦・リーグ戦
 
+本書は設計の参照資料。概念例・将来候補を含むため、実装範囲は[対象test list](../test-lists/README.md)で確認する。
+
+## 参照する節
+
+- [2. 集約モデル](#2-集約モデル)
+- [4. Stage format](#4-stage-format)
+- [5. Assignment policy](#5-assignment-policy)
+- [6. 段位戦とレーティング](#6-段位戦とレーティング)
+- [7. チーム戦](#7-チーム戦)
+- [8. 集計](#8-集計)
+- [9. Stage state machine](#9-stage-state-machine)
+- [10. 失敗と再試合](#10-失敗と再試合)
+
 ## 1. なぜ卓内 engine と分けるか
 
 一つの半荘は参加者の得点と順位を返せば完結する。一方、段位戦は母集団と queue、league は schedule と累積順位、tournament は勝ち上がりと再配置を持つ。卓内 engine がこれらを知ると、同じ M リーグ卓内ルールを別の大会で再利用できず、半荘のテストに season 全体が必要になる。

@@ -10,6 +10,23 @@
 - `Superseded`: 後継 ADR に置換済み
 - `Rejected`: 検討したが採用しない
 
+## 対象から選ぶ
+
+| 対象 | 現在の判断 |
+|---|---|
+| イベント駆動・継続 | [0001](0001-event-driven-typed-continuations.md) |
+| ルールの層・大会分離 | [0002](0002-versioned-rule-layers.md)、[0003](0003-separate-competition-domain.md) |
+| 用語 | [0004](0004-pinyin-terminology-and-round.md) |
+| プリセット優先順位 | [0005](0005-mahjong-soul-first.md) |
+| toolchain・CI | [0006](0006-rust-toolchain-workspace-and-ci.md) |
+| 公式資料の記録 | [0008](0008-source-review-without-copying.md)（0007を置換） |
+| 牌譜のconformance | [0011](0011-one-pass-majsoul-conformance.md)（0009・0010の後継） |
+| 牌のidentity | [0013](0013-tile-kind-without-copy-identity.md) |
+| facade・core・rulesの責務 | [0014](0014-facade-and-core-crates.md)、[0017](0017-core-depends-on-rules.md)（0015の後継） |
+| 配牌と親第一打 | [0016](0016-initial-deal-shouqie-action.md)（0012を置換） |
+
+Superseded本文は経緯を調べるために残す。現在の実装判断では後継のDecisionを参照する。Accepted ADRの初期構成に対する後続の追加判断も、対象の設計文書と併せて確認する。
+
 ## Index
 
 | ADR | Status | Decision |

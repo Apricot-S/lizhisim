@@ -1,8 +1,17 @@
 # 公式ルール出典台帳
 
+## 参照する節
+
+- [2. 証跡 grade](#2-証跡-grade)
+- [3. オンライン段位戦](#3-オンライン段位戦)
+- [4. 競技団体・リーグ](#4-競技団体リーグ)
+- [6. Source review record](#6-source-review-record)
+- [7. Clause mapping record](#7-clause-mapping-record)
+- [8. 更新監視](#8-更新監視)
+
 ## 1. 目的
 
-プリセットの値を確定するための一次資料と、まだ足りない証跡を管理する。これはルール値そのものの一覧ではない。公式資料は改定され得るため、実装時には URL だけでなく取得 snapshot、版、対象期間、内容 hash を preset metadata に固定する。
+プリセットの値を確定するための一次資料と、まだ足りない証跡を管理する。これはルール値そのものの一覧ではない。公式資料は改定され得るため、実装時にはURL、版、対象期間、取得・確認日時、確認者、locatorをSourceReviewに記録する。原資料のsnapshot保存やcontent hashは必須にせず、[ADR-0008](../adr/0008-source-review-without-copying.md)に従う。
 
 - 初回調査日: **2026-08-08 (Asia/Tokyo)**
 - 最終更新日: **2026-08-09 (Asia/Tokyo)**
@@ -11,8 +20,8 @@
 
 | Grade | 意味 |
 |---|---|
-| A | 公式かつ版・日付が明確な規則本文。snapshot/hash と条項 mapping 後に verified の根拠にできる。 |
-| B | 公式の規則本文だが版または effective period が明確でない。取得 snapshot と公式改定確認が必要。 |
+| A | 公式かつ版・日付が明確な規則本文。確認記録と条項 mapping 後に verified の根拠にできる。 |
+| B | 公式の規則本文だが版または effective period が明確でない。取得・確認記録と公式改定確認が必要。 |
 | C | 公式の概要・guide・入口だけで完全な設定値がない。game 内 help 等の追加一次証跡が必要。 |
 | Blocked | 公式一次資料へ到達できない、または相互矛盾を解消できない。値を確定しない。 |
 
@@ -34,7 +43,7 @@ game 内表示しかない場合、最低限次を記録する。
 - service、platform、app build/version、server/region、language
 - 取得日時と navigation path
 - 画面の識別名と複数 page の順序
-- screenshot/file hash
+- 確認者、確認日時、source locator。画像の保存・hashは必須にしない
 - account 固有情報を除去したこと
 - 表の全行が scroll/pagination を含め取得できたこと
 - 同じ内容を別 reviewer が確認した記録
@@ -70,13 +79,13 @@ Kanachanの挙動だけを期待値にしない。最小fixtureはsource牌譜ID
 
 | 対象 | 公式一次資料 | Grade | 公開版・更新情報 | 次の監査 |
 |---|---|---:|---|---|
-| M リーグ | [Mリーグとは — 公式戦ルール](https://m-league.jp/about/) | B | 規則本文は公開、page 上で明示版を確認できない | 取得 snapshot、対象 season、season competition 規定を分離して mapping |
+| M リーグ | [Mリーグとは — 公式戦ルール](https://m-league.jp/about/) | B | 規則本文は公開、page 上で明示版を確認できない | SourceReview、対象 season、season competition 規定を分離して mapping |
 | WRC | [WRC Rules](https://www.worldriichi.org/wrc-rules) | A | WRC Rules 2025、Penalties、Clarifications 2025、Optional Rules への公式導線 | rules/clarifications/optional の適用優先順位を mapping |
 | 最高位戦日本プロ麻雀協会 | [ルール](https://saikouisen.com/about/rules/) | A/B | 最高位戦競技規定 PDF と対局種別特例への公式導線、更新日の表示あり | 取得時点の PDF 版を hash 化し、本戦/Classic/特例を別 family に分ける |
-| 日本プロ麻雀連盟 | [競技ルール](https://www.ma-jan.or.jp/activity/game_rule.html) | B | 公式 page、本文は埋込み資料を含む | 公式/A、WRC、WRC-R と対象大会を分離し、最新本文を snapshot |
+| 日本プロ麻雀連盟 | [競技ルール](https://www.ma-jan.or.jp/activity/game_rule.html) | B | 公式 page、本文は埋込み資料を含む | 公式/A、WRC、WRC-R と対象大会を分離し、最新本文の確認記録を残す |
 | 日本プロ麻雀協会 | [日本プロ麻雀協会 競技規定](https://npm2001.com/about/regulations/) | B | 公式規定本文と PDF への導線 | 対象期、title 戦特例、改定履歴を確認 |
 | 麻将連合 (μ) | [競技規定](https://mu-mahjong.jp/tournament/%E7%AB%B6%E6%8A%80%E8%A6%8F%E5%AE%9A/)、[麻将連合公式ルール PDF (2025-01 path)](https://mu-mahjong.jp/wp-content/uploads/2025/01/murule_202501.pdf) | A/B | 公式本文、μカップ/将王・league 等の聴牌料・罰則差を公開 | PDF 内版を確認し、卓内意味論と実卓罰則を分離 |
-| RMU | [RMU ルール](https://rmu.jp/rule) | B | A/B/M の差分と基本規則を公開 | page snapshot と改定履歴、各 title が採用する rule version を確認 |
+| RMU | [RMU ルール](https://rmu.jp/rule) | B | A/B/M の差分と基本規則を公開 | pageの確認記録と改定履歴、各 title が採用する rule version を確認 |
 
 ## 5. 資料ごとの注意
 
@@ -150,5 +159,5 @@ release 前と preset alias 更新時に公式 source を再確認する。自�
 - 公式文書の本文や画像を無断で大量転載しない。
 - 設定値と必要最小限の要約、条項 locator、URL を保存する。
 - service/団体名は互換性・出典表示のために使い、提携・公認を示唆しない。
-- screenshot evidence の保存場所とアクセス範囲は別途決める。
+- screenshot等の個別保存はADR-0008の例外手順に従い、project ownerの明示的許可と保存範囲を記録する。
 - 旧実装の third-party notice は依存撤去とともに削除した。将来 dependency を追加したら license/notice をその時点で再生成・review する。

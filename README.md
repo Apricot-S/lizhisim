@@ -24,6 +24,8 @@
 
 ## 文書
 
+作業に応じた参照先は[文書案内](docs/README.md)から選べます。以下は主要資料の一覧です。
+
 1. [ビジョンとスコープ](docs/vision.md)
 2. [要求仕様](docs/requirements.md)
 3. [アーキテクチャ](docs/design/architecture.md)

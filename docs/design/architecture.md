@@ -1,5 +1,16 @@
 # アーキテクチャ
 
+本書は設計の参照資料。概念例・将来候補を含むため、実装範囲は[対象test list](../test-lists/README.md)で確認する。
+
+## 参照する節
+
+- [2. レイヤーと依存方向](#2-レイヤーと依存方向)
+- [3. Functional core / imperative shell](#3-functional-core--imperative-shell)
+- [4. 型付き継続渡し](#4-型付き継続渡し)
+- [7. 決定性と replay](#7-決定性と-replay)
+- [9. 将来の workspace 境界](#9-将来の-workspace-境界)
+- [11. 関連 ADR](#11-関連-adr)
+
 ## 1. 概要
 
 LizhiSim は「純粋な卓内状態機械」「多数卓を駆動する orchestration」「GPU 推論をまとめる broker」「複数対局を構成する competition」の四つを分離する。中心に同期 `step()` loop を置かない。
@@ -44,7 +55,7 @@ roster、stage、schedule、table assignment、standing、ranking、advancement 
 
 ### 2.6 Adapters
 
-`xiangting`、`hule`、乱数源、永続化、metrics、推論 backend を実装する。adapter から domain への逆依存は禁止する。
+`xiangting`、`hule`、乱数源、永続化、metrics、推論 backend を実装する。adapterは対応するdomain portへ依存し、domainからadapterへの逆依存は禁止する。
 
 依存方向は常に外側から内側である。
 

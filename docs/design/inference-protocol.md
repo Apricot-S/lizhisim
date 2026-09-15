@@ -1,5 +1,21 @@
 # 推論キューと継続プロトコル
 
+本書は設計の参照資料。概念例・将来候補を含むため、実装範囲は[対象test list](../test-lists/README.md)で確認する。
+
+## 参照する節
+
+- [3. Request envelope](#3-request-envelope)
+- [4. Response envelope](#4-response-envelope)
+- [5. 応答検証](#5-応答検証)
+- [6. Pending continuation の所有](#6-pending-continuation-の所有)
+- [7. Queue topology](#7-queue-topology)
+- [9. CallWindow barrier](#9-callwindow-barrier)
+- [10. Timeout・切断・失敗](#10-timeout切断失敗)
+- [11. Retry と idempotency](#11-retry-と-idempotency)
+- [12. Observation](#12-observation)
+- [13. Action schema](#13-action-schema)
+- [16. Shutdown と drain](#16-shutdown-と-drain)
+
 ## 1. 目的
 
 麻雀の卓は意思決定点へ非同期に到達する。推論 protocol は、多数卓を停止させずに要求を集約し、GPU が処理しやすい batch を作りつつ、各応答を正しい型付き継続へ一度だけ返す。

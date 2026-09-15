@@ -1,5 +1,7 @@
 # Phase 0 review
 
+これはPhase 0からの初回実装開始の判断記録である。現在はPhase 1であり、以下の開始条件を作業再開のたびに再承認する必要はない。未決事項の現在の扱いは[ロードマップ](roadmap.md#現在の-blockingopen-decisions)、実装対象は[test list](test-lists/README.md)を参照する。
+
 Phase 0から実装へ進む判断を、文書の存在ではなく確認可能なgateとして管理する。ユーザーが実装開始を明示するまでは、全項目を満たしてもPhase 1へ移行しない。
 
 ## 1. Product and architecture
@@ -50,3 +52,15 @@ source未確定の値を推測してfixtureへ埋めない。pure engineの構�
 3. ユーザーがPhase 1または具体的なtest itemの実装開始を明示する。
 
 開始時はplanned test listから一項目だけを選び、redを確認する。複数項目をまとめてactiveにしない。
+
+## 6. 初回実装開始時の開発環境条件
+
+初回のRust変更に適用した条件を開発手順書から移設して残す。通常の再開時の新たな承認条件ではない。
+
+- Phase 0 文書が review 済み。
+- 最初の vertical slice と対象プリセットが決まっている。
+- manifest に記載済みの Edition 2024 / Rust 1.97 と workspace 境界を ADR で追認している。
+- `xiangting` の採用版と license を確認している。
+- `hule` の取得方法、license、API、capability が確認できるか、明示的な test double 期間が承認されている。
+- 最初の test list が作成されている。
+- CI の最小 command が決まっている。

@@ -1,5 +1,19 @@
 # ルールとプリセット
 
+本書は設計の参照資料。概念例・将来候補を含むため、実装範囲は[対象test list](../test-lists/README.md)で確認する。
+
+## 参照する節
+
+- [2. 設定の lifecycle](#2-設定の-lifecycle)
+- [3. TableRules の設定領域](#3-tablerules-の設定領域)
+- [4. MatchRules の設定領域](#4-matchrules-の設定領域)
+- [5. CompetitionPolicy と RankingPolicy](#5-competitionpolicy-と-rankingpolicy)
+- [6. プリセットの identity](#6-プリセットの-identity)
+- [7. 必須プリセット catalog](#7-必須プリセット-catalog)
+- [9. Semantic validation の例](#9-semantic-validation-の例)
+- [10. 公式資料の監査手順](#10-公式資料の監査手順)
+- [11. 改定の扱い](#11-改定の扱い)
+
 ## 1. 方針
 
 「雀魂ルール」のような名前を engine の条件分岐にしない。公式ルールを構造化した完全設定を検証し、engine はその値だけを見る。プリセットは便利な名前付き入力であると同時に、出典と版を固定した監査対象である。
@@ -191,7 +205,7 @@ alias:      jp.m-league.table@current
 hash:       sha256:<canonical validated content>
 ```
 
-`current` alias は設定解決時だけ許し、run 開始前に不変版 ID と hash へ置き換える。公式文書に版がない場合は、取得日だけで意味版を偽装せず、snapshot date と独自 revision を metadata に分ける。
+`current` alias は設定解決時だけ許し、run 開始前に不変版 ID と hash へ置き換える。公式文書に版がない場合は、取得日だけで意味版を偽装せず、sourceの確認日と独自 revision を metadata に分ける。
 
 ### 6.2 Metadata
 
@@ -262,7 +276,7 @@ preset:
   id: immutable-version-id
   schema: rule-schema-v1
   status: verified
-  sources: [source-snapshot-id]
+  sources: [source-review-id]
 
 table_rules:
   player_set: four_player
@@ -299,7 +313,7 @@ match_rules:
 
 1. [公式ルール出典台帳](../references/rule-sources.md) に一次資料を登録する。
 2. [ADR-0008](../adr/0008-source-review-without-copying.md)に従い原資料を複製せず、URL、title、版、effective date、取得日時、確認者を`SourceReview`へ記録する。
-3. game 内のみの仕様は app version、region、画面遷移、画像 hash を記録する。認証情報や個人情報は保存しない。
+3. game 内のみの仕様は app version、region、画面遷移、確認者・確認日時を記録する。画像の保存・hashは必須にしない。認証情報や個人情報は保存しない。
 4. 条項を設定項目へ一対一または一対多で mapping する。
 5. シミュレーション対象外の物理条項も別表へ mapping し、欠落扱いにしない。
 6. 別の確認者が値と出典を review する。
@@ -312,7 +326,7 @@ match_rules:
 
 公式側の更新を検知しても既存版を編集しない。
 
-1. source snapshot を追加する。
+1. 新しいSourceReviewを追加する。
 2. 旧版との差分 report を作る。
 3. 新しい immutable version を `draft` で作る。
 4. 変更した条項の test list を作る。

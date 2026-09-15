@@ -22,7 +22,7 @@
 | プロジェクトの目的・スコープの把握 | [README](README.md)、[ビジョン](docs/vision.md)、[要求仕様](docs/requirements.md) |
 | 実装・テストの変更 | [開発手順書](docs/development-guide.md)、対象の[test list](docs/test-lists/README.md)、対象領域の設計文書 |
 | 責務・依存方向・状態遷移 | [アーキテクチャ](docs/design/architecture.md)、[ドメインモデル](docs/design/domain-model.md) |
-| ルール・プリセット・牌譜検証 | [ルール設計](docs/design/rules-and-presets.md)、[出典台帳](docs/references/rule-sources.md)、開発手順書の8節 |
+| ルール・プリセット・牌譜検証 | [ルール設計](docs/design/rules-and-presets.md)、[出典台帳](docs/references/rule-sources.md)、[プリセット開発手順](docs/development/adapters-and-presets.md) |
 | 推論要求・応答・スケジューリング | [推論プロトコル](docs/design/inference-protocol.md) |
 | 半荘・大会・段位 | [大会設計](docs/design/competitions.md) |
 | 識別子の追加・変更 | [用語集](docs/glossary.md) |
@@ -81,7 +81,7 @@
 
 ## 7. TDD
 
-実装変更には[開発手順書の3節](docs/development-guide.md#3-t-wada-tdd-の基本サイクル)を必須手順として適用する。
+実装変更には[TDD手順](docs/development/tdd.md#3-t-wada-tdd-の基本サイクル)を必須手順として適用する。
 
 - test listの一項目を `Current` にし、意図したred、最小green、全テストgreenでのrefactor、cycle log更新の順で進める。バグ修正も再現テストのredから始め、テストを実装へ合わせて弱めない。
 - 一つのtestは一観点・原則一assertionとする。不可分な例外はcycle logへ理由を記録してreviewする。fixture/setup確認を例外にしない。
@@ -90,7 +90,7 @@
 
 ## 8. 検証
 
-検証対象ごとの方針は[開発手順書の5節](docs/development-guide.md#5-テスト戦略)、コマンドとCI運用は[12節](docs/development-guide.md#12-コマンド)を規範とする。
+検証対象ごとの方針は[テスト戦略](docs/development/testing.md)、コマンドとCI運用は[検証と完了条件](docs/development/verification.md)を規範とする。
 
 - 実装変更の標準検証は `cargo fmt -- --check`、`cargo clippy -- -D warnings`、`cargo build --verbose`、`cargo test --verbose` とする。
 - 文書変更は用語・要求ID・ADR参照・対象プリセット一覧・相対リンクの整合性と `git diff --check` を確認する。Markdown lintとoffline link checkはdocumentation workflowに従う。

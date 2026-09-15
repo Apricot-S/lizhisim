@@ -1,12 +1,14 @@
 # Test lists
 
-振る舞い単位のtest listをこのdirectoryに置く。Phase 0では実装対象を選択せず、planned listの`Selected`は`None`に保つ。ユーザーが実装開始を明示した後、一項目だけをactiveにする。
+振る舞い単位のtest listをこのdirectoryに置く。現在はPhase 1。依頼対象のlistでCurrentと未完了項目を確認し、一項目ずつ[TDD](../development/tdd.md)を進める。
 
-## Planned
+Cycle logは検証履歴であり、全件を毎回読む必要はない。既存の判断や失敗原因を確認するときに該当cycleを読む。完了・保留・移送の状態は各listを正とし、この一覧には重複して保存しない。
+
+## 対象領域
 
 - [rulesとcoreの依存方向](rules-core-dependency.md) — rules独立化とcoreによる設定の直接利用。
 
-- [雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md) — 最初の基準presetに向けたactive list。
+- [雀魂段位戦・四人 walking skeleton](mahjong-soul-ranked-four-player.md) — 最初の基準presetに向けた項目と後続listへの移送記録。
 - [TileSetと牌構成rule](tile-set-and-rule-tile-config.md) — core実行値とrules設定の直接利用、`Bingpai`/`Bipai`連携。
 - [王牌・嶺上ツモ・宝牌表示](wangpai-replacement-draw-and-baopai.md) — 王牌index、嶺上ツモ権限、表裏ドラ表示、rule依存の開槓順序。
 - [最小Player aggregateとRound初期遷移](round-player-initial-state.md) — 配牌結果のseat別所有と、局開始から最初のツモ後までのtypestate。
