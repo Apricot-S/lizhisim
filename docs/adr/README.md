@@ -2,6 +2,8 @@
 
 重要な設計判断を時系列で残す。Accepted ADR の意味を変える場合、過去本文を書き換えず新しい ADR で `Supersedes` を示す。誤字やリンク修正は可能だが、判断理由と結果を後から美化しない。
 
+現在は[再設計レビュー](../redesign/README.md)中。下記のAcceptedは既存設計の判断記録であり、具体的な型・crate・APIの新設計への継承を要求しない。新案の採否と置換範囲は[ADR-0020案](0020-redesign-review-scope.md)と判断待ち一覧で扱う。
+
 ## Status
 
 - `Proposed`: review 中
@@ -52,6 +54,7 @@ Superseded本文は経緯を調べるために残す。現在の実装判断で�
 | [0017](0017-core-depends-on-rules.md) | Accepted | coreが独立したrulesを直接利用する |
 | [0018](0018-rule-set-validation-names.md) | Accepted | ユーザー設定をRuleSet、検証済み設定をValidatedRuleSetとする |
 | [0019](0019-first-zimo-origin-in-rules.md) | Accepted | 親の開始方式をrulesのFirstZimoOriginで設定する |
+| [0020](0020-redesign-review-scope.md) | Proposed | ゼロからの再設計レビューと既存設計の適用範囲を分ける |
 
 ## Template
 

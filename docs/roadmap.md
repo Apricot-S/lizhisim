@@ -1,6 +1,6 @@
 # ロードマップ
 
-現在の作業は[Phase 1](#phase-1--決定的な一局-walking-skeleton現在)と[未決事項](#現在の-blockingopen-decisions)から確認する。個々の実装状態は[test list](test-lists/README.md)に記録する。Phase 0とGate Aは初回開始時の判断であり、後続Phaseは将来の到達目標である。
+現在の作業は[再設計レビュー](redesign/README.md)であり、Rust実装は開始しない。本書のPhase 1と未決事項は再設計前の計画として保持する。新しい実装順・release範囲は[判断待ちQ-01](redesign/questions.md)の対象である。個々の既存実装状態は[test list](test-lists/README.md)に記録する。Phase 0とGate Aは初回開始時の判断であり、新設計の実装開始許可を意味しない。
 
 ロードマップは期限ではなく、依存関係と品質 gate を示す。各 milestone は小さい vertical slice の test list に分解し、t-wada TDD で進める。
 
