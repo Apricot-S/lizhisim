@@ -1,42 +1,52 @@
-# LizhiSim 再設計レビュー案
+# LizhiSim 再設計レビュー
 
-- 作成日: 2026-09-28
-- 状態: **設計案。Rust実装開始・API確定・設計採用の承認を意味しない。**
-- 調査基準: `e755189`（作業開始時のHEAD）。調査時のworking treeはclean。
-- 対象: AI / reinforcement learning用途の日本式リーチ麻雀simulator。
+- 作成日: 2026-11-17
+- 状態: **人間によるレビュー用の案。技術案の採用・Rust 実装開始を意味しない。**
+- 調査基準: `b0c2a5fa15a592615d42e3c2e7cc91a078515daf`。作業開始時の working tree は clean。
 
-## 読み方
+## 資料の位置付け
+
+今回は既存設計の改修ではなく、AI / reinforcement learning 用の日本式リーチ麻雀 simulator をゼロから設計する。既存実装は調査用に残すが、型・crate 構成・API・実装方針を継承する前提を置かない。
+
+AGENTS.md を含む旧設計書、旧要求一覧、ADR、開発手順、test list、前回の再設計案は作業ツリーから撤去し、必要な資料だけを新しく作成した。過去資料の内容は [Git history の調査](history.md)に基準 commit と path を記し、履歴から参照する。旧 Accepted ADR を新設計の規範として扱わない。
+
+ライセンス・第三者通知、CI、repository metadata、toolchain と既存 Rust ソースは保持する。現在の workspace が旧 crate 構成のままであることは、新設計の採用を意味しない。
+
+## 区分
 
 | 区分 | 意味 |
 |---|---|
-| **confirmed requirement** | 今回の依頼と、今回変更を指示されていない製品・作業方針から確認できる要求。既存APIの採用を意味しない |
-| **candidate design** | 要求を満たすための比較・レビュー対象。採用前の案 |
-| **unresolved question** | 人間の判断または追加の証拠が必要な点。仮の既定値で埋めない |
+| **confirmed requirement** | 今回の依頼から直接確認できる目的・制約。下表の G-ID で参照する |
+| **candidate design** | 目的を満たすための提案・比較対象。採用前であり、実装方針を拘束しない |
+| **unresolved question** | 人間の判断、公式仕様の確認、実測等が必要な点。[Q-ID](questions.md)で追跡する |
 
-再設計は既存の型、crate、API、内部表現を継承する前提を置かない。既存コードは調査資料として保存し、削除・移動・再実装しない。既存Accepted ADRは当時の判断を保持する。新設計への採否は本資料で分け、採用時に後継ADRで適用範囲とsupersede関係を確定する。[ADR-0020案](../adr/0020-redesign-review-scope.md)はこの移行を整理するもので、技術案への承認を先取りしない。
+履歴調査の「確認した事実」は当時のコード・文書についての事実であり、新しい confirmed requirement ではない。旧方針を維持する提案も candidate design として示す。旧資料に「ユーザー決定」とある事項は再確認対象として追跡し、暗黙に消したり、新しい合意へ読み替えたりしない。
 
-## レビュー資料
+## Confirmed requirement
 
-| 資料 | 内容 |
+| ID | 今回確認できる要件 |
 |---|---|
-| [設計案](design.md) | 依頼の10項目。要求、概念モデル、遷移、ルール差、決定性、再生、crate候補 |
-| [既存資産とGit historyの調査](history.md) | 過去の設計、変更理由、実装で判明した制約、保全対象 |
-| [判断待ち一覧](questions.md) | 選択肢、影響、必要な根拠、判断する時期 |
-| [外部指定局面からのsimulation](positions.md) | 追加要件。期待値評価・学習用局面、生成側との境界、入力検証と再生 |
+| G-01 | AI / reinforcement learning 用途を主目的とする日本式リーチ麻雀 simulator |
+| G-02 | deterministic / reproducible simulation を重視する |
+| G-03 | high-throughput execution と parallel execution を重視する |
+| G-04 | asynchronous agent interaction を重視する |
+| G-05 | multiple rulesets を扱い、rule-dependent behavior を game mechanics から明確に分離する |
+| G-06 | replayability と testability を重視する |
+| G-07 | 既存型・crate・API・実装方針の継承を前提にしない。旧資料を削除・再作成し、必要な資料だけを作る |
+| G-08 | 今回は Rust の実装を開始せず、具体的な trait・struct を確定しない。設計上の判断を未承認で確定しない |
+| G-09 | CI、repository metadata、ライセンスなど実装と独立した infrastructure を可能な限り維持する |
+| G-10 | repository と Git history を調査し、指定の10項目を人間がレビューできる資料にする |
 
-最初に設計案の1節で目的を確認し、6節のルール差マトリクスと4節の遷移表を照合する。その後、判断待ち一覧のQ-01〜Q-06を優先してレビューする。文書作成の完了と、全設計判断の解決は別である。
+## レビューの入口
 
-## 既存文書との関係
+| 文書 | 内容 |
+|---|---|
+| [設計案](design.md) | 1. goals / non-goals、2. domain model、3. lifecycle、4. transitions、5. actions、6. rule decisions、7. invariants、8. randomness、9. replay / events、10. crate boundaries |
+| [履歴調査](history.md) | 検討済み設計、変更理由、実装で具体化した制約、維持を提案する要件と再検討事項、保全対象 |
+| [未解決の判断](questions.md) | 選択肢、影響、判断に必要な根拠、レビューの順序 |
 
-[要求仕様](../requirements.md)のIDは追跡用に保持する。今回の主目的に含まれる契約と、既存の長期スコープから再確認が必要なrelease条件を設計案で区別する。旧[設計文書](../design/architecture.md)の具体的なRust表現や依存グラフは新設計の制約にしない。[用語集](../glossary.md)の表記規約は維持し、候補の説明は概念・日本語を中心とする。新しい麻雀識別子は追加していない。
+最初に設計案の1節でスコープを読み、6節の7領域マトリクスと4節の遷移表を照合する。その後、Q-01〜Q-06を優先して検討する。文書の作成完了と、候補設計の採用・未解決事項の解消・実装許可は別である。
 
-公式ルールの新しい値・対応サービス・verified presetは追加しない。差異の例は既存資料から抽出した**表現すべき設計ケース**であり、特定サービスの現在の仕様を認定するものではない。既存の[出典台帳](../references/rule-sources.md)と[RuleClaim mapping](../references/mahjong-soul-walking-skeleton-rule-claims.md)の監査状態を引き上げない。今回、外部公式資料の再監査・元牌譜取得は行っていない。
+用語は説明用であり、コード識別子の決定ではない。本資料では hand termination は「局終了」、round continuation は「連荘・次局への進行」、game termination は「対局終了」を意味する。「手牌」と「局」、「一局」と「一対局」を区別する。
 
-## 今回の完了範囲
-
-- 10項目の設計案と、根拠をたどれる履歴調査を作成する。
-- 決定が必要な点を未解決のまま明示し、レビューの観点を用意する。
-- infrastructure、ライセンス、既存コード、既存test listの実績を保持する。
-- 文書の用語・要求ID・ADR・リンクを確認し、文書検証の実行結果と未実行項目を報告する。
-
-新しいcrate、dependency、Rust型、実行可能prototype、test listのCurrent選択は今回の対象に含まない。
+今回、外部公式ルールの再監査、サービスへの接続、元牌譜の取得、性能測定、Rust test の再実行は行っていない。ルール差の例は設計で表現すべきケースであり、特定サービスの現在の仕様を保証するものではない。公式プリセット・ルール数値・新依存は追加していない。

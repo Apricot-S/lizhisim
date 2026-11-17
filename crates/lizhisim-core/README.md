@@ -1,7 +1,5 @@
 # lizhisim-core
 
-手牌・座席・局進行などの決定的なドメイン型と純粋遷移を提供します。
-`lizhisim-rules`に依存し、検証済みルールと牌構成を直接利用します。
-`TileKind`、`TileSet`、`TileSetError`を所有し、`TileSet::try_from(&ValidatedRuleSet)`で牌構成を解決します。
+再設計前の実装を調査用に保持している crate です。新設計の境界・公開 API の規範ではありません。
 
-`Round`は検証済みルールから親の開始方式を取得します。`FirstZimoOrigin`は`lizhisim_rules`（またはfacadeの`lizhisim::rules`）から参照します。
+現在の作業範囲と設計案は[再設計レビュー資料](../../docs/redesign/README.md)を参照してください。
