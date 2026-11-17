@@ -33,7 +33,7 @@ AGENTS.md を含む旧設計書、旧要求一覧、ADR、開発手順、test li
 | G-05 | multiple rulesets を扱い、rule-dependent behavior を game mechanics から明確に分離する |
 | G-06 | replayability と testability を重視する |
 | G-07 | 既存型・crate・API・実装方針の継承を前提にしない。旧資料を削除・再作成し、必要な資料だけを作る |
-| G-08 | 今回は Rust の実装を開始せず、具体的な trait・struct を確定しない。設計上の判断を未承認で確定しない |
+| G-08 | Rust の実装は開始せず、設計上の判断・具体的な trait・struct を未承認で確定しない。後続の仕様化で合意した事項は[回答の記録](questions.md)に従う |
 | G-09 | CI、repository metadata、ライセンスなど実装と独立した infrastructure を可能な限り維持する |
 | G-10 | repository と Git history を調査し、指定の10項目を人間がレビューできる資料にする |
 

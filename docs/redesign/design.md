@@ -1,12 +1,14 @@
 # 再設計案
 
-区分と G-ID は[レビューの入口](README.md)、Q-ID は[未解決の判断](questions.md)、H-ID は[履歴調査](history.md)を参照する。図・状態・責務・入出力は概念モデルであり、Rust の型、trait、API、schema を確定しない。
+区分と G-ID は[レビューの入口](README.md)、Q-ID は[未解決の判断](questions.md)、H-ID は[履歴調査](history.md)を参照する。図・状態・責務・入出力は概念モデルであり、回答で合意した事項を除き Rust の型、trait、API、schema を確定しない。
 
 ## 1. Project goals and non-goals
 
 ### Confirmed requirement
 
 主目的は AI / reinforcement learning 用途の日本式リーチ麻雀 simulation（G-01）。決定性・再現性（G-02）、スループット・並列性（G-03）、非同期 agent（G-04）、複数 ruleset と mechanics の分離（G-05）、再生・テスト容易性（G-06）を重視する。今回は設計レビュー資料を作り、実装を開始しない（G-07〜G-10）。
+
+仕様化の第1問への回答により、最初の公開 API の利用シナリオは「複数卓の対局実行」とする。複数の対局を進め、非同期に agent の判断を受け取り、それぞれの対局結果を得る。第2問への最終回答により、呼び出し側は Agent trait の実装を渡し、LizhiSim が呼び出す。呼び出し側の手間を減らし、推論・バッチ化・通信は Agent trait が担う。第3問への回答により、LizhiSim が指定した対局群を進め、完了後に結果を返す。同期関数/async、内部実行管理、trait の method signature、人数・ruleset・対局形式は未決（[回答の記録](questions.md)）。
 
 ### Candidate design
 
@@ -94,7 +96,7 @@ flowchart TD
 
 応答待ち中も他卓を進める。対局ごとの局所的なイベント順は必要だが、独立卓すべての強制的な全順序は設けない候補とする。卓間依存が生じる大会集計や対戦相手更新は別の入力境界となる（Q-01、Q-08）。
 
-同一卓の状態更新には一つの論理的な所有者を置き、同じ窓を複数 worker が同時に確定しない案とする。卓間は独立に分配し、要求はモデル版・観測/action の版と shape・推論条件が互換な単位で batch 化する。queue 上限と backpressure は shell が扱い、混雑を理由にルール上の見送り・流局を暗黙に発生させない。公平性、待機時間、記録速度と throughput の関係は Q-10 で測定対象にする。
+同一卓の状態更新には一つの論理的な所有者を置き、同じ窓を複数 worker が同時に確定しない案とする。卓間は独立に分配し、LizhiSim は意思決定要求を Agent へ供給する。推論・バッチ化・通信は合意済みの Agent trait の責務とし、互換な要求の集約、要求の受渡し単位、queue 上限と backpressure の境界は Q-02・Q-07・Q-10 で具体化する。混雑を理由にルール上の見送り・流局を暗黙に発生させない案とする。
 
 対局の進行判断は、局の支払い、供託、本場、親の継続資格、飛び、規定局、目標点、延長、終了選択の順序をルールごとに明記する。「予定局数を消化したら終了」という共通処理にはしない。成立した終了条件同士の優先も ruleset の意味に含める（Q-05、Q-06）。
 
@@ -357,7 +359,8 @@ crate 構成の継承を前提にせず（G-07）、今回は境界候補まで�
 | 実行用ルール意味論 | 検証済みの選択・値、合法性・優先・終了・支払いの判断 | 出典取得、preset registry の I/O |
 | 入力・preset・出典管理 | authoring、版解決、意味・能力検証、証拠との対応 | 局の mutable state、scheduler |
 | 和了・向聴等の評価境界 | 評価器への変換、能力照合、評価結果 | 外部 crate 型の domain への露出 |
-| 実行 orchestration | 多数卓の所有、要求 queue、batch、backpressure、応答照合 | 麻雀の行為優先や局終了の独自判断 |
+| 実行 orchestration | 多数卓の所有、Agent 呼出し、応答照合、実行資源の管理。Agent との backpressure 境界は未決 | 麻雀の行為優先や局終了の独自判断 |
+| Agent 境界 | 合意済みの trait を通じた推論・バッチ化・通信 | 麻雀の合法性・競合解決・状態更新 |
 | 記録・再生 | 版付き入出力、入力供給、比較、checkpoint、migration | 保存形式によるゲーム意味論の変更 |
 | 学習用射影・外部牌譜 app | 観測・action encoding・trajectory、service decode/project、診断 | source 固有型のゲーム意味論への侵入 |
 
