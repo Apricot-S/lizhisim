@@ -161,6 +161,8 @@ flowchart TD
 
 ### Candidate design
 
+第7問（2026-11-19）で、Agent は選んだ行動を返すことが確定した。確率的な選択の抽選も Agent が担い、LizhiSim が行動分布から抽選する契約にはしない。具体的な action 表現や trait の method signature は未決である。
+
 行為は agent が提出する「選択意図」、イベントは規則による解決後に「起きた事実」とする。ロンの意思が受理されたことと、その座席の和了が採用されたことは別である。
 
 | 意思決定の文脈 | 合法手の候補 | 選択に必要な意味 |
@@ -296,7 +298,7 @@ I-08 の保存量は「全員の点数だけ」ではない。立直徴収を含
 
 ### Confirmed requirement
 
-deterministic / reproducible simulation と parallel execution を重視する（G-02、G-03）。seed の値だけで再現性を定義しない候補を以下に示す。
+deterministic / reproducible simulation と parallel execution を重視する（G-02、G-03）。第7問（2026-11-19）により、確率的な Agent が再実行時に同じ行動を選ぶことは LizhiSim の再現性保証外とする。ゲーム進行は、同じ意味版・ルール・初期条件・具体化済み乱数入力・要求ごとの確定行動と管理入力からの再現と区別する。牌譜・replay には実際に採用した行動を残し、Agent に同じ判断を再生成させることを前提にしない。具体的な保証環境と版の範囲は未決である。
 
 ### Candidate design
 
@@ -305,12 +307,12 @@ deterministic / reproducible simulation と parallel execution を重視する�
 | 層 | 固定する入力 | 一致を要求する対象 |
 |---|---|---|
 | ゲーム遷移の再現 | ルール内容・意味版、初期条件、具体的な牌資源、要求ごとの確定応答、管理入力 | 局・対局ごとの意味イベント、結果、状態 hash |
-| 乱数生成の再現 | master seed、導出方式・版、論理実行 ID、局の出現 ID、用途、RNG・shuffle 方式と版 | 牌山や agent sampling 等の具体的な乱数由来入力 |
-| 学習実行全体の再現 | 上記に加えモデル版、推論・数値計算条件、sampling、経験の投入順、更新順 | 方策応答・学習結果。保証範囲は別途決める |
+| LizhiSim の乱数生成の再現 | master seed、導出方式・版、論理実行 ID、局の出現 ID、用途、RNG・shuffle 方式と版 | 牌山等、LizhiSim が生成する乱数由来入力。Agent の行動抽選は含めない |
+| 学習実行全体の再現 | 上記に加えモデル版、推論・数値計算条件、sampling、経験の投入順、更新順 | 方策応答・学習結果。確率的な Agent の選択再現は LizhiSim の保証外であり、学習側の追加条件となる |
 
 同じモデル・seed でも GPU の数値計算や batch 分割で応答が変わり得るため、ゲーム再生は記録した確定応答を用い、モデルを再推論しない。モデル名だけを再現入力としない。
 
-乱数の用途は、座席割当、局ごとの牌資源生成、agent の sampling、外部局面生成等に分ける案とする。大域 RNG を worker の実行順に消費すると、卓数や実行速度が各卓の山を変える。論理 ID から stream を導出する案と、用途別 counter で生成する案を比較する。
+LizhiSim が扱う乱数の用途は、座席割当、局ごとの牌資源生成等に分ける案とする。Agent の sampling は Agent 側の責務とし、外部局面生成の採否は Q-12 で未決である。大域 RNG を worker の実行順に消費すると、卓数や実行速度が各卓の山を変える。論理 ID から stream を導出する案と、用途別 counter で生成する案を比較する。
 
 連荘では同じ場・局位置が繰り返されるため、それだけで stream key を作らない。局の出現を一意に識別する。retry は同じ入力を再利用し、新しい試行や分岐には別の識別子を割り当てる。ID 自体も wall clock や worker 番号から暗黙に決めない。
 
