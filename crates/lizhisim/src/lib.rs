@@ -214,6 +214,31 @@ impl StopHandle {
     }
 }
 
+#[derive(Debug)]
+#[non_exhaustive]
+pub enum RunError {
+    UserStop,
+    NotImplemented,
+}
+
+impl RunError {
+    pub fn is_user_stop(&self) -> bool {
+        matches!(self, Self::UserStop)
+    }
+}
+
+/// Entry point for a normal four-player run. Game progression is pending.
+/// The record and success payloads are temporarily unit types.
+pub fn run_normal_4p(
+    _settings: Settings,
+    _registry: &mut AgentRegistry<'_, FourPlayer>,
+    _agents: Agents4,
+    _sink: &mut dyn RecordSink<()>,
+    _stop: StopHandle,
+) -> Result<(), RunError> {
+    Err(RunError::NotImplemented)
+}
+
 pub mod rules {
     pub use lizhisim_rules::*;
 }
