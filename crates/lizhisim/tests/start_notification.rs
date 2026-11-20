@@ -12,10 +12,18 @@ use std::time::Duration;
 
 use lizhisim::{
     Agent, AgentContext, AgentFuture, AgentRegistry, Agents4, DecisionBatch, DecisionReplies,
-    FourPlayer, MemoryRecordSink, Settings, StopHandle, run_normal_4p,
+    FourPlayer, RecordSink, Settings, StopHandle, run_normal_4p,
 };
 
 const WAIT: Duration = Duration::from_secs(5);
+
+struct DiscardRecordSink;
+
+impl<R> RecordSink<R> for DiscardRecordSink {
+    fn write(&mut self, _record: R) -> AgentFuture<()> {
+        Box::pin(std::future::ready(Ok(())))
+    }
+}
 
 #[derive(Debug)]
 enum Event {
@@ -85,7 +93,7 @@ fn dealer_receives_first_decision_after_start_notification_completes() {
             settings,
             &mut registry,
             Agents4::Independent([learner; 4]),
-            &mut MemoryRecordSink::new(),
+            &mut DiscardRecordSink,
             runner_stop,
         )
     });

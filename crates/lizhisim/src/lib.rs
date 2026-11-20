@@ -7,7 +7,8 @@ pub use lizhisim_core::*;
 use std::error::Error;
 use std::marker::PhantomData;
 use std::pin::Pin;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 mod sealed {
     pub trait Sealed {}
@@ -188,6 +189,31 @@ impl Settings {
     }
 }
 
+/// Receives one game record and reports completion of its processing.
+pub trait RecordSink<R>: Send {
+    fn write(&mut self, record: R) -> AgentFuture<()>;
+}
+
+/// A one-way stop request shared by the caller and the run.
+#[derive(Clone, Default)]
+pub struct StopHandle {
+    requested: Arc<AtomicBool>,
+}
+
+impl StopHandle {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn request(&self) {
+        self.requested.store(true, Ordering::Relaxed);
+    }
+
+    pub fn is_requested(&self) -> bool {
+        self.requested.load(Ordering::Relaxed)
+    }
+}
+
 pub mod rules {
     pub use lizhisim_rules::*;
 }
@@ -195,6 +221,17 @@ pub mod rules {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn stop_request_is_shared_only_with_clones() {
+        let stop = StopHandle::new();
+        let runner = stop.clone();
+        let separate = StopHandle::new();
+        assert!(!runner.is_requested());
+        std::thread::spawn(move || stop.request()).join().unwrap();
+        assert!(runner.is_requested());
+        assert!(!separate.is_requested());
+    }
 
     #[derive(Default)]
     struct Counter(usize);
