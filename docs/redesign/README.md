@@ -41,6 +41,8 @@ AGENTS.md を含む旧設計書、旧要求一覧、ADR、開発手順、test li
 
 | 文書 | 内容 |
 |---|---|
+| [セッション再開用の引継ぎ](handoff.md) | 最新の確定事項・未決事項・撤回案、再開時の読み順と次の作業 |
+| [テストリスト](test-list.md) | 公開 API 起点の管理案と少数の候補。最初のシナリオ・実装順は未採用 |
 | [公開 API の契約・利用シナリオ](api-contract.md) | 第1〜150問の合意の横断整理、正常系・失敗時の契約、公開操作・戻り値の候補、最初の TDD 対象と最小 API 案 |
 | [設計案](design.md) | 1. goals / non-goals、2. domain model、3. lifecycle、4. transitions、5. actions、6. rule decisions、7. invariants、8. randomness、9. replay / events、10. crate boundaries |
 | [履歴調査](history.md) | 検討済み設計、変更理由、実装で具体化した制約、維持を提案する要件と再検討事項、保全対象 |
