@@ -28,6 +28,11 @@ impl<P> AgentContext<P> {
     }
 }
 
+/// State visible to one seat at the time of a notification.
+pub struct Observation<P> {
+    players: PhantomData<fn() -> P>,
+}
+
 /// A choice requested from one observing seat.
 pub struct DecisionRequest<P> {
     pub context: AgentContext<P>,
@@ -72,15 +77,15 @@ pub trait Agent<P>: Send {
         Box::pin(std::future::ready(Ok(())))
     }
 
-    fn start_round(&mut self, _context: AgentContext<P>, _hand: Vec<TileKind>) -> AgentFuture<()> {
+    fn start_round(&mut self, _context: AgentContext<P>, _obs: Observation<P>) -> AgentFuture<()> {
         Box::pin(std::future::ready(Ok(())))
     }
 
-    fn end_round(&mut self, _context: AgentContext<P>) -> AgentFuture<()> {
+    fn end_round(&mut self, _context: AgentContext<P>, _obs: Observation<P>) -> AgentFuture<()> {
         Box::pin(std::future::ready(Ok(())))
     }
 
-    fn end_game(&mut self, _context: AgentContext<P>) -> AgentFuture<()> {
+    fn end_game(&mut self, _context: AgentContext<P>, _obs: Observation<P>) -> AgentFuture<()> {
         Box::pin(std::future::ready(Ok(())))
     }
 
