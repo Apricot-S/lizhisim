@@ -12,8 +12,8 @@ use std::thread;
 use std::time::Duration;
 
 use lizhisim::{
-    Agent, AgentFuture, AgentRegistry, Agents4, DecisionBatch, DecisionReplies, ExecutionLimits,
-    FourPlayer, MemoryRecordSink, NormalSettings, Notification, RulePreset, Seat, StopHandle,
+    Agent, AgentContext, AgentFuture, AgentRegistry, Agents4, DecisionBatch, DecisionReplies,
+    ExecutionLimits, FourPlayer, MemoryRecordSink, NormalSettings, RulePreset, StopHandle,
     run_normal_4p,
 };
 
@@ -33,8 +33,8 @@ struct Probe {
 }
 
 impl Agent<FourPlayer> for Probe {
-    fn notify(&mut self, notice: Notification<FourPlayer>) -> AgentFuture<()> {
-        if !notice.is_game_start() || notice.seat() != Seat::East {
+    fn start_game(&mut self, context: AgentContext<FourPlayer>) -> AgentFuture<()> {
+        if context.seat_index() != 0 {
             return Box::pin(async { Ok(()) });
         }
 
@@ -58,7 +58,7 @@ impl Agent<FourPlayer> for Probe {
     ) -> AgentFuture<DecisionReplies<FourPlayer>> {
         let mut replies = DecisionReplies::new();
         for request in batch {
-            if request.seat() == Seat::East && !self.saw_dealer_decision {
+            if request.context.seat_index() == 0 && !self.saw_dealer_decision {
                 self.saw_dealer_decision = true;
                 self.events.send(Event::Decision).unwrap();
             }
