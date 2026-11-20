@@ -3,7 +3,6 @@
 // This file is part of https://github.com/Apricot-S/lizhisim
 
 use std::future::poll_fn;
-use std::num::NonZeroUsize;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{Sender, channel};
@@ -13,8 +12,7 @@ use std::time::Duration;
 
 use lizhisim::{
     Agent, AgentContext, AgentFuture, AgentRegistry, Agents4, DecisionBatch, DecisionReplies,
-    ExecutionLimits, FourPlayer, MemoryRecordSink, NormalSettings, RulePreset, StopHandle,
-    run_normal_4p,
+    FourPlayer, MemoryRecordSink, Settings, StopHandle, run_normal_4p,
 };
 
 const WAIT: Duration = Duration::from_secs(5);
@@ -82,8 +80,7 @@ fn dealer_receives_first_decision_after_start_notification_completes() {
     let run = thread::spawn(move || {
         let mut registry = AgentRegistry::new();
         let learner = registry.register(&mut agent);
-        let limits = ExecutionLimits::uniform(NonZeroUsize::MIN, Duration::ZERO, WAIT * 4);
-        let settings = NormalSettings::one_game(RulePreset::MajsoulEast, 0, limits);
+        let settings = Settings::new();
         run_normal_4p(
             settings,
             &mut registry,

@@ -178,6 +178,16 @@ pub enum Agents4 {
     TwoVsTwo([AgentHandle<FourPlayer>; 2]),
 }
 
+/// Settings for a normal run.
+#[derive(Default)]
+pub struct Settings {}
+
+impl Settings {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
 pub mod rules {
     pub use lizhisim_rules::*;
 }
