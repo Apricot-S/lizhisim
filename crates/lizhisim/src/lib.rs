@@ -4,6 +4,9 @@
 
 pub use lizhisim_core::*;
 
+/// Type-level marker for a four-player game.
+pub enum FourPlayer {}
+
 pub mod rules {
     pub use lizhisim_rules::*;
 }
